@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Public read for website content (courses, gallery, achievements, faculty, testimonials, faqs)
+    match /courses/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /instruments/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /gallery/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /testimonials/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /faculty/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /achievements/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /faqs/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /affiliations/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /siteSettings/{doc} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Public visitors can submit admissions enquiries
+    match /enquiries/{doc} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+    
+    // Admin users collection
+    match /adminUsers/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
+  }
+}
