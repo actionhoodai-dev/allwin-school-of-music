@@ -49,7 +49,7 @@ export default function AboutPreview() {
                 </div>
 
                 <p className="text-sm text-white/80 leading-relaxed italic mb-6">
-                  &ldquo;Learn Music With The Wright Foundation&rdquo;
+                  &ldquo;Learn Music With The Right Foundation&rdquo;
                 </p>
 
                 {/* Piano keys element */}

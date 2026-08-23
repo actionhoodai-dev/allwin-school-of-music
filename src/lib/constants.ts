@@ -21,7 +21,7 @@ export const NAV_ITEMS: NavItem[] = [
 export const BUSINESS = {
   name: 'Allwin School of Music',
   fullName: 'Allwin School of Music & Musicals',
-  tagline: 'Learn Music With The Wright Foundation',
+  tagline: 'Learn Music With The Right Foundation',
   established: '2007',
   address: 'Chinnathirupathi, Salem - 636008, Tamil Nadu, India',
   phone: '9489203683',
@@ -170,7 +170,7 @@ export const DEFAULT_TESTIMONIALS = [
     rating: 5,
     date: '5 months ago',
     testimonial:
-      'Very good service & excellent response... Learn Music with the Wright Foundation.',
+      'Very good service & excellent response... Learn Music with the Right Foundation.',
   },
   {
     id: 'rev-5',

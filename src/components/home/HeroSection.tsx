@@ -120,7 +120,7 @@ export default function HeroSection() {
                 <div className="w-16 h-0.5 bg-gradient-to-r from-violet to-orange my-3 rounded-full" />
 
                 <p className="text-xs text-white/80 italic mb-4">
-                  &ldquo;Learn Music With The Wright Foundation&rdquo;
+                  &ldquo;Learn Music With The Right Foundation&rdquo;
                 </p>
 
                 {/* Animated Waveform underneath */}

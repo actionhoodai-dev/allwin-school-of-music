@@ -46,7 +46,7 @@ export default function AdminSettingsPage() {
     heroHeading: 'Discover Your Musical Journey',
     heroDescription:
       'Nurturing musicians since 2007 through structured music education, practical training, and internationally recognized grade examinations with Trinity College London and Annamalai University.',
-    footerText: 'Learn Music With The Wright Foundation • Established 2007 in Salem, Tamil Nadu.',
+    footerText: 'Learn Music With The Right Foundation • Established 2007 in Salem, Tamil Nadu.',
   });
 
   useEffect(() => {

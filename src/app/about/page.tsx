@@ -74,7 +74,7 @@ export default function AboutPage() {
                 Founded in 2007 in Chinnathirupathi, Salem, <strong>{BUSINESS.fullName}</strong> was established with the vision of creating an inspiring environment where music learners could develop both technical mastery and a lifelong passion for the performing arts.
               </p>
               <p className="text-sm text-text-secondary leading-relaxed">
-                Under the guiding philosophy of <em>&ldquo;Learn Music With The Wright Foundation&rdquo;</em>, we deliver comprehensive, progressive training across both Western instruments and Indian Classical traditions. Our curriculum ensures that every student builds a rock-solid foundation in music theory, ear training, rhythm, and practical performance.
+                Under the guiding philosophy of <em>&ldquo;Learn Music With The Right Foundation&rdquo;</em>, we deliver comprehensive, progressive training across both Western instruments and Indian Classical traditions. Our curriculum ensures that every student builds a rock-solid foundation in music theory, ear training, rhythm, and practical performance.
               </p>
               <p className="text-sm text-text-secondary leading-relaxed">
                 Whether a learner is preparing for prestigious grade examinations or exploring music as a personal passion, our experienced educators guide each student with care, discipline, and encouragement.
