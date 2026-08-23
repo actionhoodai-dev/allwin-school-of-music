@@ -5,6 +5,7 @@ import { constructMetadata } from "@/lib/seo/metadata";
 import { getLocalBusinessSchema } from "@/lib/seo/structured-data";
 import PublicLayoutWrapper from "@/components/layout/PublicLayoutWrapper";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -32,16 +33,35 @@ export default function RootLayout({
   const jsonLd = getLocalBusinessSchema();
 
   return (
-    <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${playfair.variable} ${inter.variable}`}>
       <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
+        {/* Anti-flash inline script for dark theme */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const theme = localStorage.getItem('allwin_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                if (theme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                  document.documentElement.setAttribute('data-theme', 'dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                  document.documentElement.setAttribute('data-theme', 'light');
+                }
+              } catch (_) {}
+            `,
+          }}
+        />
       </head>
-      <body className="antialiased min-h-screen flex flex-col bg-surface text-text-primary selection:bg-purple-light/20 selection:text-navy">
+      <body className="antialiased min-h-screen flex flex-col bg-surface dark:bg-[#070e1b] text-text-primary dark:text-slate-100 selection:bg-purple-light/20 selection:text-navy transition-colors duration-300">
         <AuthProvider>
-          <PublicLayoutWrapper>{children}</PublicLayoutWrapper>
+          <ThemeProvider>
+            <PublicLayoutWrapper>{children}</PublicLayoutWrapper>
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

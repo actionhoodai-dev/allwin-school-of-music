@@ -147,28 +147,161 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Affiliation Recognition Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-r from-purple-deep to-navy text-white shadow-xl flex flex-col lg:flex-row items-center justify-between gap-8">
-            <div className="space-y-4 max-w-2xl">
-              <span className="text-xs font-bold uppercase tracking-widest text-orange">
-                Academic Affiliations
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-heading font-bold text-white">
-                Internationally Recognized Grade Examination Preparation
-              </h2>
-              <p className="text-sm text-white/80 leading-relaxed">
-                Allwin School of Music is affiliated with <strong>Trinity College London</strong> for Western Music Grade Examinations and associated with <strong>Annamalai University, Chidambaram</strong> for Classical Music.
-              </p>
+      {/* ─── Affiliations Section ─── */}
+      <section id="affiliations" className="py-20 bg-white scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="text-center max-w-2xl mx-auto mb-4 space-y-3">
+            <span className="text-xs font-bold uppercase tracking-widest text-orange">
+              Academic Affiliations
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-navy">
+              Internationally Recognized <span className="gradient-text">Musical Education</span>
+            </h2>
+            <p className="text-sm text-text-secondary">
+              Structured grade examination preparation and university-level academic frameworks in Salem.
+            </p>
+          </div>
+
+          {/* Card 1: Trinity College London */}
+          <div className="p-8 sm:p-12 rounded-3xl bg-surface-dim border border-border shadow-xl space-y-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border">
+              <div className="flex items-center gap-4">
+                <div className="p-4 rounded-2xl bg-purple-deep text-white shadow-md">
+                  <Award className="w-8 h-8 text-orange" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-widest text-violet">
+                    Western Music Examination Body
+                  </span>
+                  <h3 className="font-heading font-bold text-2xl sm:text-3xl text-navy">
+                    Trinity College London
+                  </h3>
+                </div>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet/10 text-violet font-semibold text-xs uppercase tracking-wider">
+                <Shield className="w-4 h-4" />
+                Affiliated for Western Music Grade Examinations
+              </div>
             </div>
-            <div className="shrink-0 flex flex-col sm:flex-row gap-3">
-              <Button href="/affiliations" variant="secondary" size="md">
-                View Affiliations
-              </Button>
-              <Button href="/contact" size="md">
-                Enquire for Classes
-              </Button>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <div className="lg:col-span-7 space-y-4">
+                <h4 className="font-heading font-semibold text-xl text-navy">
+                  Structured International Grade Pathway (Initial to Grade 8)
+                </h4>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  Allwin School of Music prepares students for the globally recognized music grade examinations administered by <strong>Trinity College London</strong>. Trinity&rsquo;s progressive syllabus evaluates candidates across technical exercises, performance pieces, sight reading, aural tests, and musical knowledge.
+                </p>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  Our structured coaching ensures that students do not just memorize examination pieces, but master foundational technique, expressive nuances, rhythmic stability, and music reading ability required to excel at every grade tier.
+                </p>
+              </div>
+
+              <div className="lg:col-span-5 p-6 rounded-2xl bg-white border border-slate-200/80 space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-navy">
+                  Disciplines Covered under Trinity Prep:
+                </h4>
+                <ul className="space-y-2 text-xs sm:text-sm text-text-secondary">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-violet shrink-0" />
+                    <span>Electronic Keyboard &amp; Piano Grade Exams</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-violet shrink-0" />
+                    <span>Acoustic &amp; Classical Guitar Grade Exams</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-violet shrink-0" />
+                    <span>Violin Grade Examinations</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-violet shrink-0" />
+                    <span>Theory of Music Written Examinations (Grades 1–8)</span>
+                  </li>
+                </ul>
+
+                <div className="pt-3">
+                  <Button
+                    href="/contact?course=Trinity%20College%20London%20Grade%20Exams"
+                    fullWidth
+                    size="sm"
+                  >
+                    Enquire About Grade Examinations
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Annamalai University */}
+          <div className="p-8 sm:p-12 rounded-3xl bg-surface-dim border border-border shadow-xl space-y-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border">
+              <div className="flex items-center gap-4">
+                <div className="p-4 rounded-2xl bg-navy text-white shadow-md">
+                  <Sparkles className="w-8 h-8 text-magenta" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-widest text-magenta">
+                    Classical Music &amp; Dance Affiliation
+                  </span>
+                  <h3 className="font-heading font-bold text-2xl sm:text-3xl text-navy">
+                    Annamalai University, Chidambaram
+                  </h3>
+                </div>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-magenta/10 text-magenta font-semibold text-xs uppercase tracking-wider">
+                <Shield className="w-4 h-4" />
+                Affiliated for Classical Music Programs
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              <div className="lg:col-span-7 space-y-4">
+                <h4 className="font-heading font-semibold text-xl text-navy">
+                  Academic Framework for Traditional Performing Arts
+                </h4>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  Through our association with <strong>Annamalai University, Chidambaram</strong>, Allwin School of Music provides structured academic frameworks for students pursuing Classical Music and traditional Indian performing arts including Bharatham / Bharatanatyam.
+                </p>
+                <p className="text-sm text-text-secondary leading-relaxed">
+                  Students follow a systematic university-recognized curriculum that encompasses authentic Ragas, Talas, traditional compositions, theoretical treatises, and performance assessments.
+                </p>
+              </div>
+
+              <div className="lg:col-span-5 p-6 rounded-2xl bg-white border border-slate-200/80 space-y-4">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-navy">
+                  Classical Disciplines:
+                </h4>
+                <ul className="space-y-2 text-xs sm:text-sm text-text-secondary">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-magenta shrink-0" />
+                    <span>Classical Vocal Music</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-magenta shrink-0" />
+                    <span>Bharatham / Bharatanatyam Classical Dance</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-magenta shrink-0" />
+                    <span>Classical Instrumental Studies</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-magenta shrink-0" />
+                    <span>Traditional Raga &amp; Tala Theoretical Systems</span>
+                  </li>
+                </ul>
+
+                <div className="pt-3">
+                  <Button
+                    href="/contact?course=Annamalai%20University%20Classical%20Music"
+                    variant="secondary"
+                    fullWidth
+                    size="sm"
+                  >
+                    Enquire About Classical Programs
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -11,6 +11,7 @@ import { usePathname } from 'next/navigation';
 import { Menu, Phone } from 'lucide-react';
 import { NAV_ITEMS } from '@/lib/constants';
 import Button from '@/components/ui/Button';
+import ThemeToggle from '@/components/ui/ThemeToggle';
 import MobileNav from './MobileNav';
 
 export default function Header() {
@@ -88,6 +89,7 @@ export default function Header() {
 
             {/* Desktop CTAs */}
             <div className="hidden lg:flex items-center gap-3">
+              <ThemeToggle />
               <a
                 href="tel:+919489203683"
                 className="flex items-center gap-1.5 text-sm text-white/75 hover:text-white transition-colors"
@@ -101,7 +103,8 @@ export default function Header() {
             </div>
 
             {/* Mobile Controls */}
-            <div className="flex lg:hidden items-center gap-3">
+            <div className="flex lg:hidden items-center gap-2">
+              <ThemeToggle />
               <Button href="/contact" size="sm">
                 Enquire
               </Button>
