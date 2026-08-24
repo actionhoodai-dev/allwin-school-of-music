@@ -2,9 +2,10 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { constructMetadata } from '@/lib/seo/metadata';
-import { Layers, Music2, Disc, Sparkles, Mic2, BookOpen, Check, ArrowRight } from 'lucide-react';
+import { Layers, Music2, Disc, Sparkles, Mic2, BookOpen, Check, ArrowRight, Volume2 } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
+import InstrumentAudioButton from '@/components/musical/InstrumentAudioButton';
 import { BUSINESS } from '@/lib/constants';
 
 export const metadata: Metadata = constructMetadata({
@@ -114,7 +115,8 @@ export default function InstrumentsPage() {
       <section className="relative py-20 lg:py-28 gradient-hero text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-orange text-xs sm:text-sm font-semibold uppercase tracking-wider border border-white/15">
-            Instruments & Disciplines
+            <Volume2 className="w-4 h-4 text-orange" />
+            Interactive Instrument Audio Previews
           </div>
           
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-white tracking-tight">
@@ -122,7 +124,7 @@ export default function InstrumentsPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto font-sans">
-            Choose from six primary disciplines taught by disciplined educators following structured international syllabi.
+            Choose from six primary disciplines taught by disciplined educators following structured international syllabi. Tap any card to hear its sound!
           </p>
         </div>
       </section>
@@ -149,8 +151,17 @@ export default function InstrumentsPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-black/20" />
                   
-                  <div className="absolute top-4 left-4 p-2 rounded-xl bg-white/90 backdrop-blur-md shadow-md z-10">
-                    {inst.icon}
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+                    <div className="p-2 rounded-xl bg-white/90 backdrop-blur-md shadow-md">
+                      {inst.icon}
+                    </div>
+
+                    {/* Audio Listen Badge */}
+                    <InstrumentAudioButton
+                      slug={inst.slug}
+                      name={inst.name.split(' ')[0]}
+                      variant="badge"
+                    />
                   </div>
 
                   <div className="absolute bottom-4 left-4 right-4 z-10">
@@ -169,6 +180,15 @@ export default function InstrumentsPage() {
                       {inst.description}
                     </p>
 
+                    {/* Interactive Audio Button */}
+                    <div className="pt-1">
+                      <InstrumentAudioButton
+                        slug={inst.slug}
+                        name={inst.name}
+                        className="w-full"
+                      />
+                    </div>
+
                     <ul className="space-y-2 pt-2 border-t border-slate-100">
                       {inst.points.map((p, i) => (
                         <li key={i} className="flex items-center gap-2 text-xs text-text-secondary">
@@ -185,13 +205,19 @@ export default function InstrumentsPage() {
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-slate-100">
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <Link
+                      href={`/courses#${inst.slug}`}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-violet hover:text-purple transition-colors"
+                    >
+                      <span>Syllabus</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
                     <Button
                       href={`/contact?course=${encodeURIComponent(inst.name)}`}
                       size="sm"
-                      fullWidth
                     >
-                      Enquire for {inst.name.split(' ')[0]}
+                      Enquire Now
                     </Button>
                   </div>
                 </div>

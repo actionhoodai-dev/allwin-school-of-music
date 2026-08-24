@@ -3,15 +3,17 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Layers, Music2, Disc, Mic2, Sparkles, BookOpen, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Layers, Music2, Disc, Mic2, Sparkles, BookOpen, CheckCircle2, ArrowRight, Volume2 } from 'lucide-react';
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
+import InstrumentAudioButton from '@/components/musical/InstrumentAudioButton';
 import { getPublishedDocuments } from '@/lib/firebase/firestore';
-import { BUSINESS } from '@/lib/constants';
+import { useSiteSettings } from '@/context/SettingsContext';
 import type { Course } from '@/types';
 
 export default function CoursesPage() {
+  const { settings } = useSiteSettings();
   const [dbCourses, setDbCourses] = useState<Course[]>([]);
 
   useEffect(() => {
@@ -179,11 +181,17 @@ export default function CoursesPage() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-navy/40" />
                   
-                  {/* Badge on image */}
-                  <div className="absolute top-4 left-4 z-10">
+                  {/* Badge & Audio on image */}
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
                     <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-navy/85 text-white backdrop-blur-md border border-white/20">
                       {course.badge}
                     </span>
+
+                    <InstrumentAudioButton
+                      slug={course.slug}
+                      name={course.title.split(' ')[0]}
+                      variant="badge"
+                    />
                   </div>
 
                   <div className="absolute bottom-4 left-4 right-4 z-10 lg:hidden">
@@ -218,6 +226,15 @@ export default function CoursesPage() {
                     <p className="text-sm text-text-secondary leading-relaxed">
                       {course.overview}
                     </p>
+
+                    {/* Audio Preview Widget */}
+                    <div className="pt-1">
+                      <InstrumentAudioButton
+                        slug={course.slug}
+                        name={course.title}
+                        className="w-full"
+                      />
+                    </div>
 
                     <div className="p-4 rounded-2xl bg-surface-dim border border-slate-200/80 space-y-1">
                       <p className="text-xs font-bold uppercase tracking-wider text-navy">
@@ -267,8 +284,8 @@ export default function CoursesPage() {
                       Enquire Course
                     </Button>
                     <Button
-                      href={BUSINESS.whatsappLink(
-                        `Hello Allwin School of Music, I am interested in ${course.title}.`
+                      href={settings.whatsappLink(
+                        `Hello ${settings.businessName}, I am interested in ${course.title}.`
                       )}
                       external
                       variant="whatsapp"

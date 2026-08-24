@@ -1,8 +1,11 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Music2, Disc, Mic2, Sparkles, BookOpen, Layers } from 'lucide-react';
+import { ArrowRight, Music2, Disc, Mic2, Sparkles, BookOpen, Layers, Volume2 } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
+import InstrumentAudioButton from '@/components/musical/InstrumentAudioButton';
 
 export default function InstrumentsSection() {
   const instruments = [
@@ -67,14 +70,15 @@ export default function InstrumentsSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-deep/5 text-violet text-xs font-semibold uppercase tracking-wider">
-            Explore Disciplines
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-deep/5 text-violet text-xs font-semibold uppercase tracking-wider border border-purple-light/20 shadow-sm">
+            <Volume2 className="w-4 h-4 text-orange animate-pulse" />
+            <span>Interactive Audio Showcase</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold text-navy tracking-tight">
-            Explore Your <span className="gradient-text">Instrument</span>
+            Hear &amp; Explore Your <span className="gradient-text">Instrument</span>
           </h2>
           <p className="text-base text-text-secondary">
-            Structured musical training tailored to beginners, intermediate learners, and grade examination aspirants in Salem.
+            Tap the <span className="font-semibold text-orange">Listen Sound</span> button on any instrument to preview its acoustic tone, crafted for students and parents in Salem.
           </p>
         </div>
 
@@ -98,14 +102,18 @@ export default function InstrumentsSection() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-black/20" />
                 
-                {/* Discipline Badge & Icon floating on image */}
+                {/* Discipline Badge & Listen Button floating on image */}
                 <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-                  <div className="p-2 rounded-xl bg-white/90 backdrop-blur-md shadow-md">
-                    {inst.icon}
-                  </div>
                   <span className="text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-navy/80 text-white backdrop-blur-md border border-white/20">
                     {inst.badge}
                   </span>
+                  
+                  {/* Floating Audio Preview Trigger */}
+                  <InstrumentAudioButton
+                    slug={inst.slug}
+                    name={inst.name.split(' ')[0]}
+                    variant="badge"
+                  />
                 </div>
 
                 <div className="absolute bottom-4 left-4 right-4 z-10">
@@ -120,6 +128,15 @@ export default function InstrumentsSection() {
                 <p className="text-sm text-text-secondary leading-relaxed">
                   {inst.description}
                 </p>
+
+                {/* Interactive Audio Button Row */}
+                <div className="pt-2">
+                  <InstrumentAudioButton
+                    slug={inst.slug}
+                    name={inst.name}
+                    className="w-full"
+                  />
+                </div>
 
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                   <Link
