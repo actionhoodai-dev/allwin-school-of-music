@@ -16,6 +16,7 @@ export default function InstrumentsSection() {
       icon: <Layers className="w-5 h-5 text-violet" />,
       description: 'Learn keyboard fundamentals, technique, notation, rhythm, finger independence, and practical playing for performance and grade examinations.',
       badge: 'Trinity Grade Prep',
+      featuredPiece: "Beethoven's Für Elise",
       isDance: false,
     },
     {
@@ -25,6 +26,7 @@ export default function InstrumentsSection() {
       icon: <Music2 className="w-5 h-5 text-orange" />,
       description: 'Develop guitar fundamentals, chords, strumming patterns, fingerstyle technique, scale theory, and dynamic musical expression.',
       badge: 'Acoustic & Classical',
+      featuredPiece: 'Romance de Amor (Spanish Romance)',
       isDance: false,
     },
     {
@@ -34,6 +36,7 @@ export default function InstrumentsSection() {
       icon: <Disc className="w-5 h-5 text-magenta" />,
       description: 'Build foundational violin technique, posture, bowing precision, intonation, notation reading, and classical performance skills.',
       badge: 'Western & Carnatic',
+      featuredPiece: "Vivaldi's Spring (Four Seasons)",
       isDance: false,
     },
     {
@@ -43,6 +46,7 @@ export default function InstrumentsSection() {
       icon: <Sparkles className="w-5 h-5 text-amber-500" />,
       description: 'Structured training in Bharatham / Bharatanatyam fundamentals, Adavus, rhythm (Talam), expressive abhinaya, and traditional performance.',
       badge: 'Classical Dance',
+      featuredPiece: 'Annamalai Affiliated Dance Video',
       isDance: true,
     },
     {
@@ -52,6 +56,7 @@ export default function InstrumentsSection() {
       icon: <Mic2 className="w-5 h-5 text-purple-light" />,
       description: 'Develop vocal fundamentals, pitch accuracy, breathing technique, voice control, range development, rhythm, and expressive singing.',
       badge: 'Western & Classical',
+      featuredPiece: 'Vatapi Ganapatim (Hamsadhwani)',
       isDance: false,
     },
     {
@@ -61,6 +66,7 @@ export default function InstrumentsSection() {
       icon: <BookOpen className="w-5 h-5 text-blue-600" />,
       description: 'Understand music notation, rhythm, key signatures, scales, intervals, chords, terminology, and structured examination foundations.',
       badge: 'Exam Preparation',
+      featuredPiece: "Beethoven's Ode to Joy",
       isDance: false,
     },
   ];
@@ -128,10 +134,27 @@ export default function InstrumentsSection() {
               </InstrumentAudioOverlay>
 
               {/* Card Body */}
-              <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-6">
+              <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-4">
                 <p className="text-sm text-text-secondary leading-relaxed">
                   {inst.description}
                 </p>
+
+                {/* Featured Masterpiece Pill */}
+                <div className="pt-2">
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-deep/5 border border-purple-light/20 text-xs font-semibold text-navy">
+                    {inst.isDance ? (
+                      <>
+                        <Video className="w-3.5 h-3.5 text-amber-600" />
+                        <span className="text-[11px] text-text-secondary">Demo: <strong className="text-navy font-bold">{inst.featuredPiece}</strong></span>
+                      </>
+                    ) : (
+                      <>
+                        <Volume2 className="w-3.5 h-3.5 text-orange" />
+                        <span className="text-[11px] text-text-secondary">Sample: <strong className="text-navy font-bold">{inst.featuredPiece}</strong></span>
+                      </>
+                    )}
+                  </div>
+                </div>
 
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                   <Link

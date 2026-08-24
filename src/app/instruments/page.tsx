@@ -31,6 +31,7 @@ export default function InstrumentsPage() {
         'Trinity College London grade pieces',
       ],
       exam: 'Trinity College London Initial – Grade 8',
+      featuredPiece: "Beethoven's Für Elise",
       isDance: false,
     },
     {
@@ -47,6 +48,7 @@ export default function InstrumentsPage() {
         'Grade examination preparation',
       ],
       exam: 'Trinity College London Acoustic & Classical',
+      featuredPiece: 'Romance de Amor (Spanish Romance)',
       isDance: false,
     },
     {
@@ -63,6 +65,7 @@ export default function InstrumentsPage() {
         'Western & Carnatic repertoire studies',
       ],
       exam: 'Western Grade Exams & Classical certifications',
+      featuredPiece: "Vivaldi's Spring (Four Seasons)",
       isDance: false,
     },
     {
@@ -79,6 +82,7 @@ export default function InstrumentsPage() {
         'Abhinaya and Margam repertoire',
       ],
       exam: 'Associated with Annamalai University syllabus',
+      featuredPiece: 'Annamalai Affiliated Dance Video',
       isDance: true,
     },
     {
@@ -95,6 +99,7 @@ export default function InstrumentsPage() {
         'Western & Classical song repertoire',
       ],
       exam: 'Graded performance & university certifications',
+      featuredPiece: 'Vatapi Ganapatim (Hamsadhwani)',
       isDance: false,
     },
     {
@@ -111,6 +116,7 @@ export default function InstrumentsPage() {
         'Trinity Theory of Music grades 1–8',
       ],
       exam: 'Trinity College London Theory of Music exams',
+      featuredPiece: "Beethoven's Ode to Joy",
       isDance: false,
     },
   ];
@@ -203,6 +209,22 @@ export default function InstrumentsPage() {
                       <span className="inline-block text-[11px] font-semibold text-navy bg-purple-deep/5 px-2.5 py-1 rounded-lg border border-purple-light/20">
                         🎓 {inst.exam}
                       </span>
+                    </div>
+
+                    <div className="pt-1">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-navy w-full">
+                        {inst.isDance ? (
+                          <>
+                            <Video className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                            <span className="text-[11px] text-text-secondary truncate">Demo: <strong className="text-navy font-bold">{inst.featuredPiece}</strong></span>
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-3.5 h-3.5 text-orange shrink-0" />
+                            <span className="text-[11px] text-text-secondary truncate">Sample: <strong className="text-navy font-bold">{inst.featuredPiece}</strong></span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
 
