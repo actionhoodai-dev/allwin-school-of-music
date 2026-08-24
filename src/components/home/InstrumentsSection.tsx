@@ -116,11 +116,11 @@ export default function InstrumentsSection() {
                     </span>
 
                     {/* Small indicator pill */}
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-bold text-navy shadow-md">
+                    <span className="tap-to-play-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-md text-[10px] font-extrabold text-slate-900 shadow-md">
                       {inst.isDance ? (
-                        <><Video className="w-3 h-3 text-amber-600" /> Watch</>
+                        <><Video className="w-3 h-3 text-amber-600 shrink-0" /><span className="text-slate-900 font-bold">Watch</span></>
                       ) : (
-                        <><Volume2 className="w-3 h-3 text-orange" /> Tap to Play</>
+                        <><Volume2 className="w-3 h-3 text-orange shrink-0" /><span className="text-slate-900 font-bold">Tap to Play</span></>
                       )}
                     </span>
                   </div>

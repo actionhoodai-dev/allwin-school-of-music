@@ -91,12 +91,12 @@ export default function AdminDashboardPage() {
       href: '/admin/courses',
     },
     {
-      title: 'Faculty Members',
-      value: metrics.faculty,
-      subtext: 'Music educators & bios',
-      icon: Users,
+      title: 'Frequently Asked Questions',
+      value: metrics.faqs,
+      subtext: 'Q&A for students & parents',
+      icon: HelpCircle,
       color: 'from-emerald-500 to-teal-600',
-      href: '/admin/faculty',
+      href: '/admin/faqs',
     },
     {
       title: 'Achievements',

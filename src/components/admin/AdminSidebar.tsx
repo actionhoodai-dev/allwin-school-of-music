@@ -22,7 +22,6 @@ const NAV_ITEMS = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { label: 'Enquiries', href: '/admin/enquiries', icon: MessageSquare },
   { label: 'Courses', href: '/admin/courses', icon: GraduationCap },
-  { label: 'Faculty', href: '/admin/faculty', icon: Users },
   { label: 'Gallery', href: '/admin/gallery', icon: ImageIcon },
   { label: 'Achievements', href: '/admin/achievements', icon: Trophy },
   { label: 'Testimonials', href: '/admin/testimonials', icon: Star },
