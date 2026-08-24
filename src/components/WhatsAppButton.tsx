@@ -1,11 +1,7 @@
-// ============================================
-// Official Floating WhatsApp Button Widget
-// ============================================
-
 'use client';
 
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
-import { BUSINESS } from '@/lib/constants';
+import { useSiteSettings } from '@/context/SettingsContext';
 
 interface WhatsAppButtonProps {
   message?: string;
@@ -13,16 +9,18 @@ interface WhatsAppButtonProps {
 }
 
 export default function WhatsAppButton({ message, courseName }: WhatsAppButtonProps) {
+  const { settings } = useSiteSettings();
+
   const finalMessage = message
     ? message
     : courseName
-    ? `Hello Allwin School of Music, I am interested in ${courseName} classes.`
-    : BUSINESS.defaultWhatsappMessage;
+    ? `Hello ${settings.businessName}, I am interested in ${courseName} classes.`
+    : `Hello ${settings.businessName}, I would like to enquire about music classes.`;
 
   return (
     <div className="fixed bottom-6 right-6 z-50">
       <a
-        href={BUSINESS.whatsappLink(finalMessage)}
+        href={settings.whatsappLink(finalMessage)}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat with Allwin School of Music on WhatsApp"

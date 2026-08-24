@@ -12,12 +12,15 @@ import { Menu, Phone } from 'lucide-react';
 import { NAV_ITEMS } from '@/lib/constants';
 import Button from '@/components/ui/Button';
 import ThemeToggle from '@/components/ui/ThemeToggle';
+import { useSiteSettings } from '@/context/SettingsContext';
 import MobileNav from './MobileNav';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const pathname = usePathname();
+
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,10 +62,10 @@ export default function Header() {
               />
               <div className="hidden sm:block">
                 <span className="block text-white font-heading font-bold text-lg leading-tight">
-                  Allwin
+                  {settings.businessName.split(' ')[0] || 'Allwin'}
                 </span>
                 <span className="block text-white/60 text-xs leading-tight">
-                  School of Music
+                  {settings.businessName.split(' ').slice(1).join(' ') || 'School of Music'}
                 </span>
               </div>
             </Link>
@@ -91,7 +94,7 @@ export default function Header() {
             <div className="hidden lg:flex items-center gap-3">
               <ThemeToggle />
               <a
-                href="tel:+919489203683"
+                href={settings.phoneLink}
                 className="flex items-center gap-1.5 text-sm text-white/75 hover:text-white transition-colors"
               >
                 <Phone className="w-4 h-4" />

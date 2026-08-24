@@ -11,8 +11,9 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Phone, Send } from 'lucide-react';
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
-import { NAV_ITEMS, BUSINESS } from '@/lib/constants';
+import { NAV_ITEMS } from '@/lib/constants';
 import Button from '@/components/ui/Button';
+import { useSiteSettings } from '@/context/SettingsContext';
 
 interface MobileNavProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ interface MobileNavProps {
 
 export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
   const pathname = usePathname();
+  const { settings } = useSiteSettings();
 
   useEffect(() => {
     if (isOpen) {
@@ -108,7 +110,7 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
               </Button>
               <div className="grid grid-cols-2 gap-2">
                 <Button
-                  href={BUSINESS.phoneLink}
+                  href={settings.phoneLink}
                   external
                   variant="secondary"
                   size="sm"
@@ -117,7 +119,7 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
                   Call Now
                 </Button>
                 <Button
-                  href={BUSINESS.whatsappLink(BUSINESS.defaultWhatsappMessage)}
+                  href={settings.whatsappLink()}
                   external
                   variant="whatsapp"
                   size="sm"
@@ -127,7 +129,7 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
                 </Button>
               </div>
               <div className="text-center pt-2">
-                <p className="text-xs text-white/50">{BUSINESS.established} • Salem, TN</p>
+                <p className="text-xs text-white/50">{settings.established} • Salem, TN</p>
               </div>
             </div>
           </motion.div>

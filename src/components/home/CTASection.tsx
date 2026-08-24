@@ -1,10 +1,14 @@
+'use client';
+
 import { Send, Phone, Music } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import MusicalNotes from '@/components/musical/MusicalNotes';
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
-import { BUSINESS } from '@/lib/constants';
+import { useSiteSettings } from '@/context/SettingsContext';
 
 export default function CTASection() {
+  const { settings } = useSiteSettings();
+
   return (
     <section className="py-20 lg:py-28 relative overflow-hidden bg-navy text-white">
       {/* Background elements */}
@@ -27,7 +31,7 @@ export default function CTASection() {
         </h2>
 
         <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto font-sans leading-relaxed">
-          Whether you aspire to learn Keyboard, Guitar, Violin, Vocal, Bharatham, or prepare for Trinity College London Grade Examinations, Allwin School of Music welcomes you.
+          Whether you aspire to learn Keyboard, Guitar, Violin, Vocal, Bharatham, or prepare for Trinity College London Grade Examinations, {settings.businessName} welcomes you.
         </p>
 
         {/* Action Buttons */}
@@ -42,7 +46,7 @@ export default function CTASection() {
           </Button>
 
           <Button
-            href={BUSINESS.whatsappLink(BUSINESS.defaultWhatsappMessage)}
+            href={settings.whatsappLink()}
             external
             variant="whatsapp"
             size="lg"
@@ -53,19 +57,19 @@ export default function CTASection() {
           </Button>
 
           <Button
-            href={BUSINESS.phoneLink}
+            href={settings.phoneLink}
             external
             variant="secondary"
             size="lg"
             className="w-full sm:w-auto bg-white/10 text-white border-white/20 hover:bg-white/20"
             icon={<Phone className="w-4 h-4 text-violet" />}
           >
-            Call {BUSINESS.phoneFormatted}
+            Call {settings.phoneFormatted}
           </Button>
         </div>
 
         <p className="text-xs text-white/50 italic pt-2">
-          {BUSINESS.tagline} • Since {BUSINESS.established}
+          &ldquo;{settings.tagline}&rdquo; • Since {settings.established}
         </p>
 
       </div>

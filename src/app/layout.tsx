@@ -6,6 +6,7 @@ import { getLocalBusinessSchema } from "@/lib/seo/structured-data";
 import PublicLayoutWrapper from "@/components/layout/PublicLayoutWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { SettingsProvider } from "@/context/SettingsContext";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -60,7 +61,9 @@ export default function RootLayout({
       <body className="antialiased min-h-screen flex flex-col bg-surface dark:bg-[#070e1b] text-text-primary dark:text-slate-100 selection:bg-purple-light/20 selection:text-navy transition-colors duration-300">
         <AuthProvider>
           <ThemeProvider>
-            <PublicLayoutWrapper>{children}</PublicLayoutWrapper>
+            <SettingsProvider>
+              <PublicLayoutWrapper>{children}</PublicLayoutWrapper>
+            </SettingsProvider>
           </ThemeProvider>
         </AuthProvider>
       </body>

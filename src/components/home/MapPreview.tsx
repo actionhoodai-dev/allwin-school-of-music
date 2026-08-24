@@ -1,11 +1,11 @@
+'use client';
+
 import { MapPin, Phone, Mail, Navigation } from 'lucide-react';
 import Button from '@/components/ui/Button';
-import { BUSINESS } from '@/lib/constants';
+import { useSiteSettings } from '@/context/SettingsContext';
 
 export default function MapPreview() {
-  const mapUrl =
-    process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL ||
-    BUSINESS.googleMapsEmbedUrl;
+  const { settings } = useSiteSettings();
 
   return (
     <section className="py-20 bg-white">
@@ -26,7 +26,7 @@ export default function MapPreview() {
           {/* Map Embed */}
           <div className="lg:col-span-8 rounded-3xl overflow-hidden shadow-xl border border-border h-80 sm:h-96 relative">
             <iframe
-              src={mapUrl}
+              src={settings.googleMapsEmbedUrl}
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -47,20 +47,20 @@ export default function MapPreview() {
               </h3>
 
               <p className="text-sm text-white/80 leading-relaxed">
-                {BUSINESS.address}
+                {settings.address}
               </p>
 
               <div className="space-y-3 pt-2 text-sm text-white/70">
                 <div className="flex items-center gap-2.5">
                   <Phone className="w-4 h-4 text-violet" />
-                  <a href={BUSINESS.phoneLink} className="hover:text-white font-medium text-white">
-                    {BUSINESS.phoneFormatted}
+                  <a href={settings.phoneLink} className="hover:text-white font-medium text-white">
+                    {settings.phoneFormatted}
                   </a>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Mail className="w-4 h-4 text-violet" />
-                  <a href={BUSINESS.emailLink} className="hover:text-white break-all">
-                    {BUSINESS.email}
+                  <a href={settings.emailLink} className="hover:text-white break-all">
+                    {settings.email}
                   </a>
                 </div>
               </div>
@@ -68,7 +68,7 @@ export default function MapPreview() {
 
             <div className="pt-6 mt-6 border-t border-white/10">
               <Button
-                href={BUSINESS.googleMapsDirectionsUrl}
+                href={settings.googleMapsDirectionsUrl}
                 external
                 fullWidth
                 size="md"

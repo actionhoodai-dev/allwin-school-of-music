@@ -11,11 +11,13 @@ import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Textarea from '@/components/ui/Textarea';
 import { submitEnquiry } from '@/lib/firebase/firestore';
-import { BUSINESS, INSTRUMENT_OPTIONS, CONTACT_METHODS } from '@/lib/constants';
+import { INSTRUMENT_OPTIONS, CONTACT_METHODS } from '@/lib/constants';
+import { useSiteSettings } from '@/context/SettingsContext';
 
 function ContactForm() {
   const searchParams = useSearchParams();
   const prefilledCourse = searchParams.get('course') || '';
+  const { settings } = useSiteSettings();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -71,16 +73,12 @@ function ContactForm() {
       // Even if Firestore network is unavailable, show a friendly fallback with direct WhatsApp/Call
       setErrorMessage(
         'Unable to submit form right now. Please call or WhatsApp us directly at ' +
-          BUSINESS.phoneFormatted
+          settings.phoneFormatted
       );
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const mapUrl =
-    process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL ||
-    BUSINESS.googleMapsEmbedUrl;
 
   return (
     <div className="bg-surface">
@@ -88,7 +86,7 @@ function ContactForm() {
       <section className="relative py-20 lg:py-28 gradient-hero text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-orange text-xs sm:text-sm font-semibold uppercase tracking-wider border border-white/15">
-            Admissions & Inquiries
+            Admissions &amp; Inquiries
           </div>
           
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-white tracking-tight">
@@ -96,7 +94,7 @@ function ContactForm() {
           </h1>
 
           <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto font-sans">
-            Get in touch with Allwin School of Music for course admissions, grade examination preparation, or class schedules in Salem.
+            Get in touch with {settings.businessName} for course admissions, grade examination preparation, or class schedules in Salem.
           </p>
         </div>
       </section>
@@ -111,7 +109,7 @@ function ContactForm() {
               <div className="p-8 sm:p-10 rounded-3xl bg-white border border-border shadow-xl space-y-6">
                 <div>
                   <h2 className="font-heading font-bold text-2xl text-navy">
-                    Enquiry & Admission Form
+                    Enquiry &amp; Admission Form
                   </h2>
                   <p className="text-xs sm:text-sm text-text-secondary mt-1">
                     Fill out your details below and our team will contact you shortly.
@@ -131,8 +129,8 @@ function ContactForm() {
                     </p>
                     <div className="pt-2 flex flex-wrap justify-center gap-3">
                       <Button
-                        href={BUSINESS.whatsappLink(
-                          `Hello Allwin School of Music, I just submitted an enquiry for ${formData.course}.`
+                        href={settings.whatsappLink(
+                          `Hello ${settings.businessName}, I just submitted an enquiry for ${formData.course}.`
                         )}
                         external
                         variant="whatsapp"
@@ -252,10 +250,10 @@ function ContactForm() {
                     {/* Instant Alternatives */}
                     <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Button
-                        href={BUSINESS.whatsappLink(
+                        href={settings.whatsappLink(
                           formData.course
-                            ? `Hello Allwin School of Music, I am interested in ${formData.course} classes.`
-                            : BUSINESS.defaultWhatsappMessage
+                            ? `Hello ${settings.businessName}, I am interested in ${formData.course} classes.`
+                            : undefined
                         )}
                         external
                         variant="whatsapp"
@@ -266,13 +264,13 @@ function ContactForm() {
                       </Button>
 
                       <Button
-                        href={BUSINESS.phoneLink}
+                        href={settings.phoneLink}
                         external
                         variant="secondary"
                         size="sm"
                         icon={<Phone className="w-4 h-4 text-violet" />}
                       >
-                        Call {BUSINESS.phoneFormatted}
+                        Call {settings.phoneFormatted}
                       </Button>
                     </div>
                   </form>
@@ -289,10 +287,10 @@ function ContactForm() {
                     Direct Contact
                   </span>
                   <h3 className="font-heading font-bold text-2xl text-white mt-1">
-                    Allwin School of Music
+                    {settings.businessName}
                   </h3>
                   <p className="text-xs text-white/70 italic mt-0.5">
-                    &ldquo;{BUSINESS.tagline}&rdquo;
+                    &ldquo;{settings.tagline}&rdquo;
                   </p>
                 </div>
 
@@ -301,7 +299,7 @@ function ContactForm() {
                     <MapPin className="w-5 h-5 text-orange shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-white">Academy Address:</p>
-                      <p className="text-white/70">{BUSINESS.address}</p>
+                      <p className="text-white/70">{settings.address}</p>
                     </div>
                   </div>
 
@@ -309,8 +307,8 @@ function ContactForm() {
                     <Phone className="w-5 h-5 text-violet shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-white">Phone Support:</p>
-                      <a href={BUSINESS.phoneLink} className="hover:text-white text-white/90">
-                        {BUSINESS.phoneFormatted}
+                      <a href={settings.phoneLink} className="hover:text-white text-white/90">
+                        {settings.phoneFormatted}
                       </a>
                     </div>
                   </div>
@@ -319,8 +317,8 @@ function ContactForm() {
                     <Mail className="w-5 h-5 text-magenta shrink-0 mt-0.5" />
                     <div>
                       <p className="font-semibold text-white">Email Address:</p>
-                      <a href={BUSINESS.emailLink} className="hover:text-white break-all text-white/90">
-                        {BUSINESS.email}
+                      <a href={settings.emailLink} className="hover:text-white break-all text-white/90">
+                        {settings.email}
                       </a>
                     </div>
                   </div>
@@ -347,7 +345,7 @@ function ContactForm() {
           {/* Full-width Responsive Map */}
           <div className="mt-16 rounded-3xl overflow-hidden shadow-2xl border border-border h-96 sm:h-[420px] relative">
             <iframe
-              src={mapUrl}
+              src={settings.googleMapsEmbedUrl}
               width="100%"
               height="100%"
               style={{ border: 0 }}

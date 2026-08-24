@@ -1,14 +1,14 @@
-// ============================================
-// Footer Component — Premium Multi-Column Footer
-// ============================================
+'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Phone, Mail, Clock, ArrowUpRight } from 'lucide-react';
-import { BUSINESS, NAV_ITEMS } from '@/lib/constants';
+import { NAV_ITEMS } from '@/lib/constants';
+import { useSiteSettings } from '@/context/SettingsContext';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const { settings } = useSiteSettings();
 
   const coursesList = [
     { label: 'Keyboard Classes', href: '/courses#keyboard' },
@@ -17,8 +17,8 @@ export default function Footer() {
     { label: 'Vocal Music Training', href: '/courses#vocal' },
     { label: 'Bharatham / Bharatanatyam', href: '/courses#bharatham' },
     { label: 'Theory of Music', href: '/courses#theory-of-music' },
-    { label: 'Trinity Grade Exam Prep', href: '/affiliations' },
-    { label: 'Classical Music Course', href: '/affiliations' },
+    { label: 'Trinity Grade Exam Prep', href: '/about#affiliations' },
+    { label: 'Classical Music Course', href: '/about#affiliations' },
   ];
 
   return (
@@ -41,18 +41,18 @@ export default function Footer() {
               />
               <div>
                 <h3 className="font-heading font-bold text-xl text-white tracking-tight">
-                  Allwin
+                  {settings.businessName.split(' ')[0] || 'Allwin'}
                 </h3>
                 <p className="text-xs text-white/70 font-sans tracking-wide">
-                  School of Music & Musicals
+                  {settings.fullName}
                 </p>
               </div>
             </div>
             <p className="text-sm text-white/70 leading-relaxed italic">
-              &ldquo;{BUSINESS.tagline}&rdquo;
+              &ldquo;{settings.tagline}&rdquo;
             </p>
             <p className="text-xs text-white/60 leading-relaxed">
-              Established in {BUSINESS.established}, providing structured Western and Classical music education, practical training, and recognized grade examination preparation in Salem.
+              Established in {settings.established}, providing structured Western and Classical music education, practical training, and recognized grade examination preparation in Salem.
             </p>
             <div className="pt-2">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs text-white/80">
@@ -118,24 +118,24 @@ export default function Footer() {
             <div className="space-y-3 text-sm text-white/70">
               <div className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-violet shrink-0 mt-0.5" />
-                <span>{BUSINESS.address}</span>
+                <span>{settings.address}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-violet shrink-0" />
                 <a
-                  href={BUSINESS.phoneLink}
+                  href={settings.phoneLink}
                   className="hover:text-white transition-colors font-medium text-white/90"
                 >
-                  {BUSINESS.phoneFormatted}
+                  {settings.phoneFormatted}
                 </a>
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-violet shrink-0" />
                 <a
-                  href={BUSINESS.emailLink}
+                  href={settings.emailLink}
                   className="hover:text-white transition-colors break-all"
                 >
-                  {BUSINESS.email}
+                  {settings.email}
                 </a>
               </div>
               <div className="flex items-center gap-3 pt-1">
@@ -148,10 +148,10 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/50">
-          <p>© {currentYear} Allwin School of Music & Musicals. All Rights Reserved.</p>
+          <p>© {currentYear} {settings.fullName}. All Rights Reserved.</p>
           <div className="flex items-center gap-6">
             <span>Salem, Tamil Nadu, India</span>
-            <span>Est. 2007</span>
+            <span>Est. {settings.established}</span>
           </div>
         </div>
       </div>

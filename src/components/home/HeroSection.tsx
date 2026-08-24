@@ -7,9 +7,11 @@ import Button from '@/components/ui/Button';
 import GlassCard from '@/components/ui/GlassCard';
 import MusicalNotes from '@/components/musical/MusicalNotes';
 import WaveformBg from '@/components/musical/WaveformBg';
-import { BUSINESS } from '@/lib/constants';
+import { useSiteSettings } from '@/context/SettingsContext';
 
 export default function HeroSection() {
+  const { settings } = useSiteSettings();
+
   return (
     <section className="relative min-h-[92vh] flex items-center justify-center overflow-hidden gradient-hero text-white py-16 lg:py-24">
       {/* Animated floating notes background */}
@@ -29,25 +31,22 @@ export default function HeroSection() {
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card-dark border border-white/15 text-xs sm:text-sm text-white/90 shadow-lg">
               <Sparkles className="w-4 h-4 text-orange" />
               <span className="font-medium tracking-wide">
-                Established Since {BUSINESS.established} • Salem, Tamil Nadu
+                Established Since {settings.established} • Salem, Tamil Nadu
               </span>
             </div>
 
             {/* Main Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold tracking-tight text-white leading-[1.15]">
-              Discover Your <br className="hidden sm:inline" />
-              <span className="bg-gradient-to-r from-white via-purple-200 to-orange bg-clip-text text-transparent">
-                Musical Journey
-              </span>
+              {settings.heroHeading || 'Discover Your Musical Journey'}
             </h1>
 
             {/* Tagline & Supporting text */}
             <p className="text-lg sm:text-xl font-heading text-white/90 italic">
-              {BUSINESS.tagline}
+              &ldquo;{settings.tagline}&rdquo;
             </p>
 
             <p className="text-sm sm:text-base text-white/75 max-w-xl mx-auto lg:mx-0 leading-relaxed font-sans">
-              Nurturing musicians since 2007 through structured music education, practical training, and internationally recognized grade examinations with Trinity College London and Annamalai University.
+              {settings.heroDescription}
             </p>
 
             {/* CTAs */}

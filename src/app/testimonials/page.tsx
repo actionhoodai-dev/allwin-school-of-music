@@ -6,10 +6,12 @@ import { Star, Calendar, ExternalLink, MessageSquareQuote, Search, Filter } from
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
 import { getPublishedDocuments } from '@/lib/firebase/firestore';
-import { DEFAULT_TESTIMONIALS, BUSINESS } from '@/lib/constants';
+import { DEFAULT_TESTIMONIALS } from '@/lib/constants';
+import { useSiteSettings } from '@/context/SettingsContext';
 import type { Testimonial } from '@/types';
 
 export default function TestimonialsPage() {
+  const { settings } = useSiteSettings();
   const [testimonials, setTestimonials] = useState<Testimonial[]>(DEFAULT_TESTIMONIALS as any);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRating, setSelectedRating] = useState<number | 'all'>('all');
@@ -49,28 +51,28 @@ export default function TestimonialsPage() {
       <section className="relative py-20 lg:py-28 gradient-hero text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-orange text-xs sm:text-sm font-semibold uppercase tracking-wider border border-white/15">
-            Verified Google Reviews & Experiences
+            Verified Google Reviews &amp; Experiences
           </div>
           
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-white tracking-tight">
-            Student & Parent <span className="bg-gradient-to-r from-white via-purple-200 to-orange bg-clip-text text-transparent">Testimonials</span>
+            Student &amp; Parent <span className="bg-gradient-to-r from-white via-purple-200 to-orange bg-clip-text text-transparent">Testimonials</span>
           </h1>
 
           <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto font-sans">
-            Genuine 5-star ratings and feedback from over 15+ years of music mentoring at Allwin School of Music in Salem.
+            Genuine 5-star ratings and feedback from over 15+ years of music mentoring at {settings.businessName} in Salem.
           </p>
 
           <div className="pt-2 flex items-center justify-center gap-4">
-            <Button
-              href={BUSINESS.googleReviewsUrl}
-              external
-              size="md"
-              variant="whatsapp"
-              className="bg-white text-navy hover:bg-slate-100"
-              iconRight={<ExternalLink className="w-4 h-4" />}
+            <a
+              href={settings.googleReviewsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-white text-navy font-bold text-sm sm:text-base shadow-xl hover:bg-amber-50 hover:shadow-2xl transition-all duration-300 hover:scale-[1.03] border-2 border-amber-300/40 cursor-pointer"
             >
-              View on Google Maps (5.0 ★)
-            </Button>
+              <Star className="w-5 h-5 fill-amber-400 text-amber-500 shrink-0" />
+              <span className="text-[#0a1628] font-bold">View on Google Maps (5.0 ★)</span>
+              <ExternalLink className="w-4 h-4 text-[#0a1628]/70 shrink-0" />
+            </a>
           </div>
         </div>
       </section>

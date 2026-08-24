@@ -1,13 +1,17 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import PianoKeys from '@/components/musical/PianoKeys';
-import { BUSINESS } from '@/lib/constants';
+import { useSiteSettings } from '@/context/SettingsContext';
 
 export default function AboutPreview() {
+  const { settings } = useSiteSettings();
+
   const highlights = [
-    'Long-standing presence in Salem since 2007',
+    `Long-standing presence in Salem since ${settings.established}`,
     'Structured curriculum for both Western & Classical music',
     'Trinity College London grade examination preparation',
     'Annamalai University classical music syllabus affiliation',
@@ -40,16 +44,16 @@ export default function AboutPreview() {
                   />
                   <div>
                     <span className="text-xs uppercase tracking-widest text-orange font-bold">
-                      Established 2007
+                      Established {settings.established}
                     </span>
                     <h3 className="font-heading text-xl font-bold text-white">
-                      Allwin School of Music
+                      {settings.businessName}
                     </h3>
                   </div>
                 </div>
 
                 <p className="text-sm text-white/80 leading-relaxed italic mb-6">
-                  &ldquo;Learn Music With The Right Foundation&rdquo;
+                  &ldquo;{settings.tagline}&rdquo;
                 </p>
 
                 {/* Piano keys element */}
@@ -85,7 +89,7 @@ export default function AboutPreview() {
             </h2>
 
             <p className="text-base text-text-secondary leading-relaxed">
-              Founded in 2007 in Salem, Tamil Nadu, <strong>{BUSINESS.fullName}</strong> has been providing structured music education under the guiding principle of <em>&ldquo;{BUSINESS.tagline}&rdquo;</em>.
+              Founded in {settings.established} in Salem, Tamil Nadu, <strong>{settings.fullName}</strong> has been providing structured music education under the guiding principle of <em>&ldquo;{settings.tagline}&rdquo;</em>.
             </p>
 
             <p className="text-sm text-text-secondary leading-relaxed">
