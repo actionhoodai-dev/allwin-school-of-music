@@ -15,7 +15,7 @@ const FAMOUS_PIECES: Record<string, string> = {
   piano: 'Für Elise — Beethoven',
   guitar: 'Romance de Amor — Spanish Romance',
   violin: 'Spring (La Primavera) — Vivaldi',
-  vocal: 'Vatapi Ganapatim — Hamsadhwani',
+  vocal: 'Amazing Grace — English Classic',
   theory: 'Ode to Joy — Beethoven',
   'theory-of-music': 'Ode to Joy — Beethoven',
 };

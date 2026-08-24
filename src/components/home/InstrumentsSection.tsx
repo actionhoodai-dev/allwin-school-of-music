@@ -56,7 +56,7 @@ export default function InstrumentsSection() {
       icon: <Mic2 className="w-5 h-5 text-purple-light" />,
       description: 'Develop vocal fundamentals, pitch accuracy, breathing technique, voice control, range development, rhythm, and expressive singing.',
       badge: 'Western & Classical',
-      featuredPiece: 'Vatapi Ganapatim (Hamsadhwani)',
+      featuredPiece: 'Amazing Grace (English Classic)',
       isDance: false,
     },
     {

@@ -400,60 +400,85 @@ class SoundEngine {
   }
 
   // =========================================================================
-  // 🎤 VOCAL: Sacred Classical Invocation "Vatapi Ganapatim Bhajeham" (Hamsadhwani Raga)
-  // Accompanied by authentic Tanpura drone (Sa-Pa-Sa')
+  // 🎤 VOCAL: Famous English Open-Source Melodious Masterpiece — "Amazing Grace"
+  // Expressive vocal formant synthesis with breath dynamics, choir pads & vibrato
   // =========================================================================
   private playVocal(ctx: AudioContext, onEnd: () => void) {
     const masterGain = ctx.createGain();
-    masterGain.gain.setValueAtTime(0.24, ctx.currentTime);
+    masterGain.gain.setValueAtTime(0.26, ctx.currentTime);
     masterGain.connect(ctx.destination);
 
-    const TOTAL_DUR = 18;
+    const beat = 0.55; // Soulful 3/4 ballad tempo
 
-    // Continuous Indian Tanpura Drone (Sa: C3, Pa: G3, Sa': C4)
-    const droneFreqs = [130.81, 196.0, 261.63];
-    droneFreqs.forEach((freq, idx) => {
-      const t = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, t);
-
-      const level = 0.35 / (idx + 1);
-      g.gain.setValueAtTime(0.001, t);
-      g.gain.exponentialRampToValueAtTime(level, t + 0.8);
-      g.gain.setValueAtTime(level, t + TOTAL_DUR - 1.5);
-      g.gain.exponentialRampToValueAtTime(0.001, t + TOTAL_DUR);
-
-      osc.connect(g);
-      g.connect(masterGain);
-      osc.start(t);
-      osc.stop(t + TOTAL_DUR + 0.1);
-      this.currentStopCallbacks.push(() => { try { osc.stop(); } catch (_) {} });
-    });
-
-    // "Vatapi Ganapatim Bhajeham" in Hamsadhwani (Sa: 261.63, Ri: 293.66, Ga: 329.63, Pa: 392.0, Ni: 493.88, Sa': 523.25)
-    const aalap = [
-      // "Va-ta-pi" (Sa - Ri - Ga - Pa)
-      { freq: 261.63, time: 1.0, dur: 1.2 },  // Sa ("Va-")
-      { freq: 293.66, time: 2.2, dur: 0.9 },  // Ri ("-ta-")
-      { freq: 329.63, time: 3.1, dur: 1.4 },  // Ga ("-pi")
-
-      // "Ga-na-pa-tim" (Ga - Ri - Sa - Ri - Ga)
-      { freq: 392.0,  time: 4.8, dur: 1.5 },  // Pa ("Ga-")
-      { freq: 329.63, time: 6.3, dur: 0.9 },  // Ga ("-na-")
-      { freq: 293.66, time: 7.2, dur: 0.9 },  // Ri ("-pa-")
-      { freq: 261.63, time: 8.1, dur: 1.6 },  // Sa ("-tim")
-
-      // "Bha-je-ham" (Ri - Ga - Pa - Ni - Sa')
-      { freq: 293.66, time: 10.0, dur: 0.9 }, // Ri ("Bha-")
-      { freq: 329.63, time: 10.9, dur: 0.9 }, // Ga ("-je-")
-      { freq: 392.0,  time: 11.8, dur: 1.2 }, // Pa
-      { freq: 493.88, time: 13.0, dur: 1.2 }, // Ni
-      { freq: 523.25, time: 14.2, dur: 3.0 }, // Sa' ("-ham", sustained high note)
+    // Warm choir accompaniment chords (G - C - G - Em - D7 - G)
+    const choirChords = [
+      { time: 0 * beat, freqs: [196.0, 246.94, 293.66, 392.0], dur: 5 * beat },   // G Major
+      { time: 5 * beat, freqs: [130.81, 261.63, 329.63, 392.0], dur: 4 * beat },   // C Major
+      { time: 9 * beat, freqs: [196.0, 246.94, 293.66, 392.0], dur: 5 * beat },   // G Major
+      { time: 14 * beat, freqs: [146.83, 220.0, 293.66, 369.99], dur: 4 * beat },  // D Major
+      { time: 18 * beat, freqs: [196.0, 246.94, 293.66, 392.0], dur: 4 * beat },  // G Major
+      { time: 22 * beat, freqs: [130.81, 261.63, 329.63, 392.0], dur: 4 * beat },  // C Major
+      { time: 26 * beat, freqs: [196.0, 246.94, 293.66, 392.0], dur: 6 * beat },  // G Major (Resolve)
     ];
 
-    aalap.forEach(({ freq, time, dur }) => {
+    choirChords.forEach(({ time, freqs, dur }) => {
+      const t = ctx.currentTime + time;
+      freqs.forEach((freq) => {
+        const osc = ctx.createOscillator();
+        const g = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+
+        g.gain.setValueAtTime(0.001, t);
+        g.gain.exponentialRampToValueAtTime(0.12, t + 0.4);
+        g.gain.setValueAtTime(0.12, t + dur - 0.3);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+
+        osc.connect(g);
+        g.connect(masterGain);
+        osc.start(t);
+        osc.stop(t + dur + 0.1);
+        this.currentStopCallbacks.push(() => { try { osc.stop(); } catch (_) {} });
+      });
+    });
+
+    // "Amazing Grace" Lead Vocal Melody (G Major)
+    // Lyrics: "A-ma-zing Grace! How sweet the sound, That saved a wretch like me! I once was lost, but now am found, Was blind, but now I see."
+    const vocalMelody = [
+      // "A - ma - zing"
+      { freq: 293.66, time: 0.0 * beat, dur: 0.9 * beat }, // D4 ("A-")
+      { freq: 392.0,  time: 1.0 * beat, dur: 1.8 * beat }, // G4 ("-ma-")
+      { freq: 493.88, time: 3.0 * beat, dur: 0.8 * beat }, // B4 ("-zing")
+      { freq: 392.0,  time: 3.8 * beat, dur: 0.5 * beat }, // G4 (slur)
+
+      // "Grace! How sweet"
+      { freq: 493.88, time: 4.5 * beat, dur: 2.0 * beat }, // B4 ("Grace!")
+      { freq: 440.0,  time: 7.0 * beat, dur: 1.0 * beat }, // A4 ("How")
+      { freq: 392.0,  time: 8.0 * beat, dur: 1.8 * beat }, // G4 ("sweet")
+
+      // "the sound"
+      { freq: 329.63, time: 10.0 * beat, dur: 1.0 * beat }, // E4 ("the")
+      { freq: 293.66, time: 11.0 * beat, dur: 2.2 * beat }, // D4 ("sound,")
+
+      // "That saved a wretch"
+      { freq: 293.66, time: 13.5 * beat, dur: 0.9 * beat }, // D4 ("That")
+      { freq: 392.0,  time: 14.5 * beat, dur: 1.8 * beat }, // G4 ("saved")
+      { freq: 493.88, time: 16.5 * beat, dur: 0.8 * beat }, // B4 ("a")
+      { freq: 392.0,  time: 17.3 * beat, dur: 0.5 * beat }, // G4 (slur)
+      { freq: 493.88, time: 18.0 * beat, dur: 1.8 * beat }, // B4 ("wretch")
+
+      // "like me!"
+      { freq: 440.0,  time: 20.0 * beat, dur: 1.0 * beat }, // A4 ("like")
+      { freq: 587.33, time: 21.0 * beat, dur: 2.5 * beat }, // D5 ("me!")
+
+      // "Was blind, but now I see" (Climax phrase)
+      { freq: 493.88, time: 24.0 * beat, dur: 1.2 * beat }, // B4 ("Was")
+      { freq: 392.0,  time: 25.5 * beat, dur: 1.2 * beat }, // G4 ("blind,")
+      { freq: 440.0,  time: 27.0 * beat, dur: 1.0 * beat }, // A4 ("now")
+      { freq: 392.0,  time: 28.0 * beat, dur: 3.5 * beat }, // G4 ("I see." — long soulful resolution)
+    ];
+
+    vocalMelody.forEach(({ freq, time, dur }) => {
       const t = ctx.currentTime + time;
       const osc = ctx.createOscillator();
       const g = ctx.createGain();
@@ -462,21 +487,22 @@ class SoundEngine {
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, t);
 
-      // Formant vowel resonance "Aaa / Ooo"
+      // Human voice formant resonance
       formant.type = 'bandpass';
-      formant.frequency.setValueAtTime(850, t);
-      formant.Q.setValueAtTime(3.2, t);
+      formant.frequency.setValueAtTime(900, t);
+      formant.Q.setValueAtTime(3.0, t);
 
+      // Smooth vocal envelope with soft breath-in
       g.gain.setValueAtTime(0.001, t);
-      g.gain.exponentialRampToValueAtTime(0.7, t + 0.18);
-      g.gain.setValueAtTime(0.7, t + dur - 0.15);
+      g.gain.exponentialRampToValueAtTime(0.75, t + 0.12);
+      g.gain.setValueAtTime(0.75, t + dur - 0.1);
       g.gain.exponentialRampToValueAtTime(0.001, t + dur);
 
-      // Vocal Meend vibrato
+      // Natural singing vibrato
       const lfo = ctx.createOscillator();
       const lfoGain = ctx.createGain();
-      lfo.frequency.setValueAtTime(5.2, t);
-      lfoGain.gain.setValueAtTime(3.8, t);
+      lfo.frequency.setValueAtTime(5.4, t);
+      lfoGain.gain.setValueAtTime(3.5, t);
       lfo.connect(lfoGain);
       lfoGain.connect(osc.frequency);
       lfo.start(t);
@@ -488,10 +514,15 @@ class SoundEngine {
       osc.start(t);
       osc.stop(t + dur);
 
-      this.currentStopCallbacks.push(() => { try { lfo.stop(); osc.stop(); } catch (_) {} });
+      this.currentStopCallbacks.push(() => {
+        try {
+          lfo.stop();
+          osc.stop();
+        } catch (_) {}
+      });
     });
 
-    const timer = setTimeout(onEnd, 17800);
+    const timer = setTimeout(onEnd, (32 * beat + 2.0) * 1000);
     this.currentStopCallbacks.push(() => clearTimeout(timer));
   }
 

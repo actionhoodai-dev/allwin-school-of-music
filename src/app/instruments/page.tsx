@@ -99,7 +99,7 @@ export default function InstrumentsPage() {
         'Western & Classical song repertoire',
       ],
       exam: 'Graded performance & university certifications',
-      featuredPiece: 'Vatapi Ganapatim (Hamsadhwani)',
+      featuredPiece: 'Amazing Grace (English Classic)',
       isDance: false,
     },
     {
