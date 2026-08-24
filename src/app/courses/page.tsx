@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Layers, Music2, Disc, Mic2, Sparkles, BookOpen, CheckCircle2, ArrowRight, Volume2 } from 'lucide-react';
+import { Layers, Music2, Disc, Mic2, Sparkles, BookOpen, CheckCircle2, ArrowRight, Volume2, Video } from 'lucide-react';
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
-import InstrumentAudioButton from '@/components/musical/InstrumentAudioButton';
+import InstrumentAudioOverlay from '@/components/musical/InstrumentAudioOverlay';
 import { getPublishedDocuments } from '@/lib/firebase/firestore';
 import { useSiteSettings } from '@/context/SettingsContext';
 import type { Course } from '@/types';
@@ -46,6 +46,7 @@ export default function CoursesPage() {
       ],
       examInfo: 'Trinity College London Western Music Grade Examinations (Initial to Grade 8).',
       badge: 'Trinity Grade Exam Prep',
+      isDance: false,
     },
     {
       slug: 'guitar',
@@ -53,17 +54,18 @@ export default function CoursesPage() {
       category: 'Instrumental',
       image: '/images/instruments/guitar.jpg',
       icon: <Music2 className="w-6 h-6 text-orange" />,
-      overview: 'Structured training for acoustic and classical guitar, focusing on chord progressions, strumming patterns, fingerstyle technique, scale theory, and melody playing.',
-      suitableLearners: 'Beginners and intermediate players interested in acoustic, classical, or contemporary guitar playing.',
+      overview: 'Structured training for acoustic and classical guitar covering fundamentals, open and barre chords, rhythm, fingerpicking, and grade syllabus pieces.',
+      suitableLearners: 'Ages 7+, teens, adults, casual learners, and Trinity College London certificate aspirants.',
       learningFocus: [
-        'Fretboard navigation, posture, and tuning fundamentals',
-        'Open chords, barre chords, and smooth transitions',
-        'Strumming patterns, fingerpicking, and rhythm timing',
-        'Lead scales, soloing techniques, and melody harmonization',
-        'Song accompaniment and grade examination pieces',
+        'Fretboard navigation, posture, and hand placement',
+        'Open chords, barre chords, and strumming patterns',
+        'Fingerstyle technique and picking accuracy',
+        'Scale theory, lead playing, and song accompaniment',
+        'Trinity College London acoustic & classical pieces',
       ],
-      examInfo: 'Trinity College London Western Music Grade Examinations syllabus available.',
+      examInfo: 'Trinity College London Acoustic & Classical Guitar Grade Examinations.',
       badge: 'Acoustic & Classical',
+      isDance: false,
     },
     {
       slug: 'violin',
@@ -71,73 +73,79 @@ export default function CoursesPage() {
       category: 'Instrumental',
       image: '/images/instruments/violin.jpg',
       icon: <Disc className="w-6 h-6 text-magenta" />,
-      overview: 'Foundational and advanced violin training developing bow control, correct posture, intonation precision, notation reading, and classical performance artistry.',
-      suitableLearners: 'Learners seeking formal, disciplined string instrument training in Western or Classical traditions.',
+      overview: 'Refined instruction in violin performance covering correct posture, bowing mechanics, intonation calibration, and repertoire across Western and Classical styles.',
+      suitableLearners: 'Ages 6+, dedicated beginners, and learners preparing for graded certifications.',
       learningFocus: [
-        'Instrument hold, chin-rest posture, and bow grip mechanics',
-        'Bowing dynamics, tone production, and smooth string crossings',
-        'Finger placement, pitch intonation, and shifting positions',
-        'Sheet music reading, classical études, and melodic pieces',
-        'Ensemble coordination and recital preparation',
+        'Instrument hold, chin rest posture, and bow grip mechanics',
+        'Bowing dynamics, articulation, and smooth string transitions',
+        'Pitch accuracy, intonation, and ear training exercises',
+        'Notation reading, rhythm discipline, and classical repertoire',
+        'Grade examination preparation and solo performance skills',
       ],
-      examInfo: 'Trinity College London grade exam prep & Classical music syllabus.',
+      examInfo: 'Western Music Grade Examinations & Classical certifications.',
       badge: 'Western & Classical',
-    },
-    {
-      slug: 'vocal',
-      title: 'Vocal Music Training',
-      category: 'Vocal',
-      image: '/images/instruments/vocal.jpg',
-      icon: <Mic2 className="w-6 h-6 text-purple-light" />,
-      overview: 'Structured vocal coaching aimed at developing pitch accuracy, breath support, voice modulation, tonal resonance, range expansion, and confident stage presentation.',
-      suitableLearners: 'Aspiring singers of all age groups interested in Western or Indian classical vocal traditions.',
-      learningFocus: [
-        'Diaphragmatic breathing and posture alignment',
-        'Pitch stabilization, scale singing, and ear training',
-        'Vocal range expansion and resonance placement',
-        'Pronunciation, diction, and expressive phrasing',
-        'Rhythmic precision (Talam) and stage singing confidence',
-      ],
-      examInfo: 'Preparation for Classical certifications & Western singing grade exams.',
-      badge: 'Western & Classical Vocal',
+      isDance: false,
     },
     {
       slug: 'bharatham',
-      title: 'Bharatham / Bharatanatyam Training',
+      title: 'Bharatham (Bharatanatyam)',
       category: 'Classical Dance',
       image: '/images/instruments/bharatham.jpg',
       icon: <Sparkles className="w-6 h-6 text-amber-500" />,
-      overview: 'Traditional Indian classical dance training teaching foundational Adavus, rhythm synchronization (Talam), mudras (hand gestures), expressive abhinaya, and stage items.',
-      suitableLearners: 'Children, students, and enthusiasts looking for structured, authentic Bharatanatyam training.',
+      overview: 'Traditional Indian classical dance training rooted in systematic Adavu practice, Mudras, rhythmic discipline (Talam), and expressive performance.',
+      suitableLearners: 'Children from age 5+, teens, and adult learners passionate about classical dance.',
       learningFocus: [
-        'Basic Adavus (steps) and posture (Aramandi, Muzhumandi)',
-        'Asamyutha and Samyutha Hastas (hand gestures)',
-        'Tala consciousness, footwork speed, and body coordination',
-        'Bhava, Rasa, and Abhinaya (facial expressions & storytelling)',
-        'Margam items (Alarippu, Jatiswaram, Shabdam, Varnam)',
+        'Systematic Adavu steps training (Tatta, Natta, Kuditta, etc.)',
+        'Asamyuta & Samyuta Hastas (hand gestures and mudras)',
+        'Tala rhythm consciousness and footwork precision',
+        'Bhavas, Rasas, and Abhinaya (facial expressions & storytelling)',
+        'Margam repertoire items and traditional stage performance',
       ],
-      examInfo: 'Associated with Annamalai University classical dance syllabus.',
-      badge: 'Annamalai Affiliated',
+      examInfo: 'Associated with Annamalai University grade/diploma certifications.',
+      badge: 'Classical Dance Training',
+      isDance: true,
+    },
+    {
+      slug: 'vocal',
+      title: 'Vocal Music Classes',
+      category: 'Vocal',
+      image: '/images/instruments/vocal.jpg',
+      icon: <Mic2 className="w-6 h-6 text-purple-light" />,
+      overview: 'Systematic vocal training designed to build strong pitch awareness, diaphragmatic breath control, voice projection, range, and expressive confidence.',
+      suitableLearners: 'All age groups — children, teens, and adults pursuing classical or light music singing.',
+      learningFocus: [
+        'Breath support, diaphragmatic management, and posture',
+        'Pitch alignment, voice placement, and ear calibration',
+        'Vocal exercises, scale runs, and range expansion',
+        'Diction, tone quality, and emotional expression',
+        'Western and Indian classical song repertoire',
+      ],
+      examInfo: 'Graded performance examinations & university certified syllabus.',
+      badge: 'Vocal Excellence',
+      isDance: false,
     },
     {
       slug: 'theory-of-music',
       title: 'Theory of Music',
-      category: 'Academic',
+      category: 'Academic Music',
       image: '/images/instruments/theory.jpg',
       icon: <BookOpen className="w-6 h-6 text-blue-600" />,
-      overview: 'A deep-dive academic course in music literacy covering staff notation, rhythm, time signatures, key signatures, scales, intervals, chords, and musical terminology.',
-      suitableLearners: 'All instrumental and vocal students preparing for Trinity grade exams or wishing to master musical literacy.',
+      overview: 'The essential foundation for every disciplined musician — covering staff notation, key signatures, intervals, chord harmony, rhythm, and analysis.',
+      suitableLearners: 'Students of all instruments, practical exam candidates, and music enthusiasts.',
       learningFocus: [
-        'Staff notation (Treble, Bass, Alto, and Tenor Clefs)',
-        'Simple, compound, and complex time signatures & rhythm dictation',
-        'Major, minor, chromatic scales, and circle of fifths',
-        'Intervals, triads, chords, cadence progressions, and transposition',
-        'Italian terms, dynamic markings, and formal analysis',
+        'Clefs (Treble, Bass, Alto), note values, and time signatures',
+        'Major, minor, and modal scale constructions',
+        'Intervals, triads, chords, and cadences',
+        'Transposition, musical terms, and signs',
+        'Trinity College London Theory of Music grade exam papers',
       ],
-      examInfo: 'Trinity College London Theory of Music Grade Examinations (Grades 1–8).',
-      badge: 'Grade Exam Centric',
+      examInfo: 'Trinity College London Theory of Music Examinations (Grades 1 to 8).',
+      badge: 'Examination Syllabus',
+      isDance: false,
     },
   ];
+
+  const coursesToRender = dbCourses.length > 0 ? dbCourses : defaultCourses;
 
   return (
     <div className="bg-surface">
@@ -145,15 +153,16 @@ export default function CoursesPage() {
       <section className="relative py-20 lg:py-28 gradient-hero text-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-orange text-xs sm:text-sm font-semibold uppercase tracking-wider border border-white/15">
-            Structured Music Curriculum • Since 2007
+            <Volume2 className="w-4 h-4 text-orange" />
+            Structured Syllabus &amp; Media Showcase
           </div>
           
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-white tracking-tight">
-            Music Courses & <span className="bg-gradient-to-r from-white via-purple-200 to-orange bg-clip-text text-transparent">Disciplines</span>
+            Our <span className="bg-gradient-to-r from-white via-purple-200 to-orange bg-clip-text text-transparent">Courses &amp; Syllabus</span>
           </h1>
 
           <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto font-sans">
-            Affiliated with Trinity College London for Western Music Grade Examinations and associated with Annamalai University for Classical Music.
+            Structured musical training tailored to beginners, intermediate learners, and grade examination aspirants in Salem. Tap course images to preview their sound!
           </p>
         </div>
       </section>
@@ -166,44 +175,50 @@ export default function CoursesPage() {
             <div
               key={course.slug}
               id={course.slug}
-              className="scroll-mt-24 rounded-3xl bg-white border border-border shadow-lg hover:shadow-xl transition-all overflow-hidden"
+              className="scroll-mt-28 bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
                 
-                {/* Course Image Column */}
+                {/* Course Image Column — Click to Play/Pause / Watch Video */}
                 <div className="lg:col-span-4 relative min-h-[240px] sm:min-h-[280px] lg:min-h-full bg-navy-light overflow-hidden group">
-                  <Image
-                    src={course.image}
-                    alt={course.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                    sizes="(max-width: 1024px) 100vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-navy/40" />
-                  
-                  {/* Badge & Audio on image */}
-                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-                    <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-navy/85 text-white backdrop-blur-md border border-white/20">
-                      {course.badge}
-                    </span>
+                  <InstrumentAudioOverlay slug={course.slug} name={course.title} className="h-full w-full">
+                    <div className="relative h-full min-h-[240px] sm:min-h-[280px] w-full">
+                      <Image
+                        src={course.image}
+                        alt={course.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-navy/40" />
+                      
+                      {/* Badge & Audio indicator on image */}
+                      <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+                        <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-navy/85 text-white backdrop-blur-md border border-white/20">
+                          {course.badge}
+                        </span>
 
-                    <InstrumentAudioButton
-                      slug={course.slug}
-                      name={course.title.split(' ')[0]}
-                      variant="badge"
-                    />
-                  </div>
-
-                  <div className="absolute bottom-4 left-4 right-4 z-10 lg:hidden">
-                    <div className="flex items-center gap-2">
-                      <div className="p-2 rounded-xl bg-white/90 backdrop-blur-md shadow">
-                        {course.icon}
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-bold text-navy shadow-md">
+                          {course.slug === 'bharatham' ? (
+                            <><Video className="w-3 h-3 text-amber-600" /> Watch</>
+                          ) : (
+                            <><Volume2 className="w-3 h-3 text-orange" /> Tap to Play</>
+                          )}
+                        </span>
                       </div>
-                      <h2 className="text-xl font-heading font-bold text-white drop-shadow">
-                        {course.title}
-                      </h2>
+
+                      <div className="absolute bottom-4 left-4 right-4 z-10 lg:hidden">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-xl bg-white/90 backdrop-blur-md shadow">
+                            {course.icon}
+                          </div>
+                          <h2 className="text-xl font-heading font-bold text-white drop-shadow">
+                            {course.title}
+                          </h2>
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </InstrumentAudioOverlay>
                 </div>
 
                 {/* Course Details Column */}
@@ -226,15 +241,6 @@ export default function CoursesPage() {
                     <p className="text-sm text-text-secondary leading-relaxed">
                       {course.overview}
                     </p>
-
-                    {/* Audio Preview Widget */}
-                    <div className="pt-1">
-                      <InstrumentAudioButton
-                        slug={course.slug}
-                        name={course.title}
-                        className="w-full"
-                      />
-                    </div>
 
                     <div className="p-4 rounded-2xl bg-surface-dim border border-slate-200/80 space-y-1">
                       <p className="text-xs font-bold uppercase tracking-wider text-navy">
@@ -302,7 +308,7 @@ export default function CoursesPage() {
             </div>
           ))}
 
-          {/* Dynamic Firestore Courses if any added by Admin */}
+          {/* Dynamic Firestore Courses if any additional added by Admin */}
           {dbCourses.map((course) => (
             <div
               key={course.id}

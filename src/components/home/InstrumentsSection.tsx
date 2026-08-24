@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Music2, Disc, Mic2, Sparkles, BookOpen, Layers, Volume2 } from 'lucide-react';
+import { ArrowRight, Music2, Disc, Mic2, Sparkles, BookOpen, Layers, Volume2, Video } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
-import InstrumentAudioButton from '@/components/musical/InstrumentAudioButton';
+import InstrumentAudioOverlay from '@/components/musical/InstrumentAudioOverlay';
 
 export default function InstrumentsSection() {
   const instruments = [
@@ -15,8 +15,8 @@ export default function InstrumentsSection() {
       image: '/images/instruments/keyboard.jpg',
       icon: <Layers className="w-5 h-5 text-violet" />,
       description: 'Learn keyboard fundamentals, technique, notation, rhythm, finger independence, and practical playing for performance and grade examinations.',
-      accent: 'from-violet/20 to-purple/20',
       badge: 'Trinity Grade Prep',
+      isDance: false,
     },
     {
       name: 'Guitar',
@@ -24,8 +24,8 @@ export default function InstrumentsSection() {
       image: '/images/instruments/guitar.jpg',
       icon: <Music2 className="w-5 h-5 text-orange" />,
       description: 'Develop guitar fundamentals, chords, strumming patterns, fingerstyle technique, scale theory, and dynamic musical expression.',
-      accent: 'from-orange/20 to-magenta/20',
       badge: 'Acoustic & Classical',
+      isDance: false,
     },
     {
       name: 'Violin',
@@ -33,8 +33,8 @@ export default function InstrumentsSection() {
       image: '/images/instruments/violin.jpg',
       icon: <Disc className="w-5 h-5 text-magenta" />,
       description: 'Build foundational violin technique, posture, bowing precision, intonation, notation reading, and classical performance skills.',
-      accent: 'from-magenta/20 to-crimson/20',
       badge: 'Western & Carnatic',
+      isDance: false,
     },
     {
       name: 'Bharatham',
@@ -42,8 +42,8 @@ export default function InstrumentsSection() {
       image: '/images/instruments/bharatham.jpg',
       icon: <Sparkles className="w-5 h-5 text-amber-500" />,
       description: 'Structured training in Bharatham / Bharatanatyam fundamentals, Adavus, rhythm (Talam), expressive abhinaya, and traditional performance.',
-      accent: 'from-amber/20 to-orange/20',
       badge: 'Classical Dance',
+      isDance: true,
     },
     {
       name: 'Vocal Music',
@@ -51,8 +51,8 @@ export default function InstrumentsSection() {
       image: '/images/instruments/vocal.jpg',
       icon: <Mic2 className="w-5 h-5 text-purple-light" />,
       description: 'Develop vocal fundamentals, pitch accuracy, breathing technique, voice control, range development, rhythm, and expressive singing.',
-      accent: 'from-purple-light/20 to-violet/20',
       badge: 'Western & Classical',
+      isDance: false,
     },
     {
       name: 'Theory of Music',
@@ -60,8 +60,8 @@ export default function InstrumentsSection() {
       image: '/images/instruments/theory.jpg',
       icon: <BookOpen className="w-5 h-5 text-blue-600" />,
       description: 'Understand music notation, rhythm, key signatures, scales, intervals, chords, terminology, and structured examination foundations.',
-      accent: 'from-blue-500/20 to-violet/20',
       badge: 'Exam Preparation',
+      isDance: false,
     },
   ];
 
@@ -72,13 +72,13 @@ export default function InstrumentsSection() {
         <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-deep/5 text-violet text-xs font-semibold uppercase tracking-wider border border-purple-light/20 shadow-sm">
             <Volume2 className="w-4 h-4 text-orange animate-pulse" />
-            <span>Interactive Audio Showcase</span>
+            <span>Interactive Audio &amp; Video Showcase</span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold text-navy tracking-tight">
             Hear &amp; Explore Your <span className="gradient-text">Instrument</span>
           </h2>
           <p className="text-base text-text-secondary">
-            Tap the <span className="font-semibold text-orange">Listen Sound</span> button on any instrument to preview its acoustic tone, crafted for students and parents in Salem.
+            Tap any instrument image to <span className="font-semibold text-orange">listen to its sound</span> — tap again to pause. Watch our Bharatham dance performance on video.
           </p>
         </div>
 
@@ -91,52 +91,47 @@ export default function InstrumentsSection() {
               hover
               className="flex flex-col justify-between border border-slate-200/80 bg-white shadow-md group overflow-hidden rounded-3xl"
             >
-              {/* Instrument Image Header */}
-              <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-navy-light">
-                <Image
-                  src={inst.image}
-                  alt={inst.name}
-                  fill
-                  className="object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-black/20" />
-                
-                {/* Discipline Badge & Listen Button floating on image */}
-                <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-navy/80 text-white backdrop-blur-md border border-white/20">
-                    {inst.badge}
-                  </span>
-                  
-                  {/* Floating Audio Preview Trigger */}
-                  <InstrumentAudioButton
-                    slug={inst.slug}
-                    name={inst.name.split(' ')[0]}
-                    variant="badge"
+              {/* Instrument Image — Click to Play/Pause */}
+              <InstrumentAudioOverlay slug={inst.slug} name={inst.name}>
+                <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-navy-light">
+                  <Image
+                    src={inst.image}
+                    alt={inst.name}
+                    fill
+                    className="object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
-                </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-black/20" />
 
-                <div className="absolute bottom-4 left-4 right-4 z-10">
-                  <h3 className="font-heading font-bold text-2xl text-white drop-shadow-md">
-                    {inst.name}
-                  </h3>
+                  {/* Discipline Badge + Play/Video indicator */}
+                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-navy/80 text-white backdrop-blur-md border border-white/20">
+                      {inst.badge}
+                    </span>
+
+                    {/* Small indicator pill */}
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-bold text-navy shadow-md">
+                      {inst.isDance ? (
+                        <><Video className="w-3 h-3 text-amber-600" /> Watch</>
+                      ) : (
+                        <><Volume2 className="w-3 h-3 text-orange" /> Tap to Play</>
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="absolute bottom-4 left-4 right-4 z-10">
+                    <h3 className="font-heading font-bold text-2xl text-white drop-shadow-md">
+                      {inst.name}
+                    </h3>
+                  </div>
                 </div>
-              </div>
+              </InstrumentAudioOverlay>
 
               {/* Card Body */}
               <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-6">
                 <p className="text-sm text-text-secondary leading-relaxed">
                   {inst.description}
                 </p>
-
-                {/* Interactive Audio Button Row */}
-                <div className="pt-2">
-                  <InstrumentAudioButton
-                    slug={inst.slug}
-                    name={inst.name}
-                    className="w-full"
-                  />
-                </div>
 
                 <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
                   <Link

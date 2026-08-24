@@ -125,6 +125,11 @@
   50% { box-shadow: 0 0 40px rgba(124, 58, 237, 0.6); }
 }
 
+@keyframes eqBar {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
 /* ---- Base Styles ---- */
 html {
   scroll-behavior: smooth;

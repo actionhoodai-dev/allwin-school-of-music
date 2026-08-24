@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { constructMetadata } from '@/lib/seo/metadata';
-import { Layers, Music2, Disc, Sparkles, Mic2, BookOpen, Check, ArrowRight, Volume2 } from 'lucide-react';
+import { Layers, Music2, Disc, Sparkles, Mic2, BookOpen, Check, ArrowRight, Volume2, Video } from 'lucide-react';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
-import InstrumentAudioButton from '@/components/musical/InstrumentAudioButton';
+import InstrumentAudioOverlay from '@/components/musical/InstrumentAudioOverlay';
 import { BUSINESS } from '@/lib/constants';
 
 export const metadata: Metadata = constructMetadata({
@@ -31,6 +31,7 @@ export default function InstrumentsPage() {
         'Trinity College London grade pieces',
       ],
       exam: 'Trinity College London Initial – Grade 8',
+      isDance: false,
     },
     {
       name: 'Guitar',
@@ -46,6 +47,7 @@ export default function InstrumentsPage() {
         'Grade examination preparation',
       ],
       exam: 'Trinity College London Acoustic & Classical',
+      isDance: false,
     },
     {
       name: 'Violin',
@@ -61,6 +63,7 @@ export default function InstrumentsPage() {
         'Western & Carnatic repertoire studies',
       ],
       exam: 'Western Grade Exams & Classical certifications',
+      isDance: false,
     },
     {
       name: 'Bharatham (Bharatanatyam)',
@@ -76,6 +79,7 @@ export default function InstrumentsPage() {
         'Abhinaya and Margam repertoire',
       ],
       exam: 'Associated with Annamalai University syllabus',
+      isDance: true,
     },
     {
       name: 'Vocal Music',
@@ -91,6 +95,7 @@ export default function InstrumentsPage() {
         'Western & Classical song repertoire',
       ],
       exam: 'Graded performance & university certifications',
+      isDance: false,
     },
     {
       name: 'Theory of Music',
@@ -106,6 +111,7 @@ export default function InstrumentsPage() {
         'Trinity Theory of Music grades 1–8',
       ],
       exam: 'Trinity College London Theory of Music exams',
+      isDance: false,
     },
   ];
 
@@ -116,7 +122,7 @@ export default function InstrumentsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-orange text-xs sm:text-sm font-semibold uppercase tracking-wider border border-white/15">
             <Volume2 className="w-4 h-4 text-orange" />
-            Interactive Instrument Audio Previews
+            Tap Images to Preview Sounds
           </div>
           
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-white tracking-tight">
@@ -124,7 +130,7 @@ export default function InstrumentsPage() {
           </h1>
 
           <p className="text-base sm:text-lg text-white/80 max-w-2xl mx-auto font-sans">
-            Choose from six primary disciplines taught by disciplined educators following structured international syllabi. Tap any card to hear its sound!
+            Six primary disciplines taught by experienced educators. Tap any instrument image to hear its sound — tap again to pause!
           </p>
         </div>
       </section>
@@ -140,54 +146,49 @@ export default function InstrumentsPage() {
                 hover
                 className="border border-slate-200 bg-white flex flex-col justify-between overflow-hidden rounded-3xl group shadow-md"
               >
-                {/* Top Image */}
-                <div className="relative h-52 w-full overflow-hidden bg-navy-light">
-                  <Image
-                    src={inst.image}
-                    alt={inst.name}
-                    fill
-                    className="object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-black/20" />
-                  
-                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-                    <div className="p-2 rounded-xl bg-white/90 backdrop-blur-md shadow-md">
-                      {inst.icon}
+                {/* Top Image — Click to Play/Pause or Watch Video */}
+                <InstrumentAudioOverlay slug={inst.slug} name={inst.name}>
+                  <div className="relative h-52 w-full overflow-hidden bg-navy-light">
+                    <Image
+                      src={inst.image}
+                      alt={inst.name}
+                      fill
+                      className="object-cover group-hover:scale-108 transition-transform duration-700 ease-out"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-navy/80 via-transparent to-black/20" />
+                    
+                    <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+                      <div className="p-2 rounded-xl bg-white/90 backdrop-blur-md shadow-md">
+                        {inst.icon}
+                      </div>
+
+                      {/* Indicator pill */}
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-bold text-navy shadow-md">
+                        {inst.isDance ? (
+                          <><Video className="w-3 h-3 text-amber-600" /> Watch</>
+                        ) : (
+                          <><Volume2 className="w-3 h-3 text-orange" /> Tap to Play</>
+                        )}
+                      </span>
                     </div>
 
-                    {/* Audio Listen Badge */}
-                    <InstrumentAudioButton
-                      slug={inst.slug}
-                      name={inst.name.split(' ')[0]}
-                      variant="badge"
-                    />
+                    <div className="absolute bottom-4 left-4 right-4 z-10">
+                      <h2 className="font-heading font-bold text-2xl text-white drop-shadow-md">
+                        {inst.name}
+                      </h2>
+                      <p className="text-xs text-orange font-medium mt-0.5 drop-shadow">
+                        {inst.tagline}
+                      </p>
+                    </div>
                   </div>
-
-                  <div className="absolute bottom-4 left-4 right-4 z-10">
-                    <h2 className="font-heading font-bold text-2xl text-white drop-shadow-md">
-                      {inst.name}
-                    </h2>
-                    <p className="text-xs text-orange font-medium mt-0.5 drop-shadow">
-                      {inst.tagline}
-                    </p>
-                  </div>
-                </div>
+                </InstrumentAudioOverlay>
 
                 <div className="p-6 sm:p-7 flex-1 flex flex-col justify-between space-y-6">
                   <div className="space-y-4">
                     <p className="text-xs sm:text-sm text-text-secondary leading-relaxed">
                       {inst.description}
                     </p>
-
-                    {/* Interactive Audio Button */}
-                    <div className="pt-1">
-                      <InstrumentAudioButton
-                        slug={inst.slug}
-                        name={inst.name}
-                        className="w-full"
-                      />
-                    </div>
 
                     <ul className="space-y-2 pt-2 border-t border-slate-100">
                       {inst.points.map((p, i) => (
