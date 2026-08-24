@@ -38,7 +38,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   secondary:
     'bg-white text-navy border border-slate-200 hover:bg-violet/10 hover:text-violet hover:border-violet/40 dark:bg-white/10 dark:text-white dark:border-white/20 dark:hover:bg-white/20 shadow-sm hover:shadow-md font-semibold',
   outline:
-    'bg-transparent text-violet border-2 border-violet hover:bg-violet hover:text-white dark:text-violet-300 dark:border-violet-400 dark:hover:bg-violet-600 dark:hover:text-white font-semibold',
+    'bg-violet text-white border-2 border-violet hover:bg-purple-deep hover:border-purple-deep dark:bg-violet-600 dark:border-violet-600 dark:hover:bg-violet-700 dark:hover:border-violet-700 shadow-md hover:shadow-lg font-semibold',
   ghost:
     'bg-transparent text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-violet dark:hover:text-white font-medium',
   whatsapp:
