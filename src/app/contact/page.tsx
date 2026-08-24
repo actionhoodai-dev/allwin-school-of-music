@@ -130,7 +130,13 @@ function ContactForm() {
                     <div className="pt-2 flex flex-wrap justify-center gap-3">
                       <Button
                         href={settings.whatsappLink(
-                          `Hello ${settings.businessName}, I just submitted an enquiry for ${formData.course}.`
+                          `Hello ${settings.businessName}, I just submitted an enquiry for the ${
+                            formData.course
+                              ? formData.course.toLowerCase().includes('course') || formData.course.toLowerCase().includes('class')
+                                ? formData.course
+                                : `${formData.course} Course`
+                              : 'Music Course'
+                          }.`
                         )}
                         external
                         variant="whatsapp"
@@ -252,7 +258,11 @@ function ContactForm() {
                       <Button
                         href={settings.whatsappLink(
                           formData.course
-                            ? `Hello ${settings.businessName}, I am interested in ${formData.course} classes.`
+                            ? `Hello ${settings.businessName}, I am interested in the ${
+                                formData.course.toLowerCase().includes('course') || formData.course.toLowerCase().includes('class')
+                                  ? formData.course
+                                  : `${formData.course} Course`
+                              }.`
                             : undefined
                         )}
                         external

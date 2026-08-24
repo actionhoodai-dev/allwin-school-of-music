@@ -195,7 +195,13 @@ export default function AdminEnquiriesPage() {
                   {/* WhatsApp trigger */}
                   <a
                     href={`https://wa.me/91${enq.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(
-                      `Hello ${enq.name}, thank you for enquiring at Allwin School of Music regarding ${enq.course || 'music classes'}.`
+                      `Hello ${enq.name}, thank you for enquiring at Allwin School of Music regarding the ${
+                        enq.course
+                          ? enq.course.toLowerCase().includes('course') || enq.course.toLowerCase().includes('class')
+                            ? enq.course
+                            : `${enq.course} Course`
+                          : 'Music Course'
+                      }.`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
