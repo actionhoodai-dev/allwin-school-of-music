@@ -130,7 +130,29 @@
   50% { transform: scaleY(1); }
 }
 
-/* ---- Base Styles ---- */
+/* ---- Base Styles & Theme Tokens ---- */
+:root {
+  --color-surface: #ffffff;
+  --color-surface-dim: #f8f9fc;
+  --color-surface-card: #ffffff;
+  --color-text-primary: #0a1628;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+}
+
+.dark, [data-theme="dark"] {
+  --color-surface: #070d18;
+  --color-surface-dim: #0b1424;
+  --color-surface-card: #0f1c32;
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-border: #1e293b;
+  --color-border-light: #152238;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -141,6 +163,87 @@ body {
   background-color: var(--color-surface);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ---- Dark Mode Global Overrides ---- */
+.dark body {
+  background-color: #070d18;
+  color: #f8fafc;
+}
+
+/* Dark Mode Backgrounds */
+.dark .bg-white {
+  background-color: #0d1728 !important;
+}
+
+.dark .bg-surface-dim {
+  background-color: #070d18 !important;
+}
+
+.dark .bg-surface {
+  background-color: #070d18 !important;
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-50\/70,
+.dark .bg-slate-100 {
+  background-color: #111d33 !important;
+}
+
+/* Dark Mode Headings & Text */
+.dark .text-navy {
+  color: #f8fafc !important;
+}
+
+.dark .text-text-primary {
+  color: #f8fafc !important;
+}
+
+.dark .text-text-secondary {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-slate-700,
+.dark .text-slate-800,
+.dark .text-slate-900 {
+  color: #f1f5f9 !important;
+}
+
+.dark .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+/* Dark Mode Borders & Glass */
+.dark .border-slate-200,
+.dark .border-slate-200\/80,
+.dark .border-slate-200\/90,
+.dark .border-slate-200\/60,
+.dark .border-slate-200\/50,
+.dark .border-slate-100,
+.dark .border-border {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark .glass-card {
+  background: rgba(15, 28, 50, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Dark Mode Form Inputs */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
+  background-color: #111d33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
 }
 
 /* ---- Typography ---- */

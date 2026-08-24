@@ -40,8 +40,8 @@ export default function Header() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? 'bg-navy shadow-lg border-b border-white/10 py-2'
-            : 'bg-navy py-3'
+            ? 'bg-white/95 dark:bg-navy/95 backdrop-blur-md shadow-md border-b border-slate-200/80 dark:border-white/10 py-2'
+            : 'bg-white/90 dark:bg-navy/90 backdrop-blur-md border-b border-slate-200/50 dark:border-white/5 py-3'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,14 +57,14 @@ export default function Header() {
                 alt="Allwin School of Music"
                 width={isScrolled ? 44 : 52}
                 height={isScrolled ? 44 : 52}
-                className="transition-all duration-300 rounded-full"
+                className="transition-all duration-300 rounded-full shadow-sm"
                 priority
               />
               <div className="hidden sm:block">
-                <span className="block text-white font-heading font-bold text-lg leading-tight">
+                <span className="block font-heading font-bold text-lg leading-tight text-navy dark:text-white">
                   {settings.businessName.split(' ')[0] || 'Allwin'}
                 </span>
-                <span className="block text-white/60 text-xs leading-tight">
+                <span className="block text-xs leading-tight text-text-secondary dark:text-white/60">
                   {settings.businessName.split(' ').slice(1).join(' ') || 'School of Music'}
                 </span>
               </div>
@@ -80,8 +80,8 @@ export default function Header() {
                     href={item.href}
                     className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                       isActive
-                        ? 'text-white bg-white/10'
-                        : 'text-white/75 hover:text-white hover:bg-white/5'
+                        ? 'text-violet bg-violet/10 dark:text-white dark:bg-white/15 font-semibold'
+                        : 'text-slate-700 hover:text-violet hover:bg-slate-100 dark:text-white/75 dark:hover:text-white dark:hover:bg-white/5'
                     }`}
                   >
                     {item.label}
@@ -95,7 +95,7 @@ export default function Header() {
               <ThemeToggle />
               <a
                 href={settings.phoneLink}
-                className="flex items-center gap-1.5 text-sm text-white/75 hover:text-white transition-colors"
+                className="flex items-center gap-1.5 text-sm text-slate-700 hover:text-violet dark:text-white/75 dark:hover:text-white transition-colors"
               >
                 <Phone className="w-4 h-4" />
                 <span className="hidden xl:inline">Call Now</span>
@@ -113,7 +113,7 @@ export default function Header() {
               </Button>
               <button
                 onClick={() => setIsMobileOpen(true)}
-                className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                className="p-2 text-slate-700 hover:text-navy hover:bg-slate-100 dark:text-white/80 dark:hover:text-white dark:hover:bg-white/10 rounded-lg transition-colors"
                 aria-label="Open navigation menu"
               >
                 <Menu className="w-6 h-6" />
