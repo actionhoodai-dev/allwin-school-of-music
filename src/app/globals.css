@@ -173,7 +173,7 @@ body {
 }
 
 /* Dark Mode Backgrounds */
-.dark .bg-white {
+.dark .bg-white:not(.piano-white-key):not(.keep-white) {
   background-color: #0d1728 !important;
 }
 
@@ -189,6 +189,20 @@ body {
 .dark .bg-slate-50\/70,
 .dark .bg-slate-100 {
   background-color: #111d33 !important;
+}
+
+/* Piano Keys White & Black Protection */
+.piano-white-key,
+.piano-white-key.bg-white,
+.dark .piano-white-key,
+.dark .piano-white-key.bg-white {
+  background-color: #ffffff !important;
+  border-right-color: #cbd5e1 !important;
+}
+
+.piano-black-key,
+.dark .piano-black-key {
+  background-color: #0f172a !important;
 }
 
 /* Dark Mode Headings & Text */

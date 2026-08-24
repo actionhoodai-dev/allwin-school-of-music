@@ -156,7 +156,7 @@ export default function InstrumentsSection() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
                   <Link
                     href={`/courses#${inst.slug}`}
                     className="inline-flex items-center gap-1.5 text-sm font-semibold text-violet hover:text-purple transition-colors"
@@ -166,7 +166,7 @@ export default function InstrumentsSection() {
                   </Link>
                   <Link
                     href={`/contact?course=${encodeURIComponent(inst.name)}`}
-                    className="text-xs font-medium text-text-muted hover:text-navy transition-colors bg-surface-dim hover:bg-slate-100 px-3 py-1.5 rounded-lg"
+                    className="inline-flex items-center justify-center text-xs font-bold px-3.5 py-1.5 rounded-xl bg-violet/10 hover:bg-violet text-violet hover:text-white dark:bg-white/10 dark:text-white dark:hover:bg-violet border border-violet/20 dark:border-white/15 transition-all shadow-sm hover:shadow-md cursor-pointer"
                   >
                     Enquire Now
                   </Link>

@@ -1,5 +1,5 @@
 // ============================================
-// Button Component
+// Button Component — High-Contrast Light & Dark Theme Compatible
 // ============================================
 
 import Link from 'next/link';
@@ -34,23 +34,23 @@ type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'btn-gradient text-white font-semibold shadow-lg hover:shadow-xl',
+    'btn-gradient text-white font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]',
   secondary:
-    'bg-white text-navy border border-border hover:bg-surface-dim hover:border-purple-light/30 shadow-sm hover:shadow-md',
+    'bg-white text-navy border border-slate-200 hover:bg-violet/10 hover:text-violet hover:border-violet/40 dark:bg-white/10 dark:text-white dark:border-white/20 dark:hover:bg-white/20 shadow-sm hover:shadow-md font-semibold',
   outline:
-    'bg-transparent text-violet border-2 border-violet hover:bg-violet hover:text-white',
+    'bg-transparent text-violet border-2 border-violet hover:bg-violet hover:text-white dark:text-violet-300 dark:border-violet-400 dark:hover:bg-violet-600 dark:hover:text-white font-semibold',
   ghost:
-    'bg-transparent text-text-secondary hover:bg-surface-dim hover:text-text-primary',
+    'bg-transparent text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-violet dark:hover:text-white font-medium',
   whatsapp:
-    'bg-[#25D366] text-white font-semibold hover:bg-[#20BD5A] shadow-lg hover:shadow-xl',
+    'bg-[#25D366] text-white font-bold hover:bg-[#20BD5A] shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]',
   danger:
-    'bg-red-600 text-white hover:bg-red-700 shadow-sm',
+    'bg-red-600 text-white font-bold hover:bg-red-700 shadow-sm',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'px-4 py-2 text-sm rounded-lg gap-1.5',
-  md: 'px-6 py-3 text-base rounded-xl gap-2',
-  lg: 'px-8 py-4 text-lg rounded-xl gap-2.5',
+  sm: 'px-4 py-2 text-xs sm:text-sm rounded-xl gap-1.5',
+  md: 'px-5 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base rounded-xl gap-2',
+  lg: 'px-7 sm:px-8 py-3.5 sm:py-4 text-base sm:text-lg rounded-2xl gap-2.5',
 };
 
 export default function Button(props: ButtonProps) {
