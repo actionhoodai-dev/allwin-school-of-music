@@ -25,8 +25,8 @@ export default function HeroSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           
-          {/* Left Column: Hero Text */}
-          <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
+          {/* Text Column (Comes 2nd on mobile, 1st on desktop) */}
+          <div className="order-2 lg:order-1 lg:col-span-7 space-y-6 text-center lg:text-left">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card-dark border border-white/15 text-xs sm:text-sm text-white/90 shadow-lg">
               <Sparkles className="w-4 h-4 text-orange" />
@@ -87,8 +87,8 @@ export default function HeroSection() {
             </div>
           </div>
 
-          {/* Right Column: Hero Visual Card (Liquid Glass) */}
-          <div className="lg:col-span-5 flex justify-center">
+          {/* Logo Visual Card (Comes 1st on mobile, 2nd on desktop) */}
+          <div className="order-1 lg:order-2 lg:col-span-5 flex justify-center">
             <div className="relative w-full max-w-md">
               {/* Pulsing halo */}
               <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-violet via-magenta to-orange opacity-40 blur-xl animate-pulse-glow" />
