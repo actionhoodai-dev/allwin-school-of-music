@@ -263,15 +263,13 @@ function ContactForm() {
                         WhatsApp Us Directly
                       </Button>
 
-                      <Button
+                      <a
                         href={settings.phoneLink}
-                        external
-                        variant="secondary"
-                        size="sm"
-                        icon={<Phone className="w-4 h-4 text-violet" />}
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold rounded-xl bg-navy text-white hover:bg-purple-deep shadow-md hover:shadow-lg transition-all cursor-pointer"
                       >
+                        <Phone className="w-4 h-4 text-white" />
                         Call {settings.phoneFormatted}
-                      </Button>
+                      </a>
                     </div>
                   </form>
                 )}

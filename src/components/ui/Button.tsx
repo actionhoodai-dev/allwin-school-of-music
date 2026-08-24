@@ -36,7 +36,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   primary:
     'btn-gradient text-white font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]',
   secondary:
-    'bg-white text-navy border border-slate-200 hover:bg-violet/10 hover:text-violet hover:border-violet/40 dark:bg-white/10 dark:text-white dark:border-white/20 dark:hover:bg-white/20 shadow-sm hover:shadow-md font-semibold',
+    'bg-navy text-white border border-navy/80 hover:bg-purple-deep hover:border-purple-deep dark:bg-white/15 dark:text-white dark:border-white/25 dark:hover:bg-white/25 shadow-sm hover:shadow-md font-semibold',
   outline:
     'bg-violet text-white border-2 border-violet hover:bg-purple-deep hover:border-purple-deep dark:bg-violet-600 dark:border-violet-600 dark:hover:bg-violet-700 dark:hover:border-violet-700 shadow-md hover:shadow-lg font-semibold',
   ghost:
