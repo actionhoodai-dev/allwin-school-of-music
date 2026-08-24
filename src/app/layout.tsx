@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { constructMetadata } from "@/lib/seo/metadata";
 import { getLocalBusinessSchema } from "@/lib/seo/structured-data";
@@ -8,7 +8,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { SettingsProvider } from "@/context/SettingsContext";
 
-const playfair = Playfair_Display({
+const fraunces = Fraunces({
   subsets: ["latin"],
   variable: "--font-heading",
   display: "swap",
@@ -34,7 +34,7 @@ export default function RootLayout({
   const jsonLd = getLocalBusinessSchema();
 
   return (
-    <html lang="en" suppressHydrationWarning className={`${playfair.variable} ${inter.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${fraunces.variable} ${inter.variable}`}>
       <head>
         <script
           type="application/ld+json"

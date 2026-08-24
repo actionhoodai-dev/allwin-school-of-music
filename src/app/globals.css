@@ -43,8 +43,8 @@
   --color-glass-shadow: rgba(0, 0, 0, 0.08);
 
   /* Typography */
-  --font-heading: 'Playfair Display', Georgia, serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  --font-heading: var(--font-heading), 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: var(--font-body), 'Inter', system-ui, -apple-system, sans-serif;
 
   /* Spacing */
   --spacing-section: 6rem;
