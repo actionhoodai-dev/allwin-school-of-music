@@ -278,7 +278,7 @@ export default function StudentLoginPage() {
         {/* Security & Offline indicator */}
         <div className="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500 text-center font-medium">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>Persistent session • Secured by Firebase Authentication</span>
+          <span>Persistent session • Secured Student Portal</span>
         </div>
       </main>
 

@@ -266,7 +266,7 @@ export default function AdminFacultyPage() {
                 }))
               }
               currentImageUrl={formData.photo}
-              label="Educator Photo (Cloudinary)"
+              label="Educator Photo"
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

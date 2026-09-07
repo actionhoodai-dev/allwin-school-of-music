@@ -244,7 +244,7 @@ export default function AdminAchievementsPage() {
                 }))
               }
               currentImageUrl={formData.imageUrl}
-              label="Photo / Certificate Image (Cloudinary)"
+              label="Photo / Certificate Image"
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

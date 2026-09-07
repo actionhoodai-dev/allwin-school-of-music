@@ -110,7 +110,7 @@ export default function AdminLoginPage() {
           <div className="pt-4 border-t border-slate-100 text-center">
             <div className="inline-flex items-center gap-1.5 text-xs text-slate-500 font-medium">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Secure Firebase Authentication</span>
+              <span>Secure Portal Authentication</span>
             </div>
           </div>
         </div>

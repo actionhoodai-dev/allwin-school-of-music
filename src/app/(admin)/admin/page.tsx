@@ -104,7 +104,7 @@ export default function AdminDashboardPage() {
     {
       title: 'Gallery Images',
       value: metrics.gallery,
-      subtext: 'Cloudinary media synced',
+      subtext: 'Media library synced',
       icon: ImageIcon,
       iconBg: 'bg-teal-50 text-teal-600 border border-teal-100',
       href: '/admin/gallery',

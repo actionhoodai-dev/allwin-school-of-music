@@ -71,7 +71,7 @@ export default function ImageUploader({
       );
 
       if (!uploadRes.ok) {
-        throw new Error('Cloudinary upload failed');
+        throw new Error('Image upload failed');
       }
 
       const data = await uploadRes.json();
@@ -88,8 +88,8 @@ export default function ImageUploader({
       setPreviewUrl(data.secure_url);
       onUploadSuccess(result);
     } catch (err: any) {
-      console.error('Upload failed:', err);
-      setErrorMessage(err.message || 'Image upload failed. Please try again.');
+      console.error('Upload error:', err);
+      setErrorMessage(err.message || 'Failed to upload photo');
     } finally {
       setIsUploading(false);
     }
@@ -97,11 +97,16 @@ export default function ImageUploader({
 
   const handleClear = () => {
     setPreviewUrl(null);
+    setErrorMessage(null);
   };
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-text-primary">{label}</label>
+      {label && (
+        <label className="block text-xs font-semibold text-text-secondary">
+          {label}
+        </label>
+      )}
 
       {errorMessage && (
         <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
@@ -122,7 +127,7 @@ export default function ImageUploader({
           {isUploading && (
             <div className="absolute inset-0 bg-navy/70 backdrop-blur-sm flex flex-col items-center justify-center text-white space-y-2">
               <Loader2 className="w-8 h-8 animate-spin text-orange" />
-              <span className="text-xs font-semibold">Uploading to Cloudinary...</span>
+              <span className="text-xs font-semibold">Uploading photo...</span>
             </div>
           )}
           {!isUploading && (

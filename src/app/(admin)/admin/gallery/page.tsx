@@ -53,7 +53,7 @@ export default function AdminGalleryPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!uploadedMedia) {
-      alert('Please upload an image to Cloudinary first.');
+      alert('Please select and upload a photo first.');
       return;
     }
 
@@ -113,13 +113,13 @@ export default function AdminGalleryPage() {
 
   return (
     <div className="flex-1 flex flex-col">
-      <AdminHeader title="Gallery & Cloudinary Media Manager" />
+      <AdminHeader title="Gallery & Media Manager" />
 
       <main className="p-6 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
         {/* Header Action */}
         <div className="flex items-center justify-between">
           <p className="text-xs sm:text-sm text-text-secondary">
-            Upload high-resolution photos securely stored on Cloudinary with automatic optimization.
+            Upload high-resolution photos for recitals, events, and classroom moments.
           </p>
           <Button
             onClick={() => setIsModalOpen(true)}
@@ -207,7 +207,7 @@ export default function AdminGalleryPage() {
         ) : (
           <EmptyState
             title="No Gallery Images Uploaded"
-            description="Upload performance recitals, classroom moments, and student photos via Cloudinary."
+            description="Upload performance recitals, classroom moments, and student photos."
             action={
               <Button onClick={() => setIsModalOpen(true)} size="sm">
                 Upload First Image
@@ -220,13 +220,13 @@ export default function AdminGalleryPage() {
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title="Upload Photo to Cloudinary"
+          title="Upload Photo to Gallery"
           size="lg"
         >
           <form onSubmit={handleSave} className="p-6 space-y-4">
             <ImageUploader
               onUploadSuccess={(result) => setUploadedMedia(result)}
-              label="Select Media to Upload (Cloudinary)"
+              label="Select Photo to Upload"
             />
 
             <Input
