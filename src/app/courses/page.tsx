@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Layers, Music2, Disc, Mic2, Sparkles, BookOpen, CheckCircle2, ArrowRight, Volume2, Video } from 'lucide-react';
+import { Layers, Music2, Disc, Mic2, Sparkles, BookOpen, CheckCircle2, ArrowRight, Volume2, Video, GraduationCap, Award } from 'lucide-react';
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
 import InstrumentAudioOverlay from '@/components/musical/InstrumentAudioOverlay';
 import { getPublishedDocuments } from '@/lib/firebase/firestore';
 import { useSiteSettings } from '@/context/SettingsContext';
+import { DEFAULT_COURSE_LEVELS } from '@/lib/constants';
 import type { Course } from '@/types';
 
 export default function CoursesPage() {
@@ -324,6 +325,103 @@ export default function CoursesPage() {
               </Button>
             </div>
           ))}
+
+        </div>
+      </section>
+
+      {/* Levels & Grades Progression Framework */}
+      <section className="py-20 bg-surface-dim relative overflow-hidden border-t border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          
+          <div className="text-center max-w-3xl mx-auto space-y-4">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet/10 text-violet text-xs font-bold uppercase tracking-wider">
+              <GraduationCap className="w-4 h-4" />
+              Academic Curriculum Hierarchy
+            </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-extrabold text-navy tracking-tight">
+              Levels &amp; <span className="gradient-text">Grade Progression</span>
+            </h2>
+            <p className="text-sm sm:text-base text-text-secondary leading-relaxed">
+              From absolute beginnings to mastery — our 6-level pedagogical roadmap prepares learners for international grade examinations.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {DEFAULT_COURSE_LEVELS.map((lvl, idx) => {
+              const levelColors = [
+                { bg: 'bg-emerald-50 text-emerald-700 border-emerald-200', tag: 'Step 1' },
+                { bg: 'bg-blue-50 text-blue-700 border-blue-200', tag: 'Step 2' },
+                { bg: 'bg-indigo-50 text-indigo-700 border-indigo-200', tag: 'Step 3' },
+                { bg: 'bg-violet-50 text-violet-700 border-violet-200', tag: 'Step 4' },
+                { bg: 'bg-amber-50 text-amber-700 border-amber-200', tag: 'Step 5' },
+                { bg: 'bg-rose-50 text-rose-700 border-rose-200', tag: 'Step 6' },
+              ];
+              const color = levelColors[idx % levelColors.length];
+
+              return (
+                <div
+                  key={lvl.name}
+                  className="p-6 sm:p-7 rounded-3xl bg-white border border-border shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-5 group"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[11px] font-extrabold uppercase px-3 py-1 rounded-full border ${color.bg}`}>
+                        Level {lvl.order} • {color.tag}
+                      </span>
+                      <span className="text-xs font-bold text-slate-400">
+                        {lvl.grades.length} {lvl.grades.length === 1 ? 'Grade' : 'Grades'}
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-heading font-bold text-navy group-hover:text-violet transition-colors">
+                      {lvl.name}
+                    </h3>
+
+                    <p className="text-xs text-text-secondary leading-relaxed">
+                      {lvl.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                      Encompassed Examination Grades:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {lvl.grades.map((g) => (
+                        <div
+                          key={g.name}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800 shadow-2xs"
+                        >
+                          <Award className="w-3.5 h-3.5 text-violet" />
+                          <span>{g.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Trinity Alignment Notice */}
+          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0">
+                <Award className="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <h4 className="font-heading font-bold text-base text-navy">
+                  Aligned with Trinity College London &amp; University Boards
+                </h4>
+                <p className="text-xs text-text-secondary">
+                  Each grade examination is prepared with official repertoire pieces, technical exercises, and aural ear training.
+                </p>
+              </div>
+            </div>
+            <Button href="/contact" size="sm">
+              Enroll for Assessment
+            </Button>
+          </div>
 
         </div>
       </section>

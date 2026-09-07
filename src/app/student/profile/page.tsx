@@ -72,7 +72,7 @@ export default function StudentProfilePage() {
           </p>
 
           <p className="text-xs text-[#2874f0] font-bold">
-            Grade: {student?.grade || 'Grade 1'} • Level: {student?.level || 'Beginner'}
+            Grade: {student?.grade || 'Initial Grade'} • Level: {student?.level || 'Pre Foundation Level'}
           </p>
         </div>
       </div>
@@ -104,14 +104,14 @@ export default function StudentProfilePage() {
           <div>
             <span className="text-slate-500 block text-[11px] font-medium">Current Level</span>
             <span className="font-bold text-slate-900">
-              {student?.level || 'Beginner'}
+              {student?.level || 'Pre Foundation Level'}
             </span>
           </div>
 
           <div>
             <span className="text-slate-500 block text-[11px] font-medium">Current Grade</span>
             <span className="font-bold text-slate-900">
-              {student?.grade || 'Grade 1'}
+              {student?.grade || 'Initial Grade'}
             </span>
           </div>
         </div>

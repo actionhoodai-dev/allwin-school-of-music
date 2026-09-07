@@ -22,8 +22,8 @@ export interface Student {
   gender?: Gender;
   course: string; // e.g. Western Music, Classical Carnatic, Vocal, Bharatham
   instrument: string; // e.g. Keyboard, Guitar, Violin, Vocal, Bharatham
-  level: string; // e.g. Beginner, Intermediate, Advanced
-  grade?: string; // e.g. Initial, Grade 1, Grade 2, Grade 3, Grade 4, Grade 5, Grade 6, Grade 7, Grade 8
+  level: string; // e.g. Pre Foundation Level, Foundation Level, Pre Intermediate Level, Intermediate Level, Pre Advance Level, Advance Level
+  grade?: string; // e.g. Initial Grade, Grade 1, Grade 2, Grade 3, Grade 4, Grade 5, Grade 6, Grade 7, Grade 8
   teacherName?: string;
   photo?: string;
   photoPublicId?: string;
@@ -43,9 +43,9 @@ export interface LevelGrade {
 
 export interface CourseLevel {
   id?: string;
-  name: string; // e.g. "Beginner", "Intermediate", "Advanced"
+  name: string; // e.g. "Pre Foundation Level", "Foundation Level", "Pre Intermediate Level", "Intermediate Level", "Pre Advance Level", "Advance Level"
   order: number;
-  grades: LevelGrade[]; // e.g. [{ name: "Initial", order: 1 }, { name: "Grade 1", order: 2 }]
+  grades: LevelGrade[]; // e.g. [{ name: "Initial Grade", order: 1 }, { name: "Grade 1", order: 2 }]
   createdAt?: Timestamp | any;
   updatedAt?: Timestamp | any;
 }

@@ -182,7 +182,7 @@ export default function StudentMorePage() {
               {student?.name || 'Student'}
             </h3>
             <p className="text-xs text-slate-600 font-semibold tracking-wide">
-              {student?.studentId} • {student?.instrument} ({student?.grade || 'Grade 1'})
+              {student?.studentId} • {student?.instrument} ({student?.grade || 'Initial Grade'})
             </p>
           </div>
         </div>

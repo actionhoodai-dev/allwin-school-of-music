@@ -400,3 +400,105 @@ export const ADMIN_NAV_ITEMS = [
   { label: 'FAQs', href: '/admin/faqs', icon: 'HelpCircle' },
   { label: 'Settings', href: '/admin/settings', icon: 'Settings' },
 ] as const;
+
+// ---- Standard Academic Levels & Grades Structure ----
+export interface CourseLevelDefinition {
+  name: string;
+  order: number;
+  description?: string;
+  grades: { name: string; order: number }[];
+}
+
+export const DEFAULT_COURSE_LEVELS: CourseLevelDefinition[] = [
+  {
+    name: 'Pre Foundation Level',
+    order: 1,
+    description: 'Initial introduction to music notation, rhythm, and basic instrument technique.',
+    grades: [
+      { name: 'Initial Grade', order: 1 },
+      { name: 'Grade 1', order: 2 },
+    ],
+  },
+  {
+    name: 'Foundation Level',
+    order: 2,
+    description: 'Core technique, scales, arpeggios, and sight-reading fundamentals.',
+    grades: [
+      { name: 'Grade 2', order: 1 },
+      { name: 'Grade 3', order: 2 },
+    ],
+  },
+  {
+    name: 'Pre Intermediate Level',
+    order: 3,
+    description: 'Expanding musicality, intermediate repertoire, hand independence, and dynamics.',
+    grades: [
+      { name: 'Grade 4', order: 1 },
+      { name: 'Grade 5', order: 2 },
+    ],
+  },
+  {
+    name: 'Intermediate Level',
+    order: 4,
+    description: 'Comprehensive technique, stylistic interpretation, and performance depth.',
+    grades: [
+      { name: 'Grade 6', order: 1 },
+    ],
+  },
+  {
+    name: 'Pre Advance Level',
+    order: 5,
+    description: 'Rigorous technical mastery, complex harmonic comprehension, and concert pieces.',
+    grades: [
+      { name: 'Grade 7', order: 1 },
+    ],
+  },
+  {
+    name: 'Advance Level',
+    order: 6,
+    description: 'Highest pre-diploma pinnacle of practical virtuosity, artistry, and exam mastery.',
+    grades: [
+      { name: 'Grade 8', order: 1 },
+    ],
+  },
+];
+
+export const ALL_GRADES = [
+  'Initial Grade',
+  'Grade 1',
+  'Grade 2',
+  'Grade 3',
+  'Grade 4',
+  'Grade 5',
+  'Grade 6',
+  'Grade 7',
+  'Grade 8',
+] as const;
+
+export const ALL_LEVELS = [
+  'Pre Foundation Level',
+  'Foundation Level',
+  'Pre Intermediate Level',
+  'Intermediate Level',
+  'Pre Advance Level',
+  'Advance Level',
+] as const;
+
+export function getLevelForGrade(gradeName?: string): string {
+  if (!gradeName) return 'Pre Foundation Level';
+  const cleanGrade = gradeName.trim().toLowerCase();
+  for (const lvl of DEFAULT_COURSE_LEVELS) {
+    if (
+      lvl.grades.some(
+        (g) =>
+          g.name.toLowerCase() === cleanGrade ||
+          (cleanGrade === 'initial' && g.name.toLowerCase().includes('initial')) ||
+          (cleanGrade === 'initial grade' && g.name.toLowerCase().includes('initial'))
+      )
+    ) {
+      return lvl.name;
+    }
+  }
+  return 'Pre Foundation Level';
+}
+

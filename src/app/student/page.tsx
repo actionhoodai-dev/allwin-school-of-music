@@ -236,10 +236,10 @@ export default function StudentDashboardPage() {
             </div>
           </div>
           <div className="text-2xl font-bold text-slate-900 truncate">
-            {student?.grade || 'Grade 1'}
+            {student?.grade || 'Initial Grade'}
           </div>
           <p className="text-[11px] text-slate-500 mt-0.5 truncate">
-            Level: {student?.level || 'Beginner'}
+            Level: {student?.level || 'Pre Foundation Level'}
           </p>
         </Link>
 

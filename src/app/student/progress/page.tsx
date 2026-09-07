@@ -67,7 +67,7 @@ export default function StudentProgressPage() {
         </div>
         <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-[#2874f0] border border-blue-200 text-xs font-bold">
           <Trophy className="w-4 h-4" />
-          <span>{student?.grade || 'Grade 1'}</span>
+          <span>{student?.grade || 'Initial Grade'}</span>
         </div>
       </div>
 
@@ -78,10 +78,10 @@ export default function StudentProgressPage() {
             Current Level Overview
           </span>
           <h3 className="font-bold text-xl sm:text-2xl text-slate-900 mt-1">
-            {student?.instrument} — {student?.grade || 'Grade 1'}
+            {student?.instrument} — {student?.grade || 'Initial Grade'}
           </h3>
           <p className="text-xs text-slate-500 font-medium">
-            Course Curriculum: {student?.course || 'Western Music'}
+            Curriculum Level: <strong className="text-slate-800">{student?.level || 'Pre Foundation Level'}</strong> • Course: {student?.course || 'Western Music'}
           </p>
         </div>
 

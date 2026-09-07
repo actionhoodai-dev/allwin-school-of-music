@@ -12,6 +12,8 @@ import {
   X,
   Check,
   BookOpen,
+  Sparkles,
+  RotateCcw,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
@@ -23,6 +25,7 @@ import {
   deleteDocument,
 } from '@/lib/firebase/firestore';
 import type { CourseLevel, LevelGrade } from '@/types/student';
+import { DEFAULT_COURSE_LEVELS } from '@/lib/constants';
 
 export default function LevelsGradesManager() {
   const [levels, setLevels] = useState<CourseLevel[]>([]);
@@ -102,6 +105,49 @@ export default function LevelsGradesManager() {
       setLevels((prev) => prev.filter((l) => l.id !== id));
     } catch (err) {
       console.error('Failed to delete level:', err);
+    }
+  };
+
+  // ── Load / Reset Standard Structure (Pre Foundation -> Advance) ──
+  const handleLoadDefaultStructure = async () => {
+    if (levels.length > 0) {
+      if (
+        !confirm(
+          'Apply the standard 6-Level curriculum structure?\n\n' +
+          '• Pre Foundation Level: Initial Grade, Grade 1\n' +
+          '• Foundation Level: Grade 2, Grade 3\n' +
+          '• Pre Intermediate Level: Grade 4, Grade 5\n' +
+          '• Intermediate Level: Grade 6\n' +
+          '• Pre Advance Level: Grade 7\n' +
+          '• Advance Level: Grade 8\n\n' +
+          'This will configure all 6 levels and grades in your database. Continue?'
+        )
+      ) {
+        return;
+      }
+    }
+    setSavingLevel(true);
+    try {
+      // Clear existing levels
+      for (const lvl of levels) {
+        if (lvl.id) {
+          await deleteDocument('courseLevels', lvl.id);
+        }
+      }
+      // Populate standard hierarchy
+      for (const dl of DEFAULT_COURSE_LEVELS) {
+        await addDocument('courseLevels', {
+          name: dl.name,
+          order: dl.order,
+          grades: dl.grades,
+        } as any);
+      }
+      await loadLevels();
+    } catch (err) {
+      console.error('Failed to load standard levels:', err);
+      alert('Failed to save standard levels. Please check your connection and try again.');
+    } finally {
+      setSavingLevel(false);
     }
   };
 
@@ -190,23 +236,35 @@ export default function LevelsGradesManager() {
   return (
     <div className="space-y-3">
       {/* Section Header */}
-      <div className="flex items-center justify-between pb-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
         <div className="flex items-center gap-2">
           <Layers className="w-4 h-4 text-emerald-600" />
           <h2 className="text-sm font-bold text-navy tracking-wide uppercase">
-            Levels & Grades
+            Levels & Grades Hierarchy
           </h2>
           <span className="text-[10px] font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
             {levels.length} Levels
           </span>
         </div>
-        <Button
-          onClick={openAddLevel}
-          size="sm"
-          icon={<Plus className="w-3.5 h-3.5" />}
-        >
-          Add Level
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleLoadDefaultStructure}
+            disabled={savingLevel}
+            icon={<RotateCcw className="w-3.5 h-3.5 text-violet" />}
+          >
+            {savingLevel ? 'Updating...' : 'Standard Structure (6 Levels)'}
+          </Button>
+          <Button
+            onClick={openAddLevel}
+            size="sm"
+            icon={<Plus className="w-3.5 h-3.5" />}
+          >
+            Add Level
+          </Button>
+        </div>
       </div>
 
       {/* Levels List */}
@@ -411,22 +469,36 @@ export default function LevelsGradesManager() {
           })}
         </div>
       ) : (
-        <div className="p-8 rounded-2xl bg-white border border-dashed border-slate-200 text-center space-y-3">
+        <div className="p-8 rounded-2xl bg-white border border-dashed border-slate-200 text-center space-y-4">
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center mx-auto">
             <Layers className="w-6 h-6 text-emerald-500" />
           </div>
           <div>
             <p className="text-sm font-semibold text-navy">
-              No Levels & Grades Defined
+              No Levels & Grades Defined Yet
             </p>
             <p className="text-xs text-text-secondary mt-1 max-w-md mx-auto">
-              Create levels (e.g. Beginner, Intermediate, Advanced) and add grades under each.
-              These will appear as options when enrolling students.
+              Set up the official Allwin School of Music 6-Level structure (Pre Foundation to Advance Level with Initial Grade to Grade 8), or create custom levels.
             </p>
           </div>
-          <Button onClick={openAddLevel} size="sm" icon={<Plus className="w-3.5 h-3.5" />}>
-            Create First Level
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+            <Button
+              onClick={handleLoadDefaultStructure}
+              size="sm"
+              icon={<Sparkles className="w-3.5 h-3.5" />}
+              disabled={savingLevel}
+            >
+              {savingLevel ? 'Applying...' : 'Apply Standard Structure (6 Levels, 8 Grades)'}
+            </Button>
+            <Button
+              onClick={openAddLevel}
+              variant="outline"
+              size="sm"
+              icon={<Plus className="w-3.5 h-3.5" />}
+            >
+              Create Custom Level
+            </Button>
+          </div>
         </div>
       )}
 

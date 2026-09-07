@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ImageUploader from '@/components/admin/ImageUploader';
-import { INSTRUMENT_OPTIONS } from '@/lib/constants';
+import { INSTRUMENT_OPTIONS, DEFAULT_COURSE_LEVELS, getLevelForGrade } from '@/lib/constants';
 import { getDocuments } from '@/lib/firebase/firestore';
 import type { Student, CourseLevel } from '@/types/student';
 
@@ -39,8 +39,8 @@ export default function StudentFormModal({
     parentPhone: '',
     course: 'Western Music',
     instrument: 'Keyboard',
-    level: 'Beginner',
-    grade: 'Grade 1',
+    level: 'Pre Foundation Level',
+    grade: 'Initial Grade',
     photo: '',
     initialPassword: '',
     status: 'active',
@@ -75,8 +75,8 @@ export default function StudentFormModal({
         parentPhone: editingStudent.parentPhone || '',
         course: editingStudent.course || 'Western Music',
         instrument: editingStudent.instrument || 'Keyboard',
-        level: editingStudent.level || 'Beginner',
-        grade: editingStudent.grade || 'Grade 1',
+        level: editingStudent.level || 'Pre Foundation Level',
+        grade: editingStudent.grade || 'Initial Grade',
         photo: editingStudent.photo || '',
         initialPassword: '',
         status: editingStudent.status || 'active',
@@ -314,29 +314,26 @@ export default function StudentFormModal({
                 <label className="block font-semibold text-text-secondary dark:text-slate-300 mb-1">
                   Level
                 </label>
-                <select
-                  value={formData.level}
-                  onChange={(e) => {
-                    const newLevel = e.target.value;
-                    // Auto-select first grade of the new level
-                    const matchedLevel = courseLevels.find((l) => l.name === newLevel);
-                    const firstGrade = matchedLevel?.grades?.sort((a, b) => a.order - b.order)?.[0]?.name || '';
-                    setFormData({ ...formData, level: newLevel, grade: firstGrade || formData.grade });
-                  }}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-violet"
-                >
-                  {courseLevels.length > 0 ? (
-                    courseLevels.map((lvl) => (
-                      <option key={lvl.id} value={lvl.name}>{lvl.name}</option>
-                    ))
-                  ) : (
-                    <>
-                      <option value="Beginner">Beginner</option>
-                      <option value="Intermediate">Intermediate</option>
-                      <option value="Advanced">Advanced</option>
-                    </>
-                  )}
-                </select>
+                {(() => {
+                  const effectiveLevels = courseLevels.length > 0 ? courseLevels : DEFAULT_COURSE_LEVELS;
+                  return (
+                    <select
+                      value={formData.level}
+                      onChange={(e) => {
+                        const newLevel = e.target.value;
+                        // Auto-select first grade of the new level
+                        const matchedLevel = effectiveLevels.find((l) => l.name === newLevel);
+                        const firstGrade = matchedLevel?.grades?.sort((a, b) => a.order - b.order)?.[0]?.name || '';
+                        setFormData({ ...formData, level: newLevel, grade: firstGrade || formData.grade });
+                      }}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-violet"
+                    >
+                      {effectiveLevels.map((lvl) => (
+                        <option key={lvl.name} value={lvl.name}>{lvl.name}</option>
+                      ))}
+                    </select>
+                  );
+                })()}
               </div>
 
               <div>
@@ -345,39 +342,26 @@ export default function StudentFormModal({
                 </label>
                 <select
                   value={formData.grade}
-                  onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
+                  onChange={(e) => {
+                    const newGrade = e.target.value;
+                    const autoLevel = getLevelForGrade(newGrade);
+                    setFormData({ ...formData, grade: newGrade, level: autoLevel || formData.level });
+                  }}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-violet"
                 >
                   {(() => {
-                    const selectedLevel = courseLevels.find((l) => l.name === formData.level);
+                    const effectiveLevels = courseLevels.length > 0 ? courseLevels : DEFAULT_COURSE_LEVELS;
+                    const selectedLevel = effectiveLevels.find((l) => l.name === formData.level);
                     const grades = selectedLevel?.grades?.sort((a, b) => a.order - b.order) || [];
                     if (grades.length > 0) {
                       return grades.map((g, i) => (
                         <option key={i} value={g.name}>{g.name}</option>
                       ));
                     }
-                    // Fallback: if no levels configured, show all grades from all levels or hardcoded
-                    if (courseLevels.length > 0) {
-                      const allGrades = courseLevels.flatMap((l) => l.grades || []);
-                      if (allGrades.length > 0) {
-                        return allGrades.sort((a, b) => a.order - b.order).map((g, i) => (
-                          <option key={i} value={g.name}>{g.name}</option>
-                        ));
-                      }
-                    }
-                    return (
-                      <>
-                        <option value="Initial">Initial</option>
-                        <option value="Grade 1">Grade 1</option>
-                        <option value="Grade 2">Grade 2</option>
-                        <option value="Grade 3">Grade 3</option>
-                        <option value="Grade 4">Grade 4</option>
-                        <option value="Grade 5">Grade 5</option>
-                        <option value="Grade 6">Grade 6</option>
-                        <option value="Grade 7">Grade 7</option>
-                        <option value="Grade 8">Grade 8</option>
-                      </>
-                    );
+                    const allGrades = effectiveLevels.flatMap((l) => l.grades || []);
+                    return allGrades.sort((a, b) => a.order - b.order).map((g, i) => (
+                      <option key={i} value={g.name}>{g.name}</option>
+                    ));
                   })()}
                 </select>
               </div>

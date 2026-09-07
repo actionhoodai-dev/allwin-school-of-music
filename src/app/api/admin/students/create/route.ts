@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase/config';
 import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'firebase/firestore';
 import { reserveNextStudentId, getStudentAuthEmail } from '@/lib/utils/student-id';
+import { getLevelForGrade } from '@/lib/constants';
 
 export async function POST(request: Request) {
   try {
@@ -74,8 +75,8 @@ export async function POST(request: Request) {
       gender: gender || 'other',
       course: course || 'Western Music',
       instrument: instrument || 'Keyboard',
-      level: level || 'Beginner',
-      grade: grade || 'Initial',
+      level: level || (grade ? getLevelForGrade(grade) : 'Pre Foundation Level'),
+      grade: grade || 'Initial Grade',
       teacherId: teacherId || '',
       teacherName: teacherName || '',
       photo: photo || '',

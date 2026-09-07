@@ -86,7 +86,7 @@ export default function StudentTrinityExamPage() {
           </div>
           <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
             <span className="text-slate-500 block text-[10px] font-medium">Current Grade</span>
-            <span className="font-bold text-slate-900">{student?.grade || 'Grade 1'}</span>
+            <span className="font-bold text-slate-900">{student?.grade || 'Initial Grade'}</span>
           </div>
           <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
             <span className="text-emerald-800 block text-[10px] font-bold">Exam Status</span>

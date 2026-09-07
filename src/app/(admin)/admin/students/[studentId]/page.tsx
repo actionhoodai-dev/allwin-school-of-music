@@ -53,6 +53,7 @@ import type {
   StudentFeeItem,
   ExamRecord,
 } from '@/types/student';
+import { ALL_GRADES, ALL_LEVELS, getLevelForGrade } from '@/lib/constants';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: User },
@@ -106,8 +107,8 @@ export default function AdminStudentWorkspacePage({
     title: 'Grade Progress Evaluation',
     term: 'Term 1',
     assessmentDate: new Date().toISOString().split('T')[0],
-    level: 'Beginner',
-    grade: 'Grade 1',
+    level: 'Pre Foundation Level',
+    grade: 'Initial Grade',
     evaluation: '',
     strengths: '',
     areasToImprove: '',
@@ -256,8 +257,8 @@ export default function AdminStudentWorkspacePage({
         title: newProgress.title,
         term: newProgress.term,
         assessmentDate: newProgress.assessmentDate,
-        level: newProgress.level || student.level || 'Beginner',
-        grade: newProgress.grade || student.grade || 'Grade 1',
+        level: newProgress.level || student.level || 'Pre Foundation Level',
+        grade: newProgress.grade || student.grade || 'Initial Grade',
         evaluation: newProgress.evaluation,
         strengths: strengthsArr,
         areasToImprove: areasArr,
@@ -576,8 +577,8 @@ export default function AdminStudentWorkspacePage({
               <div className="space-y-2.5 pt-3 border-t border-slate-100 text-xs">
                 <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Course:</span><strong className="text-slate-900 font-bold">{student.course}</strong></div>
                 <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Instrument:</span><strong className="text-slate-900 font-bold">{student.instrument}</strong></div>
-                <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Current Grade:</span><strong className="text-slate-900 font-bold">{student.grade || 'Grade 1'}</strong></div>
-                <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Current Level:</span><strong className="text-slate-900 font-bold">{student.level || 'Beginner'}</strong></div>
+                <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Current Grade:</span><strong className="text-slate-900 font-bold">{student.grade || 'Initial Grade'}</strong></div>
+                <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Current Level:</span><strong className="text-slate-900 font-bold">{student.level || 'Pre Foundation Level'}</strong></div>
               </div>
             </div>
 
@@ -769,18 +770,16 @@ export default function AdminStudentWorkspacePage({
                     <label className="block text-text-muted mb-1 font-semibold">Assigned Grade</label>
                     <select
                       value={newProgress.grade}
-                      onChange={(e) => setNewProgress({ ...newProgress, grade: e.target.value })}
+                      onChange={(e) => {
+                        const g = e.target.value;
+                        const lvl = getLevelForGrade(g);
+                        setNewProgress({ ...newProgress, grade: g, level: lvl || newProgress.level });
+                      }}
                       className="w-full p-2.5 rounded-xl bg-white border border-border text-xs"
                     >
-                      <option value="Initial">Initial / Foundation</option>
-                      <option value="Grade 1">Grade 1</option>
-                      <option value="Grade 2">Grade 2</option>
-                      <option value="Grade 3">Grade 3</option>
-                      <option value="Grade 4">Grade 4</option>
-                      <option value="Grade 5">Grade 5</option>
-                      <option value="Grade 6">Grade 6</option>
-                      <option value="Grade 7">Grade 7</option>
-                      <option value="Grade 8">Grade 8</option>
+                      {ALL_GRADES.map((g) => (
+                        <option key={g} value={g}>{g}</option>
+                      ))}
                     </select>
                   </div>
                   <div>
@@ -790,9 +789,9 @@ export default function AdminStudentWorkspacePage({
                       onChange={(e) => setNewProgress({ ...newProgress, level: e.target.value })}
                       className="w-full p-2.5 rounded-xl bg-white border border-border text-xs"
                     >
-                      <option value="Beginner">Beginner</option>
-                      <option value="Intermediate">Intermediate</option>
-                      <option value="Advanced">Advanced</option>
+                      {ALL_LEVELS.map((lvl) => (
+                        <option key={lvl} value={lvl}>{lvl}</option>
+                      ))}
                     </select>
                   </div>
                   <div className="sm:col-span-2">
