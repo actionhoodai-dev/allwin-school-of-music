@@ -285,7 +285,7 @@ export default function AdminBulkAttendancePage() {
         </div>
 
         {/* Student Roster Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {loading ? (
             <div className="col-span-full py-16 text-center text-text-muted">
               Loading class roster...
@@ -302,67 +302,108 @@ export default function AdminBulkAttendancePage() {
               return (
                 <div
                   key={student.id || student.studentId}
-                  className={`p-4 rounded-3xl bg-white border transition-all flex items-center justify-between gap-3 shadow-xs ${
+                  className={`p-4 rounded-2xl bg-white border transition-all shadow-sm flex flex-col justify-between gap-3.5 ${
                     status === 'present'
-                      ? 'border-emerald-500/60 bg-emerald-50/20'
+                      ? 'border-emerald-500/70 bg-emerald-50/20'
                       : status === 'absent'
-                      ? 'border-rose-500/60 bg-rose-50/20'
-                      : 'border-border'
+                      ? 'border-rose-500/70 bg-rose-50/20'
+                      : status === 'no_class'
+                      ? 'border-slate-400 bg-slate-50/60'
+                      : 'border-border hover:border-slate-300'
                   }`}
                 >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold tracking-wide text-[11px] text-violet bg-violet/10 px-2 py-0.5 rounded-full">
-                        {student.studentId}
-                      </span>
-                      <span className="text-xs font-semibold text-text-muted truncate">
-                        {student.instrument} ({student.grade || 'Grade 1'})
-                      </span>
+                  {/* Top Section: Badges & Name & Status */}
+                  <div>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                        <span className="font-mono font-bold tracking-wide text-[11px] text-violet bg-violet/10 px-2 py-0.5 rounded-md whitespace-nowrap shrink-0">
+                          {student.studentId}
+                        </span>
+                        <span
+                          className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md truncate max-w-[170px]"
+                          title={`${student.instrument} (${student.grade || 'Grade 1'})`}
+                        >
+                          {student.instrument} ({student.grade || 'Grade 1'})
+                        </span>
+                      </div>
+
+                      {/* Current Status Pill */}
+                      <div className="shrink-0">
+                        {status === 'present' && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                            Present
+                          </span>
+                        )}
+                        {status === 'absent' && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
+                            Absent
+                          </span>
+                        )}
+                        {status === 'no_class' && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 border border-slate-300">
+                            No Class
+                          </span>
+                        )}
+                        {!status && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                            Unmarked
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <h4 className="font-heading font-bold text-sm text-navy mt-1 truncate">
+
+                    <h4 className="font-heading font-bold text-base text-navy mt-2 truncate" title={student.name}>
                       {student.name}
                     </h4>
                   </div>
 
-                  {/* 3 Status Toggle Buttons */}
-                  <div className="flex items-center gap-1 shrink-0">
+                  {/* 3 Status Action Buttons - Mobile friendly, easy to press with visible labels */}
+                  <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100">
                     <button
+                      type="button"
                       onClick={() => handleStatusToggle(student, 'present')}
                       disabled={savingId === student.studentId}
-                      className={`p-2 rounded-xl transition-all active:scale-95 ${
+                      className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 touch-manipulation min-h-[42px] select-none ${
                         status === 'present'
-                          ? 'bg-emerald-600 text-white shadow-sm'
-                          : 'bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-700'
+                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30 ring-2 ring-emerald-600 ring-offset-1 font-extrabold'
+                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300'
                       }`}
-                      title="Present"
+                      title="Mark Present"
                     >
-                      <CheckCircle2 className="w-4 h-4" />
+                      <CheckCircle2 className={`w-4 h-4 shrink-0 ${status === 'present' ? 'text-white' : 'text-emerald-600'}`} />
+                      <span className="truncate">Present</span>
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => handleStatusToggle(student, 'absent')}
                       disabled={savingId === student.studentId}
-                      className={`p-2 rounded-xl transition-all active:scale-95 ${
+                      className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 touch-manipulation min-h-[42px] select-none ${
                         status === 'absent'
-                          ? 'bg-rose-600 text-white shadow-sm'
-                          : 'bg-slate-100 text-slate-600 hover:bg-rose-100 hover:text-rose-700'
+                          ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30 ring-2 ring-rose-600 ring-offset-1 font-extrabold'
+                          : 'bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 hover:border-rose-300'
                       }`}
-                      title="Absent"
+                      title="Mark Absent"
                     >
-                      <XCircle className="w-4 h-4" />
+                      <XCircle className={`w-4 h-4 shrink-0 ${status === 'absent' ? 'text-white' : 'text-rose-600'}`} />
+                      <span className="truncate">Absent</span>
                     </button>
 
                     <button
+                      type="button"
                       onClick={() => handleStatusToggle(student, 'no_class')}
                       disabled={savingId === student.studentId}
-                      className={`p-2 rounded-xl transition-all active:scale-95 ${
+                      className={`py-2.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 touch-manipulation min-h-[42px] select-none ${
                         status === 'no_class'
-                          ? 'bg-slate-700 text-white shadow-sm'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          ? 'bg-slate-800 text-white shadow-md shadow-slate-800/25 ring-2 ring-slate-800 ring-offset-1 font-extrabold'
+                          : 'bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200'
                       }`}
-                      title="No Class"
+                      title="Mark No Class"
                     >
-                      <MinusCircle className="w-4 h-4" />
+                      <MinusCircle className={`w-4 h-4 shrink-0 ${status === 'no_class' ? 'text-white' : 'text-slate-500'}`} />
+                      <span className="truncate">No Class</span>
                     </button>
                   </div>
                 </div>
