@@ -286,25 +286,41 @@ export default function AdminAttendanceCalendar({
           }
 
           let cellStyle = 'bg-[#FFFFFF] text-[#000000] hover:bg-slate-50';
-          let textColor = 'text-[#000000] font-normal';
-          let dot = null;
+          let textColor = 'text-[#000000] font-medium';
+          let badge = null;
 
-          if (isActive) {
-            // Figma Active day: #45539D background, #FFFFFF text
-            cellStyle = 'bg-[#45539D] text-[#FFFFFF] font-semibold';
-            textColor = 'text-[#FFFFFF] font-semibold';
-          } else if (rec?.status === 'present') {
-            cellStyle = 'bg-emerald-50/70 text-emerald-950 hover:bg-emerald-100/70 font-medium';
-            textColor = 'text-emerald-950 font-semibold';
-            dot = <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 mt-0.5" />;
+          if (rec?.status === 'present') {
+            cellStyle = isActive
+              ? 'bg-emerald-600 ring-3 ring-inset ring-[#45539D] text-white'
+              : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs';
+            textColor = 'text-white font-extrabold';
+            badge = (
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-emerald-100 uppercase tracking-tighter leading-none">
+                <Check className="w-3 h-3 stroke-[3]" />
+              </span>
+            );
           } else if (rec?.status === 'absent') {
-            cellStyle = 'bg-rose-50/70 text-rose-950 hover:bg-rose-100/70 font-medium';
-            textColor = 'text-rose-950 font-semibold';
-            dot = <span className="w-1.5 h-1.5 rounded-full bg-rose-600 mt-0.5" />;
+            cellStyle = isActive
+              ? 'bg-rose-600 ring-3 ring-inset ring-[#45539D] text-white'
+              : 'bg-rose-600 hover:bg-rose-700 text-white shadow-xs';
+            textColor = 'text-white font-extrabold';
+            badge = (
+              <span className="inline-flex items-center gap-0.5 text-[10px] font-black text-rose-100 uppercase tracking-tighter leading-none">
+                <X className="w-3 h-3 stroke-[3]" />
+              </span>
+            );
           } else if (rec?.status === 'no_class') {
-            cellStyle = 'bg-slate-100 text-slate-700 hover:bg-slate-200';
-            textColor = 'text-slate-700';
-            dot = <span className="w-1.5 h-1.5 rounded-full bg-slate-400 mt-0.5" />;
+            cellStyle = isActive
+              ? 'bg-slate-300 ring-3 ring-inset ring-[#45539D] text-slate-800'
+              : 'bg-slate-200 hover:bg-slate-300 text-slate-700';
+            textColor = 'text-slate-800 font-bold';
+            badge = (
+              <span className="text-[11px] font-black text-slate-600 leading-none">−</span>
+            );
+          } else if (isActive) {
+            // Figma Active day when not marked
+            cellStyle = 'bg-[#45539D] text-[#FFFFFF] font-semibold';
+            textColor = 'text-[#FFFFFF] font-bold';
           }
 
           return (
@@ -312,12 +328,27 @@ export default function AdminAttendanceCalendar({
               key={`${item.dateStr}-${index}`}
               type="button"
               onClick={() => handleDateClick(item.dateStr)}
-              className={`h-[52px] sm:h-[64px] border-r border-b border-[#D5D4DF] flex flex-col items-center justify-center relative cursor-pointer transition-all active:scale-95 ${cellStyle} ${
-                isToday && !isActive ? 'ring-2 ring-inset ring-[#45539D]/70' : ''
+              className={`h-[52px] sm:h-[64px] border-r border-b border-[#D5D4DF] flex flex-col items-center justify-center gap-0.5 relative cursor-pointer transition-all active:scale-95 ${cellStyle} ${
+                isToday && !isActive && !rec?.status
+                  ? 'ring-2 ring-inset ring-[#45539D]/80'
+                  : isToday && rec?.status
+                  ? 'ring-2 ring-inset ring-white'
+                  : ''
               }`}
+              title={
+                rec?.status
+                  ? `${item.dateStr}: ${rec.status.toUpperCase()}${rec.remarks ? ` (${rec.remarks})` : ''}`
+                  : item.dateStr
+              }
             >
-              <span className={`text-[14px] leading-[17px] ${textColor}`}>{item.day}</span>
-              {dot && <div className="absolute bottom-1.5 flex items-center justify-center">{dot}</div>}
+              <span className={`text-[14px] sm:text-[15px] leading-tight ${textColor}`}>
+                {item.day}
+              </span>
+              {badge && (
+                <div className="flex items-center justify-center">
+                  {badge}
+                </div>
+              )}
             </button>
           );
         })}
@@ -327,16 +358,16 @@ export default function AdminAttendanceCalendar({
       <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 text-xs text-slate-600">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-[11px] font-semibold text-slate-800">Present</span>
+            <span className="w-4 h-4 rounded-md bg-emerald-600 flex items-center justify-center text-white text-[10px] font-bold shadow-xs">✓</span>
+            <span className="text-[11px] font-bold text-slate-800">Present (Green)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-rose-500" />
-            <span className="text-[11px] font-semibold text-slate-800">Absent</span>
+            <span className="w-4 h-4 rounded-md bg-rose-600 flex items-center justify-center text-white text-[10px] font-bold shadow-xs">✕</span>
+            <span className="text-[11px] font-bold text-slate-800">Absent (Red)</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-slate-400" />
-            <span className="text-[11px] font-semibold text-slate-800">No Class</span>
+            <span className="w-4 h-4 rounded-md bg-slate-200 flex items-center justify-center text-slate-700 text-[10px] font-bold">−</span>
+            <span className="text-[11px] font-bold text-slate-800">No Class</span>
           </div>
         </div>
 
