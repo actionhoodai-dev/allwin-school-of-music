@@ -11,7 +11,6 @@ import { usePathname } from 'next/navigation';
 import { Menu, Phone } from 'lucide-react';
 import { NAV_ITEMS } from '@/lib/constants';
 import Button from '@/components/ui/Button';
-import ThemeToggle from '@/components/ui/ThemeToggle';
 import { useSiteSettings } from '@/context/SettingsContext';
 import MobileNav from './MobileNav';
 
@@ -40,8 +39,8 @@ export default function Header() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           isScrolled
-            ? 'bg-white/95 dark:bg-navy/95 backdrop-blur-md shadow-md border-b border-slate-200/80 dark:border-white/10 py-2'
-            : 'bg-white/90 dark:bg-navy/90 backdrop-blur-md border-b border-slate-200/50 dark:border-white/5 py-3'
+            ? 'bg-white/95 backdrop-blur-md shadow-md border-b border-slate-200 py-2'
+            : 'bg-white/90 backdrop-blur-md border-b border-slate-200/60 py-3'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,14 +56,14 @@ export default function Header() {
                 alt="Allwin School of Music"
                 width={isScrolled ? 44 : 52}
                 height={isScrolled ? 44 : 52}
-                className="transition-all duration-300 rounded-full shadow-sm"
+                className="transition-all duration-300 rounded-full shadow-sm ring-1 ring-slate-200"
                 priority
               />
               <div className="hidden sm:block">
-                <span className="block font-heading font-bold text-lg leading-tight text-navy dark:text-white">
+                <span className="block font-heading font-bold text-lg leading-tight text-slate-900">
                   {settings.businessName.split(' ')[0] || 'Allwin'}
                 </span>
-                <span className="block text-xs leading-tight text-text-secondary dark:text-white/60">
+                <span className="block text-xs leading-tight text-slate-600 font-medium">
                   {settings.businessName.split(' ').slice(1).join(' ') || 'School of Music'}
                 </span>
               </div>
@@ -78,10 +77,10 @@ export default function Header() {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
                       isActive
-                        ? 'text-violet bg-violet/10 dark:text-white dark:bg-white/15 font-semibold'
-                        : 'text-slate-700 hover:text-violet hover:bg-slate-100 dark:text-white/75 dark:hover:text-white dark:hover:bg-white/5'
+                        ? 'text-blue-600 bg-blue-50 border border-blue-200/60 shadow-2xs'
+                        : 'text-slate-700 hover:text-blue-600 hover:bg-slate-100'
                     }`}
                   >
                     {item.label}
@@ -92,12 +91,17 @@ export default function Header() {
 
             {/* Desktop CTAs */}
             <div className="hidden lg:flex items-center gap-3">
-              <ThemeToggle />
+              <Link
+                href="/student-login"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#2874f0] text-xs font-bold border border-blue-200 transition-all active:scale-95 shadow-2xs"
+              >
+                <span>Student Portal</span>
+              </Link>
               <a
                 href={settings.phoneLink}
-                className="flex items-center gap-1.5 text-sm text-slate-700 hover:text-violet dark:text-white/75 dark:hover:text-white transition-colors"
+                className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 hover:text-blue-600 transition-colors"
               >
-                <Phone className="w-4 h-4" />
+                <Phone className="w-4 h-4 text-blue-600" />
                 <span className="hidden xl:inline">Call Now</span>
               </a>
               <Button href="/contact" size="sm">
@@ -107,16 +111,21 @@ export default function Header() {
 
             {/* Mobile Controls */}
             <div className="flex lg:hidden items-center gap-2">
-              <ThemeToggle />
+              <Link
+                href="/student-login"
+                className="px-2.5 py-1.5 rounded-xl bg-blue-50 text-[#2874f0] text-xs font-bold border border-blue-200 shrink-0 shadow-2xs"
+              >
+                Portal
+              </Link>
               <Button href="/contact" size="sm">
                 Enquire
               </Button>
               <button
                 onClick={() => setIsMobileOpen(true)}
-                className="p-2 text-slate-700 hover:text-navy hover:bg-slate-100 dark:text-white/80 dark:hover:text-white dark:hover:bg-white/10 rounded-lg transition-colors"
+                className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200"
                 aria-label="Open navigation menu"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-5 h-5" />
               </button>
             </div>
           </div>

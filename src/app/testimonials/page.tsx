@@ -95,25 +95,25 @@ export default function TestimonialsPage() {
 
             {/* Rating Filter Pills */}
             <div className="flex items-center gap-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0">
-              <span className="text-xs text-text-muted font-medium shrink-0 flex items-center gap-1">
-                <Filter className="w-3.5 h-3.5" /> Rating:
+              <span className="text-xs text-slate-500 font-bold shrink-0 flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5 text-blue-600" /> Rating:
               </span>
               <button
                 onClick={() => setSelectedRating('all')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   selectedRating === 'all'
-                    ? 'bg-violet text-white shadow-sm'
-                    : 'bg-surface-dim text-text-secondary hover:bg-slate-100'
+                    ? 'bg-blue-600 text-white shadow-2xs'
+                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
                 }`}
               >
                 All ({testimonials.length})
               </button>
               <button
                 onClick={() => setSelectedRating(5)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1 transition-all ${
                   selectedRating === 5
-                    ? 'bg-violet text-white shadow-sm'
-                    : 'bg-surface-dim text-text-secondary hover:bg-slate-100'
+                    ? 'bg-blue-600 text-white shadow-2xs'
+                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
                 }`}
               >
                 <span>5 Stars</span>

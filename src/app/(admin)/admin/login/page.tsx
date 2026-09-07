@@ -44,35 +44,31 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-navy relative overflow-hidden">
-      {/* Background gradients */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-purple-deep/60 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-orange/20 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[#f1f3f6] relative overflow-hidden">
       <div className="max-w-md w-full relative z-10">
-        <div className="p-8 sm:p-10 rounded-3xl bg-white/95 backdrop-blur-xl border border-white/20 shadow-2xl space-y-6">
+        <div className="p-8 sm:p-10 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-6">
           {/* Logo & Header */}
-          <div className="text-center space-y-3">
+          <div className="text-center space-y-2">
             <div className="relative w-20 h-20 mx-auto">
               <Image
                 src="/logo.png"
                 alt="Allwin School of Music Logo"
                 fill
                 sizes="80px"
-                className="object-contain rounded-full shadow-md"
+                className="object-contain rounded-full shadow-sm ring-4 ring-blue-100"
                 priority
               />
             </div>
-            <h1 className="font-heading font-bold text-2xl text-navy">
+            <h1 className="font-bold text-2xl text-slate-900">
               Admin Portal
             </h1>
-            <p className="text-xs text-text-secondary">
+            <p className="text-xs text-slate-500 font-medium">
               {BUSINESS.fullName} Management
             </p>
           </div>
 
           {error && (
-            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2">
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2 font-medium">
               <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -104,6 +100,7 @@ export default function AdminLoginPage() {
                 size="md"
                 disabled={loading}
                 iconRight={<ArrowRight className="w-4 h-4" />}
+                className="bg-[#2874f0] hover:bg-blue-600 font-bold"
               >
                 {loading ? 'Authenticating...' : 'Sign In to Dashboard'}
               </Button>
@@ -111,8 +108,8 @@ export default function AdminLoginPage() {
           </form>
 
           <div className="pt-4 border-t border-slate-100 text-center">
-            <div className="inline-flex items-center gap-1.5 text-[11px] text-text-muted">
-              <ShieldCheck className="w-3.5 h-3.5 text-green-600" />
+            <div className="inline-flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>Secure Firebase Authentication</span>
             </div>
           </div>

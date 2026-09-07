@@ -3,66 +3,64 @@
    Tailwind CSS v4 + Custom Tokens
    ============================================ */
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ---- Custom Theme Tokens ---- */
 @theme {
-  /* Brand Colors — derived from logo gradient */
-  --color-navy: #0a1628;
-  --color-navy-light: #121f3d;
-  --color-navy-800: #1a2744;
-  --color-purple-deep: #2d1066;
-  --color-purple: #4a1d96;
-  --color-purple-light: #6d28d9;
-  --color-violet: #7c3aed;
-  --color-magenta: #c026d3;
-  --color-magenta-light: #d946ef;
-  --color-crimson: #dc2626;
-  --color-orange: #f97316;
-  --color-orange-warm: #fb923c;
+  --font-primary: var(--font-poppins), 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  /* Brand Colors — Royal Blue, Slate Navy & Warm Amber */
+  --color-navy: #0f172a;
+  --color-navy-light: #1e293b;
+  --color-navy-800: #334155;
+  --color-purple-deep: #1e3a8a;
+  --color-purple: #1d4ed8;
+  --color-purple-light: #2563eb;
+  --color-violet: #2563eb;
+  --color-magenta: #0284c7;
+  --color-magenta-light: #38bdf8;
+  --color-crimson: #e11d48;
+  --color-orange: #ea580c;
+  --color-orange-warm: #f59e0b;
   --color-amber: #f59e0b;
+  --color-amber-dark: #d97706;
 
-  /* Neutral Palette */
+  /* Neutral Palette — Crisp Light Mode */
   --color-surface: #ffffff;
-  --color-surface-dim: #f8f9fc;
-  --color-surface-dark: #0a1628;
+  --color-surface-dim: #f8fafc;
+  --color-surface-dark: #0f172a;
   --color-surface-card: #ffffff;
   --color-text-primary: #0f172a;
   --color-text-secondary: #475569;
   --color-text-muted: #94a3b8;
-  --color-text-on-dark: #f1f5f9;
+  --color-text-on-dark: #f8fafc;
   --color-text-on-dark-secondary: #cbd5e1;
   --color-border: #e2e8f0;
   --color-border-light: #f1f5f9;
 
   /* Glass Tokens */
-  --color-glass-bg: rgba(255, 255, 255, 0.08);
-  --color-glass-bg-light: rgba(255, 255, 255, 0.72);
-  --color-glass-border: rgba(255, 255, 255, 0.15);
-  --color-glass-border-light: rgba(255, 255, 255, 0.45);
-  --color-glass-shadow: rgba(0, 0, 0, 0.08);
+  --color-glass-bg: rgba(255, 255, 255, 0.9);
+  --color-glass-bg-light: rgba(255, 255, 255, 0.85);
+  --color-glass-border: rgba(226, 232, 240, 0.8);
+  --color-glass-border-light: rgba(241, 245, 249, 0.8);
+  --color-glass-shadow: rgba(15, 23, 42, 0.04);
 
   /* Typography */
-  --font-heading: var(--font-heading), 'Fraunces', Georgia, 'Times New Roman', serif;
-  --font-body: var(--font-body), 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: var(--font-poppins), 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: var(--font-poppins), 'Poppins', system-ui, -apple-system, sans-serif;
 
   /* Spacing */
-  --spacing-section: 6rem;
-  --spacing-section-sm: 4rem;
+  --spacing-section: 5rem;
+  --spacing-section-sm: 3rem;
 
-  /* Animations */
-  --animate-float: float 6s ease-in-out infinite;
-  --animate-float-slow: float 8s ease-in-out infinite;
-  --animate-float-delay: float 6s ease-in-out 2s infinite;
-  --animate-note-drift: noteDrift 12s linear infinite;
-  --animate-wave: wave 3s ease-in-out infinite;
-  --animate-shimmer: shimmer 2s linear infinite;
-  --animate-fade-up: fadeUp 0.6s ease-out forwards;
-  --animate-fade-in: fadeIn 0.5s ease-out forwards;
-  --animate-slide-in-right: slideInRight 0.5s ease-out forwards;
-  --animate-slide-in-left: slideInLeft 0.5s ease-out forwards;
-  --animate-scale-in: scaleIn 0.4s ease-out forwards;
-  --animate-pulse-glow: pulseGlow 2s ease-in-out infinite;
+  /* Mobile-first subtle animations */
+  --animate-fade-up: fadeUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-fade-in: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-slide-in-right: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-slide-in-left: slideInLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-scale-in: scaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* ---- Keyframes ---- */
@@ -130,144 +128,122 @@
   50% { transform: scaleY(1); }
 }
 
-/* ---- Base Styles & Theme Tokens ---- */
+/* ---- High-Contrast Light Theme Tokens ---- */
 :root {
+  --font-primary: var(--font-poppins), 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-body: var(--font-primary);
+  --font-heading: var(--font-primary);
   --color-surface: #ffffff;
-  --color-surface-dim: #f8f9fc;
+  --color-surface-dim: #f8fafc;
   --color-surface-card: #ffffff;
-  --color-text-primary: #0a1628;
-  --color-text-secondary: #475569;
-  --color-text-muted: #94a3b8;
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
   --color-border: #e2e8f0;
   --color-border-light: #f1f5f9;
 }
 
-.dark, [data-theme="dark"] {
-  --color-surface: #070d18;
-  --color-surface-dim: #0b1424;
-  --color-surface-card: #0f1c32;
-  --color-text-primary: #f8fafc;
-  --color-text-secondary: #cbd5e1;
-  --color-text-muted: #94a3b8;
-  --color-border: #1e293b;
-  --color-border-light: #152238;
-}
-
 html {
   scroll-behavior: smooth;
+  background-color: #ffffff;
+  color: #0f172a;
 }
 
 body {
-  font-family: var(--font-body);
-  color: var(--color-text-primary);
-  background-color: var(--color-surface);
+  font-family: var(--font-primary);
+  font-size: 16px;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  color: #0f172a; /* Deep rich dark slate for maximum readability */
+  background-color: #ffffff;
 }
 
-/* ---- Dark Mode Global Overrides ---- */
-.dark body {
-  background-color: #070d18;
-  color: #f8fafc;
+/* ==========================================================================
+   GLOBAL UX TYPOGRAPHY & LIGHT THEME CONTRAST RULES
+   Applies to: Main Website, Admin Dashboard, and Student Portal
+   ========================================================================== */
+
+/* High-Contrast Public Website Styles */
+.website-heading {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #0f172a;
 }
 
-/* Dark Mode Backgrounds */
-.dark .bg-white:not(.piano-white-key):not(.keep-white) {
-  background-color: #0d1728 !important;
+/* Admin Dashboard Styles */
+.dashboard-table, .admin-panel {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #1e293b;
+}
+.dashboard-metrics {
+  font-weight: 600;
+  color: #0f172a;
 }
 
-.dark .bg-surface-dim {
-  background-color: #070d18 !important;
+/* Student Portal Styles */
+.portal-content {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #0f172a;
+}
+.portal-navigation {
+  font-weight: 500;
 }
 
-.dark .bg-surface {
-  background-color: #070d18 !important;
+/* Universal Form Elements */
+input, select, textarea, button {
+  font-family: var(--font-primary);
+  font-size: 15px;
 }
 
-.dark .bg-slate-50,
-.dark .bg-slate-50\/70,
-.dark .bg-slate-100 {
-  background-color: #111d33 !important;
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  background-color: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
 }
 
-/* Piano Keys White & Black Protection */
+input::placeholder,
+textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* Piano Keys Protection */
 .piano-white-key,
-.piano-white-key.bg-white,
-.dark .piano-white-key,
-.dark .piano-white-key.bg-white {
+.piano-white-key.bg-white {
   background-color: #ffffff !important;
   border-right-color: #cbd5e1 !important;
 }
 
-.piano-black-key,
-.dark .piano-black-key {
+.piano-black-key {
   background-color: #0f172a !important;
 }
 
-/* Tap to Play / Media Badge Protection — Always dark text on white badge */
+/* Tap to Play / Media Badge Protection */
 .tap-to-play-badge,
-.dark .tap-to-play-badge,
 .tap-to-play-badge span,
-.dark .tap-to-play-badge span,
-.dark .tap-to-play-badge * {
+.tap-to-play-badge * {
   color: #0f172a !important;
   background-color: rgba(255, 255, 255, 0.95) !important;
 }
 
-/* Dark Mode Headings & Text */
-.dark .text-navy {
-  color: #f8fafc !important;
+/* Ensure all white/light cards have sharp, readable text */
+.bg-white,
+.bg-surface,
+.bg-surface-card {
+  color: #0f172a;
 }
 
-.dark .text-text-primary {
-  color: #f8fafc !important;
+/* Card & Module Hover Contrast Guarantee */
+.hover\:bg-white:hover {
+  background-color: #ffffff !important;
 }
 
-.dark .text-text-secondary {
-  color: #cbd5e1 !important;
-}
-
-.dark .text-slate-700,
-.dark .text-slate-800,
-.dark .text-slate-900 {
-  color: #f1f5f9 !important;
-}
-
-.dark .text-slate-600 {
-  color: #cbd5e1 !important;
-}
-
-/* Dark Mode Borders & Glass */
-.dark .border-slate-200,
-.dark .border-slate-200\/80,
-.dark .border-slate-200\/90,
-.dark .border-slate-200\/60,
-.dark .border-slate-200\/50,
-.dark .border-slate-100,
-.dark .border-border {
-  border-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-.dark .glass-card {
-  background: rgba(15, 28, 50, 0.75) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6) !important;
-}
-
-.dark .shadow-md,
-.dark .shadow-lg,
-.dark .shadow-xl {
-  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6), 0 0 1px 1px rgba(255, 255, 255, 0.05) !important;
-}
-
-/* Dark Mode Form Inputs */
-.dark input:not([type="checkbox"]):not([type="radio"]),
-.dark textarea,
-.dark select {
-  background-color: #111d33 !important;
-  color: #f8fafc !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+.hover\:bg-white:hover *:not([class*="text-"]) {
+  color: #0f172a;
 }
 
 /* ---- Typography ---- */
@@ -327,48 +303,161 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ---- Gradient Utilities ---- */
 .gradient-brand {
-  background: linear-gradient(135deg, #2d1066 0%, #4a1d96 20%, #7c3aed 40%, #c026d3 60%, #dc2626 80%, #f97316 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 35%, #2563eb 70%, #d97706 100%);
 }
 
 .gradient-brand-subtle {
-  background: linear-gradient(135deg, rgba(45, 16, 102, 0.05) 0%, rgba(124, 58, 237, 0.08) 50%, rgba(249, 115, 22, 0.05) 100%);
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.03) 0%, rgba(37, 99, 235, 0.05) 50%, rgba(245, 158, 11, 0.03) 100%);
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #4a1d96 0%, #7c3aed 30%, #c026d3 60%, #f97316 100%);
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 40%, #2563eb 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-hero {
-  background: linear-gradient(160deg, #0a1628 0%, #1a0a3e 30%, #2d1066 50%, #1a0a3e 70%, #0a1628 100%);
+  background: linear-gradient(160deg, #0f172a 0%, #1e293b 40%, #1e3a8a 70%, #0f172a 100%);
 }
 
 .gradient-dark-section {
-  background: linear-gradient(180deg, #0a1628 0%, #121f3d 50%, #0a1628 100%);
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
 }
 
 .gradient-cta {
-  background: linear-gradient(135deg, #4a1d96 0%, #7c3aed 50%, #c026d3 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
 }
 
 /* ---- Button Gradient ---- */
 .btn-gradient {
-  background: linear-gradient(135deg, #4a1d96 0%, #7c3aed 50%, #c026d3 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
   background-size: 200% 200%;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .btn-gradient:hover {
   background-position: right center;
-  box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
   transform: translateY(-1px);
+}
+
+/* ---- Solid Tactile Press Buttons (Mobile App Physics) ---- */
+.btn-press {
+  cursor: pointer;
+  user-select: none;
+  font-weight: 700;
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-press:hover {
+  transform: translateY(-1px);
+}
+.btn-press:active {
+  transform: translateY(2px) scale(0.97);
+}
+
+.btn-solid-primary {
+  background-color: #1d4ed8;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.28);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  user-select: none;
+}
+.btn-solid-primary:hover {
+  background-color: #1e40af;
+  box-shadow: 0 6px 16px rgba(29, 78, 216, 0.35);
+  transform: translateY(-1px);
+}
+.btn-solid-primary:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 1px 4px rgba(29, 78, 216, 0.2);
+}
+
+.btn-solid-danger {
+  background-color: #e11d48;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.28);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  user-select: none;
+}
+.btn-solid-danger:hover {
+  background-color: #be123c;
+  box-shadow: 0 6px 16px rgba(225, 29, 72, 0.35);
+  transform: translateY(-1px);
+}
+.btn-solid-danger:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 1px 4px rgba(225, 29, 72, 0.2);
+}
+
+.btn-solid-emerald {
+  background-color: #059669;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.28);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  user-select: none;
+}
+.btn-solid-emerald:hover {
+  background-color: #047857;
+  box-shadow: 0 6px 16px rgba(5, 150, 105, 0.35);
+  transform: translateY(-1px);
+}
+.btn-solid-emerald:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 1px 4px rgba(5, 150, 105, 0.2);
+}
+
+.btn-solid-dark {
+  background-color: #0f172a;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+  user-select: none;
+}
+.btn-solid-dark:hover {
+  background-color: #1e293b;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.32);
+  transform: translateY(-1px);
+}
+.btn-solid-dark:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.15);
+}
+
+/* ---- Mobile-App Motion & Micro-interactions ---- */
+.mobile-tap {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.mobile-tap:active {
+  transform: scale(0.95);
+}
+
+.mobile-card-press {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.mobile-card-press:hover {
+  transform: translateY(-2px);
+}
+.mobile-card-press:active {
+  transform: scale(0.98);
 }
 
 /* ---- Section Divider ---- */
 .section-divider {
-  background: linear-gradient(90deg, transparent 0%, rgba(124, 58, 237, 0.3) 50%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.2) 50%, transparent 100%);
   height: 1px;
 }
 
@@ -467,4 +556,13 @@ html {
 .masonry-grid > * {
   break-inside: avoid;
   margin-bottom: 1rem;
+}
+
+/* ---- Hide scrollbar utility ---- */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

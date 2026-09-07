@@ -84,6 +84,15 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
             {/* Navigation links */}
             <div className="flex-1 overflow-y-auto py-4 px-4 space-y-1">
+              <Link
+                href="/student-login"
+                onClick={onClose}
+                className="flex items-center justify-between px-4 py-3 mb-3 rounded-2xl bg-gradient-to-r from-purple via-violet to-magenta text-white font-bold text-sm shadow-md"
+              >
+                <span>Student Portal Login</span>
+                <span className="text-xs px-2 py-0.5 rounded-full bg-white/20">Portal ↗</span>
+              </Link>
+
               {NAV_ITEMS.map((item) => {
                 const isActive = pathname === item.href;
                 return (

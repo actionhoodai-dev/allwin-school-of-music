@@ -193,3 +193,7 @@ export interface CloudinaryUploadResult {
   format: string;
   bytes: number;
 }
+
+// ---- Re-export Student Portal Types ----
+export * from './student';
+

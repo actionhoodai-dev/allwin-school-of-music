@@ -8,9 +8,12 @@ import type { ReactNode } from 'react';
 
 export default function PublicLayoutWrapper({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin');
+  const isPortalOrAdmin =
+    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/student') ||
+    pathname === '/student-login';
 
-  if (isAdmin) {
+  if (isPortalOrAdmin) {
     return <>{children}</>;
   }
 
@@ -23,3 +26,4 @@ export default function PublicLayoutWrapper({ children }: { children: ReactNode 
     </>
   );
 }
+

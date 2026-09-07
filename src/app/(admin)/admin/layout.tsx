@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import AdminSidebar from '@/components/admin/AdminSidebar';
@@ -21,16 +22,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }, [user, loading, isLoginPage, router]);
 
   if (isLoginPage) {
-    return <div className="min-h-screen bg-surface-dim">{children}</div>;
+    return <div className="min-h-screen bg-[#f1f3f6]">{children}</div>;
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface-dim flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Spinner size="lg" />
-          <p className="text-sm text-text-secondary">Authenticating admin portal...</p>
+      <div className="min-h-screen bg-[#f1f3f6] flex flex-col items-center justify-center p-6 text-slate-900 text-center select-none">
+        <div className="relative w-20 h-20 mb-4 animate-pulse">
+          <Image
+            src="/logo.png"
+            alt="Allwin School of Music"
+            fill
+            sizes="80px"
+            className="object-contain rounded-full shadow-md ring-4 ring-blue-100"
+            priority
+          />
         </div>
+        <Spinner size="md" />
+        <p className="text-xs font-bold text-slate-600 mt-3 tracking-wide">
+          Authenticating Admin Portal...
+        </p>
       </div>
     );
   }
@@ -40,7 +51,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen bg-surface-dim flex">
+    <div className="min-h-screen bg-[#f1f3f6] flex text-slate-900">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block shrink-0">
         <AdminSidebar />
@@ -50,7 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div
-            className="fixed inset-0 bg-navy/70 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
             onClick={() => setMobileSidebarOpen(false)}
           />
           <div className="relative z-10">

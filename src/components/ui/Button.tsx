@@ -34,17 +34,17 @@ type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'btn-gradient text-white font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]',
+    'bg-[#1d4ed8] hover:bg-[#1e40af] text-white font-bold shadow-md shadow-blue-600/25 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0.5 active:scale-[0.96] active:shadow-xs',
   secondary:
-    'bg-navy text-white border border-navy/80 hover:bg-purple-deep hover:border-purple-deep dark:bg-white/15 dark:text-white dark:border-white/25 dark:hover:bg-white/25 shadow-sm hover:shadow-md font-semibold',
+    'bg-slate-900 hover:bg-slate-800 text-white font-bold shadow-md shadow-slate-950/20 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0.5 active:scale-[0.96] active:shadow-xs',
   outline:
-    'bg-violet text-white border-2 border-violet hover:bg-purple-deep hover:border-purple-deep dark:bg-violet-600 dark:border-violet-600 dark:hover:bg-violet-700 dark:hover:border-violet-700 shadow-md hover:shadow-lg font-semibold',
+    'bg-slate-100 hover:bg-slate-200 text-slate-900 border border-slate-300 font-bold shadow-xs hover:-translate-y-0.5 active:translate-y-0.5 active:scale-[0.96]',
   ghost:
-    'bg-transparent text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-violet dark:hover:text-white font-medium',
+    'bg-transparent text-slate-700 hover:bg-slate-100 hover:text-blue-600 font-bold active:scale-[0.96]',
   whatsapp:
-    'bg-[#25D366] text-white font-bold hover:bg-[#20BD5A] shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]',
+    'bg-[#25D366] text-white font-bold hover:bg-[#20BD5A] shadow-md shadow-emerald-600/25 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0.5 active:scale-[0.96] active:shadow-xs',
   danger:
-    'bg-red-600 text-white font-bold hover:bg-red-700 shadow-sm',
+    'bg-[#e11d48] text-white font-bold hover:bg-[#be123c] shadow-md shadow-rose-600/25 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0.5 active:scale-[0.96] active:shadow-xs',
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

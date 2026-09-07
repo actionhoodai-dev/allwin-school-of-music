@@ -5,9 +5,11 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
+  Users,
+  CalendarCheck,
+  Megaphone,
   MessageSquare,
   GraduationCap,
-  Users,
   Image as ImageIcon,
   Trophy,
   Star,
@@ -20,6 +22,9 @@ import { signOut } from '@/lib/firebase/auth';
 
 const NAV_ITEMS = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+  { label: 'Students', href: '/admin/students', icon: Users },
+  { label: 'Attendance', href: '/admin/attendance', icon: CalendarCheck },
+  { label: 'Announcements', href: '/admin/announcements', icon: Megaphone },
   { label: 'Enquiries', href: '/admin/enquiries', icon: MessageSquare },
   { label: 'Courses', href: '/admin/courses', icon: GraduationCap },
   { label: 'Gallery', href: '/admin/gallery', icon: ImageIcon },
@@ -42,23 +47,23 @@ export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
   };
 
   return (
-    <aside className="w-64 bg-navy text-white flex flex-col justify-between h-screen sticky top-0 border-r border-white/10 select-none">
+    <aside className="w-64 bg-white text-slate-800 flex flex-col justify-between h-screen sticky top-0 border-r border-slate-200 select-none shadow-sm">
       {/* Brand Header */}
       <div>
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
+        <div className="p-5 border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Image
               src="/logo.png"
               alt="Allwin Logo"
               width={36}
               height={36}
-              className="rounded-full shadow"
+              className="rounded-full shadow-sm ring-2 ring-blue-100"
             />
             <div>
-              <h2 className="font-heading font-bold text-base text-white leading-tight">
+              <h2 className="font-bold text-base text-slate-900 leading-tight">
                 Allwin Admin
               </h2>
-              <p className="text-[10px] text-white/50 tracking-wide uppercase">
+              <p className="text-[10px] text-slate-500 font-bold tracking-wider uppercase">
                 Management Portal
               </p>
             </div>
@@ -66,23 +71,23 @@ export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-180px)]">
+        <nav className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-180px)]">
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href;
+            const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href));
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={onClose}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   isActive
-                    ? 'bg-gradient-to-r from-purple/60 to-violet/50 text-white font-semibold shadow-md'
-                    : 'text-white/70 hover:text-white hover:bg-white/5'
+                    ? 'bg-[#2874f0] text-white shadow-sm'
+                    : 'text-slate-700 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${isActive ? 'text-orange' : 'text-white/60'}`} />
+                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-[#2874f0]'}`} />
                 <span>{item.label}</span>
               </Link>
             );
@@ -91,21 +96,27 @@ export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
       </div>
 
       {/* Footer Controls */}
-      <div className="p-4 border-t border-white/10 space-y-2 bg-navy-light/40">
+      <div className="p-4 border-t border-slate-100 space-y-2 bg-slate-50">
         <Link
           href="/"
           target="_blank"
-          className="flex items-center justify-between px-3.5 py-2 rounded-xl text-xs text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+          className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-white transition-all border border-slate-200"
         >
-          <span>View Public Site</span>
-          <ExternalLink className="w-3.5 h-3.5" />
+          <span className="flex items-center gap-2">
+            <ExternalLink className="w-3.5 h-3.5 text-[#2874f0]" />
+            <span>Live Website</span>
+          </span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold">
+            Online
+          </span>
         </Link>
+
         <button
           onClick={handleSignOut}
-          className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-rose-700 hover:bg-rose-50 transition-colors"
         >
-          <LogOut className="w-4 h-4" />
-          <span>Sign Out</span>
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Sign Out Admin</span>
         </button>
       </div>
     </aside>

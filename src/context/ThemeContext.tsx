@@ -1,12 +1,12 @@
 // ============================================
-// ThemeContext — Light & Dark Mode State Provider
+// ThemeContext — Locked to High-Contrast Light Theme
 // ============================================
 
 'use client';
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
-type Theme = 'light' | 'dark';
+type Theme = 'light';
 
 interface ThemeContextType {
   theme: Theme;
@@ -21,44 +21,24 @@ const ThemeContext = createContext<ThemeContextType>({
 });
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
-  const [mounted, setMounted] = useState(false);
+  const [theme] = useState<Theme>('light');
 
   useEffect(() => {
-    // Check localStorage or system preference
-    const savedTheme = localStorage.getItem('allwin_theme') as Theme | null;
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-      setThemeState(savedTheme);
-      applyTheme(savedTheme);
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const initial = prefersDark ? 'dark' : 'light';
-      setThemeState(initial);
-      applyTheme(initial);
-    }
-    setMounted(true);
-  }, []);
-
-  const applyTheme = (t: Theme) => {
-    const root = document.documentElement;
-    if (t === 'dark') {
-      root.classList.add('dark');
-      root.setAttribute('data-theme', 'dark');
-    } else {
+    // Always enforce clean light theme across entire site
+    try {
+      localStorage.setItem('allwin_theme', 'light');
+      const root = document.documentElement;
       root.classList.remove('dark');
       root.setAttribute('data-theme', 'light');
-    }
-  };
-
-  const setTheme = (t: Theme) => {
-    setThemeState(t);
-    localStorage.setItem('allwin_theme', t);
-    applyTheme(t);
-  };
+    } catch (_) {}
+  }, []);
 
   const toggleTheme = () => {
-    const next = theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
+    // No-op: Dark theme is disabled; light theme only
+  };
+
+  const setTheme = () => {
+    // No-op: Light theme only
   };
 
   return (
@@ -71,3 +51,4 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 export function useTheme() {
   return useContext(ThemeContext);
 }
+

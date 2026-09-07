@@ -166,7 +166,7 @@ export default function InstrumentsSection() {
                   </Link>
                   <Link
                     href={`/contact?course=${encodeURIComponent(inst.name)}`}
-                    className="inline-flex items-center justify-center text-xs font-bold px-3.5 py-1.5 rounded-xl bg-violet/10 hover:bg-violet text-violet hover:text-white dark:bg-white/10 dark:text-white dark:hover:bg-violet border border-violet/20 dark:border-white/15 transition-all shadow-sm hover:shadow-md cursor-pointer"
+                    className="inline-flex items-center justify-center text-xs font-bold px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white border border-blue-200 transition-all shadow-2xs hover:shadow-sm cursor-pointer"
                   >
                     Enquire Now
                   </Link>
