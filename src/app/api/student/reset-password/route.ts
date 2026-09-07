@@ -130,48 +130,21 @@ export async function POST(request: Request) {
     });
 
     // 4. Update password in Firebase Auth
-    const authEmail = student.email || getStudentAuthEmail(student.studentId);
     try {
-      // If the student has existing Firebase Auth credentials, we need to update password.
-      // Since we're server-side in a client SDK context, we sign in with any known credential
-      // and then update password. If the student has never logged in, we create credentials.
-      if (student.uid) {
-        // Student has logged in before — try to sign in and update password
-        // In a client-side Firebase SDK, we can't do admin password resets.
-        // Instead, we'll create a new account or re-create with the new password.
-        // The cleanest approach: delete and re-create auth, or use Firebase Admin SDK.
-        // Since we don't have Admin SDK, we'll mark the password in Firestore and
-        // handle it on next login attempt.
-        await updateDoc(doc(db, 'students', student.id), {
-          pendingPasswordReset: newPassword,
-          mustChangePassword: false,
-          updatedAt: serverTimestamp(),
-        });
-      } else {
-        // No Firebase Auth account yet — create one with the new password
-        try {
-          const cred = await createUserWithEmailAndPassword(auth, authEmail, newPassword);
-          await updateDoc(doc(db, 'students', student.id), {
-            uid: cred.user.uid,
-            mustChangePassword: false,
-            updatedAt: serverTimestamp(),
-          });
-        } catch (createErr: any) {
-          if (createErr.code === 'auth/email-already-in-use') {
-            // Account exists but no UID linked. Store pending reset.
-            await updateDoc(doc(db, 'students', student.id), {
-              pendingPasswordReset: newPassword,
-              mustChangePassword: false,
-              updatedAt: serverTimestamp(),
-            });
-          } else {
-            throw createErr;
-          }
-        }
-      }
+      const cleanId = student.studentId.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const freshEmail = `student.${cleanId}_v${Date.now()}@allwinschoolofmusic.internal`;
+      const cred = await createUserWithEmailAndPassword(auth, freshEmail, newPassword);
+
+      await updateDoc(doc(db, 'students', student.id), {
+        email: freshEmail,
+        uid: cred.user.uid,
+        pendingPasswordReset: null,
+        mustChangePassword: false,
+        updatedAt: serverTimestamp(),
+      });
     } catch (authError: any) {
       console.error('[Reset Password Auth Error]', authError);
-      // Even if auth update fails, the OTP was valid. Store the pending reset.
+      // Fallback: store pending reset for client-side resolution
       await updateDoc(doc(db, 'students', student.id), {
         pendingPasswordReset: newPassword,
         mustChangePassword: false,

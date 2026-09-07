@@ -91,8 +91,9 @@ export default function LevelsGradesManager() {
       }
       setIsLevelModalOpen(false);
       loadLevels();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to save level:', err);
+      alert(`Failed to save level: ${err?.message || 'Please check your Firestore rules in Firebase Console.'}`);
     } finally {
       setSavingLevel(false);
     }
@@ -103,8 +104,9 @@ export default function LevelsGradesManager() {
     try {
       await deleteDocument('courseLevels', id);
       setLevels((prev) => prev.filter((l) => l.id !== id));
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to delete level:', err);
+      alert(`Failed to delete level: ${err?.message || 'Please check your Firestore rules in Firebase Console.'}`);
     }
   };
 
@@ -143,9 +145,14 @@ export default function LevelsGradesManager() {
         } as any);
       }
       await loadLevels();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to load standard levels:', err);
-      alert('Failed to save standard levels. Please check your connection and try again.');
+      const isPermission = err?.code === 'permission-denied' || String(err?.message || '').toLowerCase().includes('permission');
+      if (isPermission) {
+        alert('Permission Denied by Cloud Firestore: Your Firebase Security Rules in Firebase Console must allow read/write on "courseLevels". Please update the rules in Firebase Console to resolve this.');
+      } else {
+        alert(`Failed to save standard levels: ${err?.message || 'Please check your connection and try again.'}`);
+      }
     } finally {
       setSavingLevel(false);
     }

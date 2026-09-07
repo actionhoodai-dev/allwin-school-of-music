@@ -138,25 +138,21 @@ export async function signInStudent(identifier: string, password: string): Promi
     ) {
       // If there's a pending password reset and the user entered the new password, honour it
       if (hasPendingReset && cleanPassword === pendingPassword) {
-        if (!foundStudent.uid) {
-          // No Firebase Auth account yet — create with the new password
-          try {
-            const newCred = await createUserWithEmailAndPassword(auth, authEmail, cleanPassword);
-            user = newCred.user;
-            // Clear the pending reset
-            if (foundStudent.id) {
-              await updateDoc(doc(db, 'students', foundStudent.id), {
-                pendingPasswordReset: null,
-              }).catch(() => {});
-            }
-          } catch (createErr: any) {
-            if (createErr.code === 'auth/email-already-in-use') {
-              throw new Error('Password reset is pending. Please try logging in again or contact school administration.');
-            }
-            throw createErr;
+        try {
+          const cleanId = foundStudent.studentId.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const freshEmail = `student.${cleanId}_v${Date.now()}@allwinschoolofmusic.internal`;
+          const newCred = await createUserWithEmailAndPassword(auth, freshEmail, cleanPassword);
+          user = newCred.user;
+          if (foundStudent.id) {
+            await updateDoc(doc(db, 'students', foundStudent.id), {
+              email: freshEmail,
+              uid: user.uid,
+              pendingPasswordReset: null,
+            }).catch(() => {});
           }
-        } else {
-          throw new Error('Your password has been reset. Please try again — if the issue persists, contact school administration.');
+        } catch (createErr: any) {
+          console.error('[Auth] Failed to update user with reset password:', createErr);
+          throw new Error('Failed to complete password reset login. Please try again.');
         }
       } else if (!foundStudent.uid) {
         try {
