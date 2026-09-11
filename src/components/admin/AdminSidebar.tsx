@@ -17,6 +17,7 @@ import {
   Settings,
   LogOut,
   ExternalLink,
+  X,
 } from 'lucide-react';
 import { signOut } from '@/lib/firebase/auth';
 
@@ -68,6 +69,16 @@ export default function AdminSidebar({ onClose }: { onClose?: () => void }) {
               </p>
             </div>
           </div>
+
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors lg:hidden"
+              aria-label="Close sidebar"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Navigation */}

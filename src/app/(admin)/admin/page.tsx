@@ -10,6 +10,10 @@ import {
   Trophy,
   Star,
   ArrowRight,
+  Megaphone,
+  CalendarCheck,
+  HelpCircle,
+  Settings,
 } from 'lucide-react';
 import AdminHeader from '@/components/admin/AdminHeader';
 import { getDocuments } from '@/lib/firebase/firestore';
@@ -26,6 +30,7 @@ export default function AdminDashboardPage() {
     achievements: 0,
     testimonials: 0,
     faqs: 0,
+    announcements: 0,
   });
 
   const [loading, setLoading] = useState(true);
@@ -33,7 +38,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function loadMetrics() {
       try {
-        const [stud, enq, crs, fac, gal, ach, test, fq] = await Promise.all([
+        const [stud, enq, crs, fac, gal, ach, test, fq, ann] = await Promise.all([
           getDocuments<any>('students').catch(() => []),
           getDocuments<any>('enquiries').catch(() => []),
           getDocuments<any>('courses').catch(() => []),
@@ -42,6 +47,7 @@ export default function AdminDashboardPage() {
           getDocuments<any>('achievements').catch(() => []),
           getDocuments<any>('testimonials').catch(() => []),
           getDocuments<any>('faqs').catch(() => []),
+          getDocuments<any>('announcements').catch(() => []),
         ]);
 
         const newCount = enq.filter((e: any) => e.status === 'new').length;
@@ -58,6 +64,7 @@ export default function AdminDashboardPage() {
           achievements: ach.length,
           testimonials: test.length,
           faqs: fq.length,
+          announcements: ann.length,
         });
       } catch (err) {
         console.error('Error loading metrics:', err);
@@ -70,12 +77,28 @@ export default function AdminDashboardPage() {
 
   const cards = [
     {
+      title: 'School Announcements',
+      value: metrics.announcements,
+      subtext: 'Circulars & student notices',
+      icon: Megaphone,
+      iconBg: 'bg-blue-50 text-[#2874f0] border border-blue-100',
+      href: '/admin/announcements',
+    },
+    {
       title: 'Enrolled Students',
       value: metrics.students,
       subtext: `${metrics.activeStudents} Active in Portal`,
       icon: Users,
       iconBg: 'bg-blue-50 text-[#2874f0] border border-blue-100',
       href: '/admin/students',
+    },
+    {
+      title: 'Student Attendance',
+      value: `${metrics.students} enrolled`,
+      subtext: 'Class rosters & logs',
+      icon: CalendarCheck,
+      iconBg: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
+      href: '/admin/attendance',
     },
     {
       title: 'Total Enquiries',
@@ -114,8 +137,16 @@ export default function AdminDashboardPage() {
       value: metrics.testimonials,
       subtext: 'Student & parent reviews',
       icon: Star,
-      iconBg: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
+      iconBg: 'bg-purple-50 text-purple-600 border border-purple-100',
       href: '/admin/testimonials',
+    },
+    {
+      title: 'FAQs Management',
+      value: metrics.faqs,
+      subtext: 'Student questions & answers',
+      icon: HelpCircle,
+      iconBg: 'bg-rose-50 text-rose-600 border border-rose-100',
+      href: '/admin/faqs',
     },
   ];
 
@@ -123,9 +154,9 @@ export default function AdminDashboardPage() {
     <div className="flex-1 flex flex-col bg-[#f1f3f6] min-h-screen">
       <AdminHeader title="Institution Overview" />
 
-      <main className="p-6 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
-        {/* Welcome banner — Clean White Card with Flipkart Blue & Amazon Gold */}
-        <div className="p-6 sm:p-7 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <main className="p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
+        {/* Welcome banner — Clean White Card */}
+        <div className="p-5 sm:p-7 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
           <div className="space-y-1.5">
             <span className="text-[11px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-md bg-[#fff7e6] text-[#b78103] border border-[#ffd591]">
               Allwin School of Music & Musicals
@@ -134,20 +165,29 @@ export default function AdminDashboardPage() {
               Welcome to the Admin Dashboard
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 max-w-xl font-medium">
-              Manage course syllabi, student admissions, attendance markers, faculty rosters, FAQs, and site configuration in real-time.
+              Manage school announcements, student admissions, attendance rosters, course syllabi, and institution settings in real-time.
             </p>
           </div>
-          <Link
-            href="/admin/enquiries"
-            className="px-5 py-2.5 rounded-xl bg-[#fb641b] text-white font-bold text-xs sm:text-sm hover:bg-orange-600 transition-all shadow-sm shrink-0 flex items-center gap-2 active:scale-95"
-          >
-            <span>Review Enquiries</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+            <Link
+              href="/admin/announcements"
+              className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-[#2874f0] text-white font-bold text-xs sm:text-sm hover:bg-blue-600 transition-all shadow-sm shrink-0 flex items-center justify-center gap-2 active:scale-95"
+            >
+              <Megaphone className="w-4 h-4" />
+              <span>Announcements</span>
+            </Link>
+            <Link
+              href="/admin/enquiries"
+              className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-[#fb641b] text-white font-bold text-xs sm:text-sm hover:bg-orange-600 transition-all shadow-sm shrink-0 flex items-center justify-center gap-2 active:scale-95"
+            >
+              <span>Review Enquiries</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
 
         {/* Metrics Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {cards.map((card) => {
             const Icon = card.icon;
             return (

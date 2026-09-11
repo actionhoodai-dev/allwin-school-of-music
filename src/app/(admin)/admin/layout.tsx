@@ -1,17 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { AdminNavProvider, useAdminNav } from '@/context/AdminNavContext';
 import AdminSidebar from '@/components/admin/AdminSidebar';
+import AdminBottomNav from '@/components/admin/AdminBottomNav';
 import Spinner from '@/components/ui/Spinner';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const adminNav = useAdminNav();
 
   const isLoginPage = pathname === '/admin/login';
 
@@ -58,22 +60,33 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </div>
 
       {/* Mobile Drawer */}
-      {mobileSidebarOpen && (
+      {adminNav?.mobileSidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
-            onClick={() => setMobileSidebarOpen(false)}
+            onClick={() => adminNav.closeMobileSidebar()}
           />
           <div className="relative z-10">
-            <AdminSidebar onClose={() => setMobileSidebarOpen(false)} />
+            <AdminSidebar onClose={() => adminNav.closeMobileSidebar()} />
           </div>
         </div>
       )}
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden">
+      {/* Main Content Area with padding for Mobile Bottom Navigation */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-x-hidden pb-20 lg:pb-0">
         {children}
       </div>
+
+      {/* Persistent Mobile Bottom Navigation */}
+      <AdminBottomNav />
     </div>
+  );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminNavProvider>
+      <AdminLayoutContent>{children}</AdminLayoutContent>
+    </AdminNavProvider>
   );
 }
