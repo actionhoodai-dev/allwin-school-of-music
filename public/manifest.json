@@ -1,0 +1,18 @@
+{
+  "name": "Allwin School of Music",
+  "short_name": "Allwin Music",
+  "description": "Allwin School of Music & Musicals - Student & Admin Management Portal",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f3f6",
+  "theme_color": "#2874f0",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

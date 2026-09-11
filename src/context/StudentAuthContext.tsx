@@ -35,6 +35,7 @@ interface StudentAuthContextType {
   user: User | null;
   student: Student | null;
   loading: boolean;
+  hasCachedSession: boolean;
   unreadNotifications: number;
   notifications: StudentNotification[];
   sectionBadges: SectionBadgeState;
@@ -50,6 +51,7 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasCachedSession, setHasCachedSession] = useState(false);
   const [notifications, setNotifications] = useState<StudentNotification[]>([]);
   const [sectionBadges, setSectionBadges] = useState<SectionBadgeState>({});
 
@@ -59,6 +61,7 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
       const cached = localStorage.getItem('allwin_student_profile');
       if (cached) {
         setStudent(JSON.parse(cached));
+        setHasCachedSession(true);
       }
       const cachedBadges = localStorage.getItem('allwin_section_badges');
       if (cachedBadges) {
@@ -109,20 +112,56 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    let graceTimeout: NodeJS.Timeout | null = null;
     enablePersistentSession();
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      setUser(firebaseUser);
       if (firebaseUser) {
+        if (graceTimeout) clearTimeout(graceTimeout);
+        setUser(firebaseUser);
+        setHasCachedSession(true);
         await fetchStudentForUser(firebaseUser);
+        setLoading(false);
       } else {
-        setStudent(null);
-        localStorage.removeItem('allwin_student_profile');
+        // If student profile is cached, give mobile Chrome a grace period to reconnect
+        // rather than immediately destroying the local session on first tick
+        const cached = localStorage.getItem('allwin_student_profile');
+        if (cached && !auth.currentUser) {
+          if (graceTimeout) clearTimeout(graceTimeout);
+          graceTimeout = setTimeout(() => {
+            if (auth.currentUser) {
+              setUser(auth.currentUser);
+              setLoading(false);
+            } else {
+              setStudent(null);
+              setHasCachedSession(false);
+              localStorage.removeItem('allwin_student_profile');
+              setLoading(false);
+            }
+          }, 2500);
+        } else {
+          setStudent(null);
+          setHasCachedSession(false);
+          localStorage.removeItem('allwin_student_profile');
+          setLoading(false);
+        }
       }
-      setLoading(false);
     });
 
-    return () => unsubscribe();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && auth.currentUser) {
+        setUser(auth.currentUser);
+        setLoading(false);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (graceTimeout) clearTimeout(graceTimeout);
+      unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [fetchStudentForUser]);
 
   // Subscribe to real-time student document updates
@@ -310,6 +349,7 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
       const { user: authedUser, student: studentData } = await signInStudent(identifier, pass);
       setUser(authedUser);
       setStudent(studentData);
+      setHasCachedSession(true);
       localStorage.setItem('allwin_student_profile', JSON.stringify(studentData));
     } finally {
       setLoading(false);
@@ -317,6 +357,7 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    setHasCachedSession(false);
     await signOutStudent();
     setUser(null);
     setStudent(null);
@@ -340,6 +381,7 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
         user,
         student,
         loading,
+        hasCachedSession,
         unreadNotifications,
         notifications,
         sectionBadges,

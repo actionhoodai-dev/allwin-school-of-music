@@ -10,7 +10,7 @@ import AdminBottomNav from '@/components/admin/AdminBottomNav';
 import Spinner from '@/components/ui/Spinner';
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, hasCachedSession } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const adminNav = useAdminNav();
@@ -18,10 +18,10 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const isLoginPage = pathname === '/admin/login';
 
   useEffect(() => {
-    if (!loading && !user && !isLoginPage) {
+    if (!loading && !user && !hasCachedSession && !isLoginPage) {
       router.push('/admin/login');
     }
-  }, [user, loading, isLoginPage, router]);
+  }, [user, loading, hasCachedSession, isLoginPage, router]);
 
   if (isLoginPage) {
     return <div className="min-h-screen bg-[#f1f3f6]">{children}</div>;

@@ -3,9 +3,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
 import { Lock, Mail, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
-import { auth } from '@/lib/firebase/config';
+import { signInWithEmail } from '@/lib/firebase/auth';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { BUSINESS } from '@/lib/constants';
@@ -23,7 +22,7 @@ export default function AdminLoginPage() {
     setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      await signInWithEmail(email.trim(), password);
       router.push('/admin');
     } catch (err: any) {
       console.error('Login error:', err);

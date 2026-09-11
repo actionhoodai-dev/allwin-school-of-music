@@ -15,16 +15,16 @@ import ForcePasswordChangeModal from '@/components/student/ForcePasswordChangeMo
 import Spinner from '@/components/ui/Spinner';
 
 export default function StudentLayout({ children }: { children: React.ReactNode }) {
-  const { user, student, loading } = useStudentAuth();
+  const { user, student, loading, hasCachedSession } = useStudentAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [showPasswordChange, setShowPasswordChange] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (!loading && !user && !hasCachedSession) {
       router.push('/student-login');
     }
-  }, [user, loading, router]);
+  }, [user, loading, hasCachedSession, router]);
 
   useEffect(() => {
     if (student?.mustChangePassword) {

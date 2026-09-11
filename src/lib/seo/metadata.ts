@@ -48,6 +48,7 @@ export function constructMetadata({
     title: fullTitle,
     description,
     keywords: mergedKeywords.join(', '),
+    manifest: '/manifest.json',
     authors: [{ name: BUSINESS.name }],
     creator: BUSINESS.name,
     publisher: BUSINESS.name,
