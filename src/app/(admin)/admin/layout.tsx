@@ -18,8 +18,13 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const isLoginPage = pathname === '/admin/login';
 
   useEffect(() => {
-    if (!loading && !user && !hasCachedSession && !isLoginPage) {
-      router.push('/admin/login');
+    if (!loading && !isLoginPage) {
+      if (!user && !hasCachedSession) {
+        router.push('/admin/login');
+      } else if (user && !hasCachedSession) {
+        // User is authenticated but does not hold an admin session (e.g. student session)
+        router.push('/admin/login');
+      }
     }
   }, [user, loading, hasCachedSession, isLoginPage, router]);
 

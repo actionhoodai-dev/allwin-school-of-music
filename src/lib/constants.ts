@@ -411,8 +411,17 @@ export interface CourseLevelDefinition {
 
 export const DEFAULT_COURSE_LEVELS: CourseLevelDefinition[] = [
   {
-    name: 'Pre Foundation Level',
+    name: 'Free Hand Exercise',
     order: 1,
+    description: 'Foundational hand posture, finger drills, wrist relaxation, and introductory freehand drills.',
+    grades: [
+      { name: 'Free Hand Exercise', order: 1 },
+      { name: 'Initial Grade', order: 2 },
+    ],
+  },
+  {
+    name: 'Pre Foundation Level',
+    order: 2,
     description: 'Initial introduction to music notation, rhythm, and basic instrument technique.',
     grades: [
       { name: 'Initial Grade', order: 1 },
@@ -421,7 +430,7 @@ export const DEFAULT_COURSE_LEVELS: CourseLevelDefinition[] = [
   },
   {
     name: 'Foundation Level',
-    order: 2,
+    order: 3,
     description: 'Core technique, scales, arpeggios, and sight-reading fundamentals.',
     grades: [
       { name: 'Grade 2', order: 1 },
@@ -430,7 +439,7 @@ export const DEFAULT_COURSE_LEVELS: CourseLevelDefinition[] = [
   },
   {
     name: 'Pre Intermediate Level',
-    order: 3,
+    order: 4,
     description: 'Expanding musicality, intermediate repertoire, hand independence, and dynamics.',
     grades: [
       { name: 'Grade 4', order: 1 },
@@ -439,7 +448,7 @@ export const DEFAULT_COURSE_LEVELS: CourseLevelDefinition[] = [
   },
   {
     name: 'Intermediate Level',
-    order: 4,
+    order: 5,
     description: 'Comprehensive technique, stylistic interpretation, and performance depth.',
     grades: [
       { name: 'Grade 6', order: 1 },
@@ -447,7 +456,7 @@ export const DEFAULT_COURSE_LEVELS: CourseLevelDefinition[] = [
   },
   {
     name: 'Pre Advance Level',
-    order: 5,
+    order: 6,
     description: 'Rigorous technical mastery, complex harmonic comprehension, and concert pieces.',
     grades: [
       { name: 'Grade 7', order: 1 },
@@ -455,7 +464,7 @@ export const DEFAULT_COURSE_LEVELS: CourseLevelDefinition[] = [
   },
   {
     name: 'Advance Level',
-    order: 6,
+    order: 7,
     description: 'Highest pre-diploma pinnacle of practical virtuosity, artistry, and exam mastery.',
     grades: [
       { name: 'Grade 8', order: 1 },
@@ -464,6 +473,7 @@ export const DEFAULT_COURSE_LEVELS: CourseLevelDefinition[] = [
 ];
 
 export const ALL_GRADES = [
+  'Free Hand Exercise',
   'Initial Grade',
   'Grade 1',
   'Grade 2',
@@ -476,6 +486,7 @@ export const ALL_GRADES = [
 ] as const;
 
 export const ALL_LEVELS = [
+  'Free Hand Exercise',
   'Pre Foundation Level',
   'Foundation Level',
   'Pre Intermediate Level',
@@ -485,8 +496,9 @@ export const ALL_LEVELS = [
 ] as const;
 
 export function getLevelForGrade(gradeName?: string): string {
-  if (!gradeName) return 'Pre Foundation Level';
+  if (!gradeName) return 'Free Hand Exercise';
   const cleanGrade = gradeName.trim().toLowerCase();
+  if (cleanGrade.includes('free hand')) return 'Free Hand Exercise';
   for (const lvl of DEFAULT_COURSE_LEVELS) {
     if (
       lvl.grades.some(

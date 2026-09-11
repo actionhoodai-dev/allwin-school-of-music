@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ImageUploader from '@/components/admin/ImageUploader';
-import { INSTRUMENT_OPTIONS, DEFAULT_COURSE_LEVELS, getLevelForGrade } from '@/lib/constants';
+import { INSTRUMENT_OPTIONS, DEFAULT_COURSE_LEVELS, ALL_GRADES, getLevelForGrade } from '@/lib/constants';
 import { getDocuments } from '@/lib/firebase/firestore';
 import type { Student, CourseLevel } from '@/types/student';
 
@@ -344,23 +344,23 @@ export default function StudentFormModal({
                   value={formData.grade}
                   onChange={(e) => {
                     const newGrade = e.target.value;
-                    const autoLevel = getLevelForGrade(newGrade);
-                    setFormData({ ...formData, grade: newGrade, level: autoLevel || formData.level });
+                    setFormData({ ...formData, grade: newGrade });
                   }}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-violet"
                 >
                   {(() => {
                     const effectiveLevels = courseLevels.length > 0 ? courseLevels : DEFAULT_COURSE_LEVELS;
                     const selectedLevel = effectiveLevels.find((l) => l.name === formData.level);
-                    const grades = selectedLevel?.grades?.sort((a, b) => a.order - b.order) || [];
-                    if (grades.length > 0) {
-                      return grades.map((g, i) => (
-                        <option key={i} value={g.name}>{g.name}</option>
-                      ));
-                    }
-                    const allGrades = effectiveLevels.flatMap((l) => l.grades || []);
-                    return allGrades.sort((a, b) => a.order - b.order).map((g, i) => (
-                      <option key={i} value={g.name}>{g.name}</option>
+                    const levelGrades = selectedLevel?.grades?.sort((a, b) => a.order - b.order) || [];
+                    const allAvailableGrades = Array.from(
+                      new Set([
+                        ...levelGrades.map((g) => g.name),
+                        ...ALL_GRADES,
+                      ])
+                    );
+
+                    return allAvailableGrades.map((gName) => (
+                      <option key={gName} value={gName}>{gName}</option>
                     ));
                   })()}
                 </select>

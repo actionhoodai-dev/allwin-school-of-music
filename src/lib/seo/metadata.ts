@@ -49,6 +49,16 @@ export function constructMetadata({
     description,
     keywords: mergedKeywords.join(', '),
     manifest: '/manifest.json',
+    icons: {
+      icon: [
+        { url: '/logo.png', type: 'image/png' },
+        { url: '/favicon.ico', sizes: 'any' },
+      ],
+      apple: [
+        { url: '/logo.png', sizes: '180x180', type: 'image/png' },
+      ],
+      shortcut: ['/logo.png'],
+    },
     authors: [{ name: BUSINESS.name }],
     creator: BUSINESS.name,
     publisher: BUSINESS.name,
