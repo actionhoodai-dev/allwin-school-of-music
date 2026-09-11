@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -24,7 +24,13 @@ import Button from '@/components/ui/Button';
 
 export default function StudentLoginPage() {
   const router = useRouter();
-  const { signIn } = useStudentAuth();
+  const { signIn, user } = useStudentAuth();
+
+  useEffect(() => {
+    if (user) {
+      router.replace('/student');
+    }
+  }, [user, router]);
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');

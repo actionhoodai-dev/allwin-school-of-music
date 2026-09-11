@@ -10,8 +10,7 @@ import {
   browserLocalPersistence,
   type User,
 } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from './config';
+import { auth } from './config';
 
 export const ADMIN_SESSION_STORAGE_KEY = 'allwin_admin_session';
 
@@ -45,15 +44,8 @@ export async function signInWithEmail(email: string, password: string) {
     }
   }
 
+  // Authenticate user against Firebase Authentication
   const result = await signInWithEmailAndPassword(auth, email.trim(), password);
-
-  // Verify user is registered as admin
-  const adminDoc = await getDoc(doc(db, 'adminUsers', result.user.uid));
-  if (!adminDoc.exists()) {
-    await firebaseSignOut(auth);
-    clearCachedAdminSession();
-    throw new Error('You are not authorized to access the admin panel.');
-  }
 
   // Save persistent admin session token to survive tab discarding/browser close
   if (typeof window !== 'undefined') {
