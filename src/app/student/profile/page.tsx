@@ -114,6 +114,13 @@ export default function StudentProfilePage() {
               {student?.grade || 'Initial Grade'}
             </span>
           </div>
+
+          <div>
+            <span className="text-slate-500 block text-[11px] font-medium">Date of Joining</span>
+            <span className="font-bold text-slate-900">
+              {student?.joiningDate || 'Enrolled'}
+            </span>
+          </div>
         </div>
       </div>
 

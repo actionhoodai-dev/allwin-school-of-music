@@ -24,7 +24,6 @@ import { signOut } from '@/lib/firebase/auth';
 const NAV_ITEMS = [
   { label: 'Dashboard', href: '/admin', icon: LayoutDashboard },
   { label: 'Students', href: '/admin/students', icon: Users },
-  { label: 'Attendance', href: '/admin/attendance', icon: CalendarCheck },
   { label: 'Announcements', href: '/admin/announcements', icon: Megaphone },
   { label: 'Enquiries', href: '/admin/enquiries', icon: MessageSquare },
   { label: 'Courses', href: '/admin/courses', icon: GraduationCap },

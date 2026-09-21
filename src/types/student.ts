@@ -27,6 +27,7 @@ export interface Student {
   teacherName?: string;
   photo?: string;
   photoPublicId?: string;
+  joiningDate?: string; // YYYY-MM-DD
   status: StudentStatus;
   mustChangePassword?: boolean;
   notes?: string;
@@ -86,20 +87,24 @@ export interface ClassScheduleItem {
 export interface ProgressReport {
   id?: string;
   studentId: string;
-  title: string; // e.g. "Quarter 1 Evaluation"
+  assessmentDate: string; // YYYY-MM-DD (Preserved date field)
+  todaysClass?: string; // What was covered in today's class
+  practiceWork?: string; // Homework / exercises to practice
+  songsCovered?: string; // Songs / musical pieces covered
+  title?: string; // e.g. "Quarter 1 Evaluation"
   term?: string; // e.g. "Term 1 - 2026"
-  assessmentDate: string;
   course?: string;
   instrument?: string;
   level?: string; // e.g. Beginner, Intermediate, Advanced
   grade?: string; // e.g. Grade 1, Grade 2, Grade 3
-  evaluation: string;
+  evaluation?: string;
   strengths?: string[];
   areasToImprove?: string[];
   teacherComments?: string;
   reportFileUrl?: string;
   reportPublicId?: string;
   createdAt?: Timestamp | any;
+  updatedAt?: Timestamp | any;
 }
 
 // ---- Certificates & Achievements ----

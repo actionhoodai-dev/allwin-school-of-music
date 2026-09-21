@@ -6,7 +6,7 @@ export default function WhyChooseSection() {
     {
       icon: <Calendar className="w-6 h-6 text-orange" />,
       title: 'Since 2007',
-      description: 'Over 15 years of continuous dedication to music education in Salem, building musical confidence across generations.',
+      description: 'Over 19 years of continuous dedication to music education in Salem, building musical confidence across generations.',
     },
     {
       icon: <Layers className="w-6 h-6 text-violet" />,

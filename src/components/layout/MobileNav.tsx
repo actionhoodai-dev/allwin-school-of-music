@@ -9,7 +9,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Phone, Send } from 'lucide-react';
+import { X, Phone, ShieldCheck } from 'lucide-react';
 import WhatsAppIcon from '@/components/ui/WhatsAppIcon';
 import { NAV_ITEMS } from '@/lib/constants';
 import Button from '@/components/ui/Button';
@@ -114,8 +114,14 @@ export default function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
             {/* Quick Action CTAs */}
             <div className="p-5 border-t border-white/10 space-y-3 bg-navy-light/50">
-              <Button href="/contact" fullWidth size="md" icon={<Send className="w-4 h-4" />}>
-                Enquire Now
+              <Button
+                href="/admin/login"
+                onClick={onClose}
+                fullWidth
+                size="md"
+                icon={<ShieldCheck className="w-4 h-4" />}
+              >
+                Admin Portal
               </Button>
               <div className="grid grid-cols-2 gap-2">
                 <Button

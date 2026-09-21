@@ -158,13 +158,6 @@ export default function AdminStudentsPage() {
         {/* Directory Count / Stats */}
         <div className="flex items-center justify-between text-xs text-slate-500 px-1">
           <span>Showing <strong>{filteredStudents.length}</strong> of {students.length} enrolled students</span>
-          <Link
-            href="/admin/attendance"
-            className="text-blue-600 dark:text-blue-400 font-semibold hover:underline flex items-center gap-1"
-          >
-            <CalendarCheck className="w-3.5 h-3.5" />
-            <span>Open Bulk Attendance Marker →</span>
-          </Link>
         </div>
 
         {/* Students Cards Grid */}

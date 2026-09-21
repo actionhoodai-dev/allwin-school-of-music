@@ -79,6 +79,30 @@ export default function StudentAttendancePage() {
         </div>
       </div>
 
+      {/* Prominent Attendance & Compensation Policy at Top */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-amber-50/80 via-white to-orange-50/50 border border-amber-200/90 shadow-sm text-xs text-slate-700 space-y-3">
+        <div className="flex items-center gap-2 font-bold text-slate-900 text-sm border-b border-amber-200/60 pb-2">
+          <Sparkles className="w-4 h-4 text-[#fb641b]" />
+          <span>Attendance & Compensation Policy</span>
+        </div>
+
+        <p className="font-medium text-slate-800 leading-relaxed">
+          Students are expected to maintain an attendance of at least <strong>80%</strong> to be eligible for annual Trinity College London exam certifications and grade promotions.
+        </p>
+
+        <div className="space-y-1.5 pt-1">
+          <h4 className="font-bold text-slate-900 text-xs tracking-wide uppercase text-[11px]">
+            Class Attendance &amp; Compensation Policy
+          </h4>
+          <ul className="space-y-1.5 list-disc list-inside text-slate-600 font-medium pl-1 leading-relaxed">
+            <li>The monthly fee is based on the monthly class schedule.</li>
+            <li>Whether 8, 9, or 10 classes are conducted in a month, the number of classes will not be calculated separately, and no additional fee will be charged.</li>
+            <li>If a student misses a class due to leave, absence, or personal reasons, no compensation class will be provided.</li>
+            <li>If additional classes are conducted in a particular month, they will be considered as adjustment for any missed classes.</li>
+          </ul>
+        </div>
+      </div>
+
       {/* Summary Statistics */}
       <AttendanceStats
         totalClasses={totalClasses}
@@ -91,17 +115,6 @@ export default function StudentAttendancePage() {
       {/* Custom Touch-Friendly Interactive Calendar */}
       <div className="space-y-2">
         <AttendanceCalendar records={records} readOnly={true} />
-      </div>
-
-      {/* Informative Note for Parents */}
-      <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-sm text-xs text-slate-600 space-y-1.5">
-        <div className="flex items-center gap-1.5 font-bold text-slate-900">
-          <Sparkles className="w-4 h-4 text-[#fb641b]" />
-          <span>Attendance Policy</span>
-        </div>
-        <p>
-          Students are expected to maintain an attendance of at least 80% to be eligible for annual Trinity College London exam certifications and grade promotions.
-        </p>
       </div>
     </div>
   );

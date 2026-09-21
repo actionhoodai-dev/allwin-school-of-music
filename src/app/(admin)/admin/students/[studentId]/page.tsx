@@ -90,6 +90,8 @@ export default function AdminStudentWorkspacePage({
 
   // Sub-modals & forms
   const [showAddSchedule, setShowAddSchedule] = useState(false);
+  const [isSavingSchedule, setIsSavingSchedule] = useState(false);
+  const [scheduleError, setScheduleError] = useState('');
   const [newSchedule, setNewSchedule] = useState<{
     dayOfWeek: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
     time: string;
@@ -104,16 +106,18 @@ export default function AdminStudentWorkspacePage({
 
   const [showAddProgress, setShowAddProgress] = useState(false);
   const [newProgress, setNewProgress] = useState({
-    title: 'Grade Progress Evaluation',
-    term: 'Term 1',
     assessmentDate: new Date().toISOString().split('T')[0],
-    level: 'Pre Foundation Level',
-    grade: 'Initial Grade',
-    evaluation: '',
-    strengths: '',
-    areasToImprove: '',
-    teacherComments: '',
-    reportFileUrl: '',
+    todaysClass: '',
+    practiceWork: '',
+    songsCovered: '',
+  });
+  const [editingProgress, setEditingProgress] = useState<ProgressReport | null>(null);
+  const [editProgressForm, setEditProgressForm] = useState({
+    id: '',
+    assessmentDate: new Date().toISOString().split('T')[0],
+    todaysClass: '',
+    practiceWork: '',
+    songsCovered: '',
   });
 
   const [showAddAchievement, setShowAddAchievement] = useState(false);
@@ -215,14 +219,40 @@ export default function AdminStudentWorkspacePage({
   // Create Class Schedule Slot
   const handleCreateSchedule = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!student) return;
+    if (!student || isSavingSchedule) return;
+    setScheduleError('');
+
+    const trimmedTime = newSchedule.time.trim();
+    const trimmedEndTime = newSchedule.endTime.trim();
+
+    if (!trimmedTime) {
+      setScheduleError('Please enter a start time.');
+      return;
+    }
+
+    // Check if slot already exists on this day and time for this student
+    const isDuplicate = schedules.some(
+      (s) =>
+        s.dayOfWeek.toLowerCase() === newSchedule.dayOfWeek.toLowerCase() &&
+        s.time.trim().toLowerCase() === trimmedTime.toLowerCase()
+    );
+
+    if (isDuplicate) {
+      setScheduleError(`A class slot for ${newSchedule.dayOfWeek} at ${trimmedTime} already exists.`);
+      return;
+    }
+
     try {
+      setIsSavingSchedule(true);
       const docRef = await addDoc(collection(db, 'schedules'), {
         studentId: student.studentId,
         course: student.course,
         instrument: student.instrument,
         active: true,
-        ...newSchedule,
+        dayOfWeek: newSchedule.dayOfWeek,
+        time: trimmedTime,
+        endTime: trimmedEndTime,
+        notes: newSchedule.notes.trim(),
         createdAt: serverTimestamp(),
       });
       setSchedules((prev) => [
@@ -233,76 +263,112 @@ export default function AdminStudentWorkspacePage({
           course: student.course,
           instrument: student.instrument,
           active: true,
-          ...newSchedule,
+          dayOfWeek: newSchedule.dayOfWeek,
+          time: trimmedTime,
+          endTime: trimmedEndTime,
+          notes: newSchedule.notes.trim(),
         },
       ]);
       setShowAddSchedule(false);
+      setScheduleError('');
+      setNewSchedule({
+        dayOfWeek: 'Monday',
+        time: '05:00 PM',
+        endTime: '06:00 PM',
+        notes: '',
+      });
     } catch (err) {
       console.error(err);
+      setScheduleError('Failed to save class slot. Please try again.');
+    } finally {
+      setIsSavingSchedule(false);
     }
   };
 
-  // Create / Update Progress & Grade Evaluation
+  // Create Progress & Grade Evaluation
   const handleCreateProgress = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!student) return;
     try {
-      const strengthsArr = newProgress.strengths.split(',').map((s) => s.trim()).filter(Boolean);
-      const areasArr = newProgress.areasToImprove.split(',').map((s) => s.trim()).filter(Boolean);
-
       const docRef = await addDoc(collection(db, 'progressReports'), {
         studentId: student.studentId,
-        course: student.course,
-        instrument: student.instrument,
-        title: newProgress.title,
-        term: newProgress.term,
+        course: student.course || '',
+        instrument: student.instrument || '',
+        title: `Evaluation - ${newProgress.assessmentDate}`,
         assessmentDate: newProgress.assessmentDate,
-        level: newProgress.level || student.level || 'Pre Foundation Level',
-        grade: newProgress.grade || student.grade || 'Initial Grade',
-        evaluation: newProgress.evaluation,
-        strengths: strengthsArr,
-        areasToImprove: areasArr,
-        teacherComments: newProgress.teacherComments,
-        reportFileUrl: newProgress.reportFileUrl,
+        todaysClass: newProgress.todaysClass,
+        practiceWork: newProgress.practiceWork,
+        songsCovered: newProgress.songsCovered,
         createdAt: serverTimestamp(),
       });
-
-      // Update student's primary grade & level in Firestore
-      if (student.id) {
-        await updateDoc(doc(db, 'students', student.id), {
-          grade: newProgress.grade,
-          level: newProgress.level,
-          updatedAt: serverTimestamp(),
-        });
-        setStudent({ ...student, grade: newProgress.grade, level: newProgress.level });
-      }
 
       // Add in-app notification for student/parent
       await addDoc(collection(db, 'notifications'), {
         studentId: student.studentId,
-        title: 'New Progress & Grade Evaluation Added',
-        message: `Your teacher updated your evaluation for ${newProgress.grade} (${student.instrument}).`,
+        title: 'New Class Evaluation Added',
+        message: `Evaluation for ${newProgress.assessmentDate} has been posted.`,
         type: 'progress',
         read: false,
         link: '/student/progress',
         createdAt: serverTimestamp(),
-      });
+      }).catch(() => {});
 
       setProgressReports((prev) => [
-        ...prev,
         {
           id: docRef.id,
           studentId: student.studentId,
           course: student.course,
           instrument: student.instrument,
-          ...newProgress,
-          strengths: strengthsArr,
-          areasToImprove: areasArr,
+          title: `Evaluation - ${newProgress.assessmentDate}`,
+          assessmentDate: newProgress.assessmentDate,
+          todaysClass: newProgress.todaysClass,
+          practiceWork: newProgress.practiceWork,
+          songsCovered: newProgress.songsCovered,
         },
+        ...prev,
       ]);
+      setNewProgress({
+        assessmentDate: new Date().toISOString().split('T')[0],
+        todaysClass: '',
+        practiceWork: '',
+        songsCovered: '',
+      });
       setShowAddProgress(false);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  // Update Existing Progress & Grade Evaluation
+  const handleUpdateProgress = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!student || !editingProgress?.id) return;
+    try {
+      const progRef = doc(db, 'progressReports', editingProgress.id);
+      await updateDoc(progRef, {
+        assessmentDate: editProgressForm.assessmentDate,
+        todaysClass: editProgressForm.todaysClass,
+        practiceWork: editProgressForm.practiceWork,
+        songsCovered: editProgressForm.songsCovered,
+        updatedAt: serverTimestamp(),
+      });
+
+      setProgressReports((prev) =>
+        prev.map((r) =>
+          r.id === editingProgress.id
+            ? {
+                ...r,
+                assessmentDate: editProgressForm.assessmentDate,
+                todaysClass: editProgressForm.todaysClass,
+                practiceWork: editProgressForm.practiceWork,
+                songsCovered: editProgressForm.songsCovered,
+              }
+            : r
+        )
+      );
+      setEditingProgress(null);
+    } catch (err) {
+      console.error('Error updating progress evaluation:', err);
     }
   };
 
@@ -579,6 +645,7 @@ export default function AdminStudentWorkspacePage({
                 <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Instrument:</span><strong className="text-slate-900 font-bold">{student.instrument}</strong></div>
                 <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Current Grade:</span><strong className="text-slate-900 font-bold">{student.grade || 'Initial Grade'}</strong></div>
                 <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Current Level:</span><strong className="text-slate-900 font-bold">{student.level || 'Pre Foundation Level'}</strong></div>
+                <div className="flex justify-between items-center"><span className="text-slate-500 font-medium">Date of Joining:</span><strong className="text-slate-900 font-bold">{student.joiningDate || 'Not specified'}</strong></div>
               </div>
             </div>
 
@@ -689,15 +756,26 @@ export default function AdminStudentWorkspacePage({
                     className="w-full p-2.5 rounded-xl bg-white border border-border text-xs"
                   />
                 </div>
+                {scheduleError && (
+                  <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-medium">
+                    {scheduleError}
+                  </div>
+                )}
                 <div className="flex justify-end gap-2 pt-2">
                   <button
                     type="button"
-                    onClick={() => setShowAddSchedule(false)}
-                    className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 active:bg-slate-400 text-slate-900 font-bold text-xs shadow-xs active:translate-y-0.5 active:scale-95 transition-all cursor-pointer"
+                    disabled={isSavingSchedule}
+                    onClick={() => {
+                      setShowAddSchedule(false);
+                      setScheduleError('');
+                    }}
+                    className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 active:bg-slate-400 disabled:opacity-50 text-slate-900 font-bold text-xs shadow-xs active:translate-y-0.5 active:scale-95 transition-all cursor-pointer"
                   >
                     Cancel
                   </button>
-                  <Button type="submit" size="sm">Save Class Slot</Button>
+                  <Button type="submit" size="sm" disabled={isSavingSchedule}>
+                    {isSavingSchedule ? 'Saving Slot...' : 'Save Class Slot'}
+                  </Button>
                 </div>
               </form>
             )}
@@ -745,95 +823,61 @@ export default function AdminStudentWorkspacePage({
 
             {showAddProgress && (
               <form onSubmit={handleCreateProgress} className="p-5 rounded-3xl bg-slate-50 border border-border space-y-3 text-xs">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex items-center justify-between border-b border-border pb-2">
+                  <h4 className="font-bold text-slate-900 text-sm">New Class / Grade Evaluation</h4>
+                  <span className="text-[11px] text-slate-500 font-medium">Record daily class coverage and practice assignments</span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-3">
                   <div>
-                    <label className="block text-text-muted mb-1 font-semibold">Evaluation Title *</label>
-                    <input
-                      type="text"
-                      required
-                      value={newProgress.title}
-                      onChange={(e) => setNewProgress({ ...newProgress, title: e.target.value })}
-                      placeholder="e.g. Grade 3 Piano Assessment"
-                      className="w-full p-2.5 rounded-xl bg-white border border-border text-xs"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-text-muted mb-1 font-semibold">Assessment Date</label>
+                    <label className="block text-text-muted mb-1 font-semibold">Date *</label>
                     <input
                       type="date"
+                      required
                       value={newProgress.assessmentDate}
                       onChange={(e) => setNewProgress({ ...newProgress, assessmentDate: e.target.value })}
-                      className="w-full p-2.5 rounded-xl bg-white border border-border text-xs"
+                      className="w-full sm:w-64 p-2.5 rounded-xl bg-white border border-border text-xs focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
+
                   <div>
-                    <label className="block text-text-muted mb-1 font-semibold">Assigned Grade</label>
-                    <select
-                      value={newProgress.grade}
-                      onChange={(e) => {
-                        const g = e.target.value;
-                        const lvl = getLevelForGrade(g);
-                        setNewProgress({ ...newProgress, grade: g, level: lvl || newProgress.level });
-                      }}
-                      className="w-full p-2.5 rounded-xl bg-white border border-border text-xs"
-                    >
-                      {ALL_GRADES.map((g) => (
-                        <option key={g} value={g}>{g}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-text-muted mb-1 font-semibold">Level</label>
-                    <select
-                      value={newProgress.level}
-                      onChange={(e) => setNewProgress({ ...newProgress, level: e.target.value })}
-                      className="w-full p-2.5 rounded-xl bg-white border border-border text-xs"
-                    >
-                      {ALL_LEVELS.map((lvl) => (
-                        <option key={lvl} value={lvl}>{lvl}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <label className="block text-text-muted mb-1 font-semibold">Evaluation Summary</label>
+                    <label className="block text-text-muted mb-1 font-semibold">For Today's Class *</label>
                     <textarea
                       rows={2}
-                      value={newProgress.evaluation}
-                      onChange={(e) => setNewProgress({ ...newProgress, evaluation: e.target.value })}
-                      placeholder="Summary of student technique, musicality, and performance..."
-                      className="w-full p-2.5 rounded-xl bg-white border border-border text-xs"
+                      required
+                      value={newProgress.todaysClass}
+                      onChange={(e) => setNewProgress({ ...newProgress, todaysClass: e.target.value })}
+                      placeholder="e.g. Learned C Major scale with both hands, finger posture exercise, bar 1-8 reading"
+                      className="w-full p-2.5 rounded-xl bg-white border border-border text-xs focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
+
                   <div>
-                    <label className="block text-text-muted mb-1 font-semibold">Strengths (Comma separated)</label>
-                    <input
-                      type="text"
-                      value={newProgress.strengths}
-                      onChange={(e) => setNewProgress({ ...newProgress, strengths: e.target.value })}
-                      placeholder="Rhythm accuracy, Finger agility"
-                      className="w-full p-2.5 rounded-xl bg-white border border-border text-xs"
+                    <label className="block text-text-muted mb-1 font-semibold">Practice Work *</label>
+                    <textarea
+                      rows={2}
+                      required
+                      value={newProgress.practiceWork}
+                      onChange={(e) => setNewProgress({ ...newProgress, practiceWork: e.target.value })}
+                      placeholder="e.g. Practice right hand 20 mins daily with metronome at 60 bpm"
+                      className="w-full p-2.5 rounded-xl bg-white border border-border text-xs focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
+
                   <div>
-                    <label className="block text-text-muted mb-1 font-semibold">Areas to Improve (Comma separated)</label>
-                    <input
-                      type="text"
-                      value={newProgress.areasToImprove}
-                      onChange={(e) => setNewProgress({ ...newProgress, areasToImprove: e.target.value })}
-                      placeholder="Sight reading, Scale tempo"
-                      className="w-full p-2.5 rounded-xl bg-white border border-border text-xs"
-                    />
-                  </div>
-                  <div className="sm:col-span-2">
-                    <ImageUploader
-                      label="Upload Evaluation / Report Card Image"
-                      folder="allwin_reports"
-                      currentImageUrl={newProgress.reportFileUrl}
-                      onUploadSuccess={(res) => setNewProgress({ ...newProgress, reportFileUrl: res.secure_url })}
+                    <label className="block text-text-muted mb-1 font-semibold">Songs Covered *</label>
+                    <textarea
+                      rows={2}
+                      required
+                      value={newProgress.songsCovered}
+                      onChange={(e) => setNewProgress({ ...newProgress, songsCovered: e.target.value })}
+                      placeholder="e.g. Ode to Joy (Beethoven), Twinkle Twinkle Theme, Trinity Piece No. 2"
+                      className="w-full p-2.5 rounded-xl bg-white border border-border text-xs focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
-                <div className="flex justify-end gap-2 pt-2">
+
+                <div className="flex justify-end gap-2 pt-2 border-t border-border">
                   <button
                     type="button"
                     onClick={() => setShowAddProgress(false)}
@@ -841,39 +885,168 @@ export default function AdminStudentWorkspacePage({
                   >
                     Cancel
                   </button>
-                  <Button type="submit" size="sm">Save Evaluation</Button>
+                  <Button type="submit" size="sm">Publish Evaluation</Button>
                 </div>
               </form>
             )}
 
-            <div className="space-y-3">
-              {progressReports.map((r) => (
-                <div key={r.id} className="p-5 rounded-2xl bg-white border border-border shadow-xs flex items-start justify-between gap-3">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-violet bg-violet/10 px-2.5 py-0.5 rounded-full">{r.grade || student.grade}</span>
-                      <span className="text-xs text-text-muted">{r.assessmentDate}</span>
-                    </div>
-                    <h4 className="font-bold text-base text-navy mt-1">{r.title}</h4>
-                    <p className="text-xs text-text-secondary">{r.evaluation}</p>
-                    {r.reportFileUrl && (
-                      <a href={r.reportFileUrl} target="_blank" className="text-xs font-semibold text-violet hover:underline mt-1 inline-block">
-                        View Uploaded Report ↗
-                      </a>
-                    )}
+            {/* Edit Evaluation Modal */}
+            {editingProgress && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+                <form
+                  onSubmit={handleUpdateProgress}
+                  className="w-full max-w-lg p-6 rounded-3xl bg-white border border-border shadow-2xl space-y-4 text-xs animate-scale-in"
+                >
+                  <div className="flex items-center justify-between border-b border-border pb-3">
+                    <h4 className="font-bold text-slate-900 text-base">Edit Grade Evaluation</h4>
+                    <span className="text-[11px] text-slate-500 font-medium">Modify and correct published details</span>
                   </div>
-                  <button
-                    onClick={async () => {
-                      if (!r.id) return;
-                      await deleteDoc(doc(db, 'progressReports', r.id));
-                      setProgressReports(progressReports.filter((x) => x.id !== r.id));
-                    }}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded-xl"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-text-muted mb-1 font-semibold">Date *</label>
+                      <input
+                        type="date"
+                        required
+                        value={editProgressForm.assessmentDate}
+                        onChange={(e) => setEditProgressForm({ ...editProgressForm, assessmentDate: e.target.value })}
+                        className="w-full p-2.5 rounded-xl bg-white border border-border text-xs focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-text-muted mb-1 font-semibold">For Today's Class *</label>
+                      <textarea
+                        rows={2}
+                        required
+                        value={editProgressForm.todaysClass}
+                        onChange={(e) => setEditProgressForm({ ...editProgressForm, todaysClass: e.target.value })}
+                        className="w-full p-2.5 rounded-xl bg-white border border-border text-xs focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-text-muted mb-1 font-semibold">Practice Work *</label>
+                      <textarea
+                        rows={2}
+                        required
+                        value={editProgressForm.practiceWork}
+                        onChange={(e) => setEditProgressForm({ ...editProgressForm, practiceWork: e.target.value })}
+                        className="w-full p-2.5 rounded-xl bg-white border border-border text-xs focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-text-muted mb-1 font-semibold">Songs Covered *</label>
+                      <textarea
+                        rows={2}
+                        required
+                        value={editProgressForm.songsCovered}
+                        onChange={(e) => setEditProgressForm({ ...editProgressForm, songsCovered: e.target.value })}
+                        className="w-full p-2.5 rounded-xl bg-white border border-border text-xs focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                    <button
+                      type="button"
+                      onClick={() => setEditingProgress(null)}
+                      className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs shadow-xs"
+                    >
+                      Cancel
+                    </button>
+                    <Button type="submit" size="sm">Save Changes</Button>
+                  </div>
+                </form>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {progressReports.length === 0 ? (
+                <div className="p-8 text-center bg-white rounded-2xl border border-dashed border-border text-slate-400 text-xs">
+                  No evaluations posted yet for this student. Click &ldquo;Add Grade Evaluation&rdquo; above.
                 </div>
-              ))}
+              ) : (
+                progressReports.map((r) => (
+                  <div key={r.id} className="p-5 rounded-2xl bg-white border border-border shadow-xs flex flex-col sm:flex-row items-start justify-between gap-4">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          <span>{r.assessmentDate}</span>
+                        </span>
+                      </div>
+
+                      {/* 3 Custom Fields */}
+                      {r.todaysClass && (
+                        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-0.5">
+                          <span className="font-bold text-slate-800 block text-[11px]">Today's Class:</span>
+                          <p className="text-slate-700 leading-relaxed font-medium">{r.todaysClass}</p>
+                        </div>
+                      )}
+
+                      {r.practiceWork && (
+                        <div className="p-2.5 rounded-xl bg-amber-50/70 border border-amber-100 text-xs space-y-0.5">
+                          <span className="font-bold text-amber-900 block text-[11px]">Practice Work:</span>
+                          <p className="text-amber-950 leading-relaxed font-medium">{r.practiceWork}</p>
+                        </div>
+                      )}
+
+                      {r.songsCovered && (
+                        <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100 text-xs space-y-0.5">
+                          <span className="font-bold text-emerald-900 block text-[11px]">Songs Covered:</span>
+                          <p className="text-emerald-950 leading-relaxed font-medium">{r.songsCovered}</p>
+                        </div>
+                      )}
+
+                      {/* Legacy fields fallback */}
+                      {!r.todaysClass && !r.practiceWork && !r.songsCovered && r.evaluation && (
+                        <div className="text-xs text-text-secondary">
+                          <h4 className="font-bold text-navy">{r.title}</h4>
+                          <p className="mt-0.5">{r.evaluation}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1.5 shrink-0 self-end sm:self-start">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingProgress(r);
+                          setEditProgressForm({
+                            id: r.id || '',
+                            assessmentDate: r.assessmentDate || new Date().toISOString().split('T')[0],
+                            todaysClass: r.todaysClass || '',
+                            practiceWork: r.practiceWork || '',
+                            songsCovered: r.songsCovered || '',
+                          });
+                        }}
+                        className="px-3 py-1.5 text-xs font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl flex items-center gap-1 transition-colors"
+                        title="Edit Evaluation"
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!r.id) return;
+                          if (confirm('Are you sure you want to delete this evaluation?')) {
+                            await deleteDoc(doc(db, 'progressReports', r.id));
+                            setProgressReports(progressReports.filter((x) => x.id !== r.id));
+                          }
+                        }}
+                        className="p-1.5 text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                        title="Delete Evaluation"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         )}

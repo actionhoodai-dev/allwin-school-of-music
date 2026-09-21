@@ -42,6 +42,7 @@ export default function StudentFormModal({
     level: 'Pre Foundation Level',
     grade: 'Initial Grade',
     photo: '',
+    joiningDate: new Date().toISOString().split('T')[0],
     initialPassword: '',
     status: 'active',
   });
@@ -78,11 +79,16 @@ export default function StudentFormModal({
         level: editingStudent.level || 'Pre Foundation Level',
         grade: editingStudent.grade || 'Initial Grade',
         photo: editingStudent.photo || '',
+        joiningDate: editingStudent.joiningDate || new Date().toISOString().split('T')[0],
         initialPassword: '',
         status: editingStudent.status || 'active',
       });
       setNextIdPreview(editingStudent.studentId);
     } else {
+      setFormData((prev) => ({
+        ...prev,
+        joiningDate: new Date().toISOString().split('T')[0],
+      }));
       fetch('/api/admin/students/next-id')
         .then((res) => res.json())
         .then((data) => {
@@ -365,6 +371,22 @@ export default function StudentFormModal({
                   })()}
                 </select>
               </div>
+            </div>
+
+            {/* Date of Joining */}
+            <div className="pt-2">
+              <label className="block font-semibold text-text-secondary dark:text-slate-300 mb-1">
+                Date of Joining
+              </label>
+              <input
+                type="date"
+                value={formData.joiningDate}
+                onChange={(e) => setFormData({ ...formData, joiningDate: e.target.value })}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-violet"
+              />
+              <p className="text-[11px] text-slate-500 mt-1">
+                Official enrollment date when the student joined the academy.
+              </p>
             </div>
           </div>
 

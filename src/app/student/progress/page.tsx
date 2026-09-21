@@ -113,31 +113,67 @@ export default function StudentProgressPage() {
               key={rep.id}
               className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4"
             >
-              {/* Header */}
+              {/* Header with Date */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-blue-50 text-[#2874f0] border border-blue-100">
-                    {rep.term || 'Term Assessment'}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-[#2874f0] border border-blue-100 flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>Class Date: {rep.assessmentDate}</span>
                   </span>
-                  <h4 className="font-bold text-base sm:text-lg text-slate-900 mt-1.5">
-                    {rep.title}
-                  </h4>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Assessed: {rep.assessmentDate}</span>
-                </div>
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                  {student?.instrument} • {student?.grade || 'Current Grade'}
+                </span>
               </div>
 
-              {/* Evaluation / Overview */}
-              {rep.evaluation && (
+              {/* 3 Custom Evaluation Fields */}
+              <div className="space-y-3">
+                {rep.todaysClass && (
+                  <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 text-xs space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold text-slate-900 text-xs">
+                      <span className="w-2 h-2 rounded-full bg-[#2874f0]" />
+                      <span>Today&apos;s Class</span>
+                    </div>
+                    <p className="text-slate-700 leading-relaxed font-medium pl-3.5">
+                      {rep.todaysClass}
+                    </p>
+                  </div>
+                )}
+
+                {rep.practiceWork && (
+                  <div className="p-4 rounded-xl bg-amber-50/60 border border-amber-200/80 text-xs space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold text-amber-900 text-xs">
+                      <span className="w-2 h-2 rounded-full bg-amber-500" />
+                      <span>Practice Work / Assignments</span>
+                    </div>
+                    <p className="text-amber-950 leading-relaxed font-medium pl-3.5">
+                      {rep.practiceWork}
+                    </p>
+                  </div>
+                )}
+
+                {rep.songsCovered && (
+                  <div className="p-4 rounded-xl bg-emerald-50/60 border border-emerald-200/80 text-xs space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold text-emerald-900 text-xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      <span>Songs Covered</span>
+                    </div>
+                    <p className="text-emerald-950 leading-relaxed font-medium pl-3.5">
+                      {rep.songsCovered}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Legacy Evaluation / Overview fallback */}
+              {!rep.todaysClass && !rep.practiceWork && !rep.songsCovered && rep.evaluation && (
                 <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
                   {rep.evaluation}
                 </p>
               )}
 
-              {/* Strengths & Areas for Improvement */}
+              {/* Legacy Strengths & Areas for Improvement */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {rep.strengths && rep.strengths.length > 0 && (
                   <div className="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-1.5">
@@ -167,18 +203,6 @@ export default function StudentProgressPage() {
                   </div>
                 )}
               </div>
-
-              {/* Teacher Comments */}
-              {rep.teacherComments && (
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-                  <span className="font-bold text-slate-900 block text-[11px] mb-0.5">
-                    Teacher's Recommendation:
-                  </span>
-                  <p className="text-slate-700 italic font-medium">
-                    "{rep.teacherComments}"
-                  </p>
-                </div>
-              )}
 
               {/* Download Report File */}
               {rep.reportFileUrl && (

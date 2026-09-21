@@ -33,18 +33,26 @@ export default function StudentSchedulePage() {
         const list = snap.docs
           .map((d) => ({ id: d.id, ...d.data() })) as ClassScheduleItem[];
 
-        // Filter for this student or their course
+        // Filter for this student or course-wide slots
         const studentId = student?.studentId;
-        const filtered = list.filter(
-          (s) =>
-            !s.studentId ||
-            s.studentId === studentId ||
-            s.course === student?.course ||
-            s.instrument === student?.instrument
-        );
+        const filtered = list.filter((s) => {
+          if (s.studentId) {
+            return s.studentId === studentId;
+          }
+          return s.course === student?.course || s.instrument === student?.instrument;
+        });
 
-        filtered.sort((a, b) => DAYS_ORDER.indexOf(a.dayOfWeek) - DAYS_ORDER.indexOf(b.dayOfWeek));
-        setSchedules(filtered);
+        // Deduplicate any identical slots (by day, time, and instrument)
+        const seenKeys = new Set<string>();
+        const uniqueSchedules = filtered.filter((s) => {
+          const key = `${s.dayOfWeek}-${s.time}-${s.endTime || ''}-${s.instrument || ''}`.toLowerCase();
+          if (seenKeys.has(key)) return false;
+          seenKeys.add(key);
+          return true;
+        });
+
+        uniqueSchedules.sort((a, b) => DAYS_ORDER.indexOf(a.dayOfWeek) - DAYS_ORDER.indexOf(b.dayOfWeek));
+        setSchedules(uniqueSchedules);
       } catch (err) {
         console.error('Error fetching schedule:', err);
       } finally {

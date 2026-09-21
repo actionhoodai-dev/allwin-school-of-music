@@ -104,8 +104,8 @@ export default function Header() {
                 <Phone className="w-4 h-4 text-blue-600" />
                 <span className="hidden xl:inline">Call Now</span>
               </a>
-              <Button href="/contact" size="sm">
-                Enquire Now
+              <Button href="/admin/login" size="sm">
+                Admin Portal
               </Button>
             </div>
 
@@ -117,8 +117,8 @@ export default function Header() {
               >
                 Portal
               </Link>
-              <Button href="/contact" size="sm">
-                Enquire
+              <Button href="/admin/login" size="sm">
+                Admin Portal
               </Button>
               <button
                 onClick={() => setIsMobileOpen(true)}

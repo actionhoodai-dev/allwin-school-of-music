@@ -5,7 +5,7 @@ export default function TrustStats() {
     {
       icon: <Calendar className="w-6 h-6 text-orange" />,
       value: 'Since 2007',
-      label: '15+ Years of Dedicated Music Education',
+      label: '19+ Years of Dedicated Music Education',
     },
     {
       icon: <Music className="w-6 h-6 text-violet" />,

@@ -6,7 +6,7 @@ import {
   LayoutDashboard,
   Megaphone,
   Users,
-  CalendarCheck,
+  MessageSquare,
   Menu,
 } from 'lucide-react';
 import { useAdminNav } from '@/context/AdminNavContext';
@@ -35,9 +35,9 @@ export default function AdminBottomNav() {
       exact: false,
     },
     {
-      label: 'Attendance',
-      href: '/admin/attendance',
-      icon: CalendarCheck,
+      label: 'Enquiries',
+      href: '/admin/enquiries',
+      icon: MessageSquare,
       exact: false,
     },
   ];

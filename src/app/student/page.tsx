@@ -82,14 +82,23 @@ export default function StudentDashboardPage() {
         const schedSnap = await getDocs(schedQuery).catch(() => ({ docs: [] } as any));
         const schedList = schedSnap.docs
           .map((d: any) => ({ id: d.id, ...d.data() }))
-          .filter(
-            (s: any) =>
-              !s.studentId ||
-              s.studentId === studentId ||
-              s.course === student?.course ||
-              s.instrument === student?.instrument
-          );
-        setSchedule(schedList);
+          .filter((s: any) => {
+            if (s.studentId) {
+              return s.studentId === studentId;
+            }
+            return s.course === student?.course || s.instrument === student?.instrument;
+          });
+
+        // Deduplicate identical slots
+        const seenSched = new Set<string>();
+        const uniqueSched = schedList.filter((s: any) => {
+          const key = `${s.dayOfWeek}-${s.time}-${s.endTime || ''}-${s.instrument || ''}`.toLowerCase();
+          if (seenSched.has(key)) return false;
+          seenSched.add(key);
+          return true;
+        });
+
+        setSchedule(uniqueSched);
 
         // 4. Progress / Latest Grade Evaluation
         const progQuery = query(

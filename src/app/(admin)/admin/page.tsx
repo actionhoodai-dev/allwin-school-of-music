@@ -95,10 +95,10 @@ export default function AdminDashboardPage() {
     {
       title: 'Student Attendance',
       value: `${metrics.students} enrolled`,
-      subtext: 'Class rosters & logs',
+      subtext: 'Student profiles & logs',
       icon: CalendarCheck,
       iconBg: 'bg-indigo-50 text-indigo-600 border border-indigo-100',
-      href: '/admin/attendance',
+      href: '/admin/students',
     },
     {
       title: 'Total Enquiries',
