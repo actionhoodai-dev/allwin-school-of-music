@@ -475,6 +475,7 @@ export const DEFAULT_COURSE_LEVELS: CourseLevelDefinition[] = [
 export const ALL_GRADES = [
   'Free Hand Exercise',
   'Initial Grade',
+  'Theory',
   'Grade 1',
   'Grade 2',
   'Grade 3',
@@ -499,6 +500,7 @@ export function getLevelForGrade(gradeName?: string): string {
   if (!gradeName) return 'Free Hand Exercise';
   const cleanGrade = gradeName.trim().toLowerCase();
   if (cleanGrade.includes('free hand')) return 'Free Hand Exercise';
+  if (cleanGrade === 'theory') return 'Free Hand Exercise';
   for (const lvl of DEFAULT_COURSE_LEVELS) {
     if (
       lvl.grades.some(
