@@ -38,7 +38,7 @@ import type {
   SchoolAnnouncement,
   ProgressReport,
 } from '@/types/student';
-import { ensureCurrentMonthFee } from '@/lib/utils/fees';
+import { ensureSequentialMonthlyFees } from '@/lib/utils/fees';
 
 export default function StudentDashboardPage() {
   const { student, sectionBadges, markSectionViewed } = useStudentAuth();
@@ -74,7 +74,7 @@ export default function StudentDashboardPage() {
         const feeSnap = await getDocs(feeQuery).catch(() => ({ docs: [] } as any));
         const rawFeeList = feeSnap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
         const finalizedFeeList = (!student?.status || student?.status === 'active')
-          ? await ensureCurrentMonthFee(studentId, rawFeeList, student?.monthlyFee || 2000)
+          ? await ensureSequentialMonthlyFees(studentId, rawFeeList, student?.monthlyFee)
           : rawFeeList;
         setFees(finalizedFeeList);
 
@@ -294,7 +294,9 @@ export default function StudentDashboardPage() {
           </div>
           <div className="text-lg font-bold">
             {pendingFee ? (
-              <span className="text-[#fb641b]">₹{pendingFee.amount} Due</span>
+              <span className="text-[#fb641b]">
+                {pendingFee.amount > 0 ? `₹${pendingFee.amount.toLocaleString()} Due` : 'Fees Unpaid'}
+              </span>
             ) : (
               <span className="text-emerald-600 flex items-center gap-1">
                 <span>Paid</span>
@@ -303,7 +305,11 @@ export default function StudentDashboardPage() {
             )}
           </div>
           <p className="text-[11px] text-slate-500 mt-0.5 truncate">
-            {pendingFee ? pendingFee.title : 'Tuition up to date'}
+            {pendingFee
+              ? pendingFee.amount > 0
+                ? pendingFee.title
+                : 'Fees unpaid (fee amount to be assigned)'
+              : 'Tuition up to date'}
           </p>
         </Link>
       </div>

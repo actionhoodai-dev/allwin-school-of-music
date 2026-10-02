@@ -14,11 +14,13 @@ import {
   ArrowRight,
   Receipt,
   Smartphone,
+  AlertCircle,
+  Calendar,
 } from 'lucide-react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import type { StudentFeeItem } from '@/types/student';
-import { ensureCurrentMonthFee } from '@/lib/utils/fees';
+import { ensureSequentialMonthlyFees, getFeeMonthDetails } from '@/lib/utils/fees';
 
 export default function StudentFeesPage() {
   const { student, markSectionViewed } = useStudentAuth();
@@ -28,7 +30,7 @@ export default function StudentFeesPage() {
   // Clear the unread badge when parent opens this section
   useEffect(() => {
     markSectionViewed('fees');
-  }, []);
+  }, [markSectionViewed]);
 
   useEffect(() => {
     if (!student?.studentId) return;
@@ -44,9 +46,12 @@ export default function StudentFeesPage() {
         );
         const snap = await getDocs(q);
         const rawList = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as StudentFeeItem[];
+        
+        // Pass student's dedicated static monthly fee (no 2000 fallback!)
         const finalizedList = (!studentStatus || studentStatus === 'active')
-          ? await ensureCurrentMonthFee(studentId, rawList, student?.monthlyFee || 2000)
+          ? await ensureSequentialMonthlyFees(studentId, rawList, student?.monthlyFee)
           : rawList;
+
         finalizedList.sort((a, b) => (b.dueDate || '').localeCompare(a.dueDate || ''));
         setFees(finalizedList);
       } catch (err) {
@@ -57,11 +62,12 @@ export default function StudentFeesPage() {
     }
 
     loadFees();
-  }, [student?.studentId, student?.status]);
+  }, [student?.studentId, student?.status, student?.monthlyFee]);
 
   const pendingDues = fees.filter((f) => f.status === 'pending' || f.status === 'overdue');
   const paidFees = fees.filter((f) => f.status === 'paid');
   const totalPendingAmount = pendingDues.reduce((sum, f) => sum + (f.balanceAmount || f.amount || 0), 0);
+  const hasUnassignedPending = pendingDues.some((f) => !f.amount || f.amount === 0);
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -69,10 +75,10 @@ export default function StudentFeesPage() {
       <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h2 className="font-bold text-xl sm:text-2xl text-slate-900">
-            Class Fees & Dues
+            Class Fees &amp; Dues
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            Monthly tuition records, exam dues & payment history
+            Monthly tuition records, sequential dues &amp; payment receipts
           </p>
         </div>
 
@@ -86,7 +92,7 @@ export default function StudentFeesPage() {
         </Link>
       </div>
 
-      {/* Main Status Hero Card — Clean White with Amazon Gold Accent */}
+      {/* Main Status Hero Card */}
       <div className="p-5 sm:p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -94,63 +100,155 @@ export default function StudentFeesPage() {
               Current Fee Status
             </span>
             <div className="text-3xl sm:text-4xl font-black text-slate-900 mt-2">
-              {totalPendingAmount > 0 ? `₹${totalPendingAmount.toLocaleString()}` : '₹0.00'}
+              {pendingDues.length === 0 ? (
+                '₹0.00'
+              ) : totalPendingAmount > 0 ? (
+                `₹${totalPendingAmount.toLocaleString()}`
+              ) : (
+                <span className="text-[#fb641b]">Fees Unpaid</span>
+              )}
             </div>
             <p className="text-xs text-slate-500 font-medium mt-1">
-              {totalPendingAmount > 0 ? 'Total outstanding tuition & exam dues' : 'All tuition fees are fully cleared'}
+              {pendingDues.length === 0
+                ? 'All tuition fees are fully cleared'
+                : totalPendingAmount > 0
+                ? `Total outstanding tuition (${pendingDues.length} ${pendingDues.length === 1 ? 'month' : 'months'} pending)`
+                : `Tuition is unpaid for ${pendingDues.length} ${pendingDues.length === 1 ? 'month' : 'months'} (fee amount to be assigned by academy)`}
             </p>
           </div>
 
           <div className="shrink-0">
-            {totalPendingAmount === 0 ? (
+            {pendingDues.length === 0 ? (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-xs">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>PAID & UP TO DATE</span>
+                <span>PAID &amp; UP TO DATE</span>
               </div>
             ) : (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-orange-50 border border-orange-200 text-[#fb641b] font-bold text-xs">
                 <Clock className="w-4 h-4" />
-                <span>PAYMENT PENDING</span>
+                <span>
+                  {pendingDues.length > 1 ? `${pendingDues.length} MONTHS PENDING` : 'FEES PENDING'}
+                </span>
               </div>
             )}
           </div>
         </div>
+
+        {/* Dedicated Monthly Fee Badge */}
+        <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+          <span className="font-medium">Student Dedicated Fee:</span>
+          {student?.monthlyFee && student.monthlyFee > 0 ? (
+            <span className="font-bold text-[#2874f0]">₹{student.monthlyFee.toLocaleString()} / month</span>
+          ) : (
+            <span className="font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+              Not Assigned Yet (Contact School)
+            </span>
+          )}
+        </div>
       </div>
 
-      {/* Active Dues Breakdown */}
+      {/* Active Dues Breakdown (Sequential Order) */}
       {pendingDues.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider px-1">
-            Pending Invoices ({pendingDues.length})
-          </h3>
+          <div className="flex items-center justify-between px-1">
+            <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              Pending Month-by-Month Dues ({pendingDues.length})
+            </h3>
+            <span className="text-[11px] text-slate-500 font-medium">Sequential monthly order</span>
+          </div>
 
           <div className="space-y-2.5">
-            {pendingDues.map((fee) => (
-              <div
-                key={fee.id}
-                className="p-4 sm:p-5 rounded-2xl bg-white border border-amber-300 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-              >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-bold uppercase px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">
-                      {fee.feeType || 'Tuition'}
+            {pendingDues.map((fee) => {
+              const monthDetails = getFeeMonthDetails(fee);
+              const hasAmount = fee.amount && fee.amount > 0;
+
+              return (
+                <div
+                  key={fee.id}
+                  className="p-4 sm:p-5 rounded-2xl bg-white border border-amber-300 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all hover:border-amber-400"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md ${
+                        monthDetails.isCurrentMonth
+                          ? 'bg-blue-50 text-[#2874f0] border border-blue-200'
+                          : monthDetails.isLastMonth
+                          ? 'bg-amber-100 text-amber-900 border border-amber-300 font-extrabold'
+                          : 'bg-rose-50 text-rose-700 border border-rose-200'
+                      }`}>
+                        {monthDetails.relativeLabel || 'Pending Due'}
+                      </span>
+                      <span className="text-xs font-bold text-slate-800">
+                        {monthDetails.formattedMonth}
+                      </span>
+                      <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Due: {fee.dueDate}</span>
+                      </span>
+                    </div>
+
+                    <h4 className="font-bold text-base text-slate-900 mt-1">
+                      {fee.title}
+                    </h4>
+                  </div>
+
+                  <div className="text-left sm:text-right">
+                    <div className="text-xl font-bold text-[#fb641b]">
+                      {hasAmount ? (
+                        `₹${fee.amount.toLocaleString()}`
+                      ) : (
+                        <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                          Fees Unpaid
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs text-slate-500 font-medium block mt-0.5">
+                      {hasAmount ? 'Pending Payment' : 'Fee amount not assigned yet'}
                     </span>
-                    <span className="text-xs text-slate-500 font-medium">Due: {fee.dueDate}</span>
                   </div>
-
-                  <h4 className="font-bold text-base text-slate-900 mt-1">
-                    {fee.title}
-                  </h4>
                 </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
-                <div className="text-left sm:text-right">
-                  <div className="text-xl font-bold text-[#fb641b]">
-                    ₹{fee.amount}
+      {/* Cleared / Paid Fees History */}
+      {paidFees.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wider px-1">
+            Cleared Payments ({paidFees.length})
+          </h3>
+
+          <div className="space-y-2">
+            {paidFees.slice(0, 4).map((fee) => {
+              const monthDetails = getFeeMonthDetails(fee);
+              return (
+                <div
+                  key={fee.id}
+                  className="p-3.5 sm:p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-between gap-3"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        PAID ✓
+                      </span>
+                      <span className="text-xs font-semibold text-slate-800">
+                        {monthDetails.formattedMonth}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 font-medium mt-0.5">
+                      {fee.title} {fee.paymentDate ? `• Paid on ${fee.paymentDate}` : ''}
+                    </p>
                   </div>
-                  <span className="text-xs text-slate-500 font-medium">Pay via UPI or at academy desk</span>
+                  <div className="text-right">
+                    <span className="text-sm font-bold text-emerald-700">
+                      {fee.amount > 0 ? `₹${fee.amount.toLocaleString()}` : 'Cleared'}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
@@ -171,7 +269,7 @@ export default function StudentFeesPage() {
               +91 94892 03683
             </span>
             <span className="text-xs text-slate-500 mt-0.5 block font-medium">
-              Please include student ID in payment remarks.
+              Please include student ID ({student?.studentId}) in payment remarks.
             </span>
           </div>
 

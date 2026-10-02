@@ -232,6 +232,12 @@ export default function AdminStudentsPage() {
                       <span className="text-slate-500">Grade / Level:</span>
                       <strong className="text-slate-900 dark:text-white">{student.grade || student.level}</strong>
                     </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-500">Monthly Fee:</span>
+                      <strong className={student.monthlyFee && student.monthlyFee > 0 ? "text-blue-600 dark:text-blue-400 font-bold" : "text-amber-600 font-medium"}>
+                        {student.monthlyFee && student.monthlyFee > 0 ? `₹${student.monthlyFee.toLocaleString()}` : 'Not Assigned'}
+                      </strong>
+                    </div>
                     {student.teacherName && (
                       <div className="flex items-center justify-between">
                         <span className="text-slate-500">Faculty:</span>

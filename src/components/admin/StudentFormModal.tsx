@@ -45,7 +45,7 @@ export default function StudentFormModal({
     joiningDate: new Date().toISOString().split('T')[0],
     initialPassword: '',
     status: 'active',
-    monthlyFee: 2000,
+    monthlyFee: '' as number | string,
   });
 
   const [nextIdPreview, setNextIdPreview] = useState<string>('Loading...');
@@ -83,14 +83,14 @@ export default function StudentFormModal({
         joiningDate: editingStudent.joiningDate || new Date().toISOString().split('T')[0],
         initialPassword: '',
         status: editingStudent.status || 'active',
-        monthlyFee: editingStudent.monthlyFee ?? 2000,
+        monthlyFee: (editingStudent.monthlyFee !== undefined && editingStudent.monthlyFee !== null) ? editingStudent.monthlyFee : '',
       });
       setNextIdPreview(editingStudent.studentId);
     } else {
       setFormData((prev) => ({
         ...prev,
         joiningDate: new Date().toISOString().split('T')[0],
-        monthlyFee: 2000,
+        monthlyFee: '',
       }));
       fetch('/api/admin/students/next-id')
         .then((res) => res.json())
@@ -118,6 +118,11 @@ export default function StudentFormModal({
 
     setLoading(true);
     try {
+      const normalizedPayload = {
+        ...formData,
+        monthlyFee: formData.monthlyFee === '' ? 0 : Number(formData.monthlyFee),
+      };
+
       if (editingStudent?.id) {
         // Edit existing student
         const res = await fetch('/api/admin/students/update-account', {
@@ -125,22 +130,22 @@ export default function StudentFormModal({
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             studentDocId: editingStudent.id,
-            updates: formData,
+            updates: normalizedPayload,
           }),
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed to update student');
-        onSuccess({ ...editingStudent, ...formData } as any);
+        onSuccess({ ...editingStudent, ...normalizedPayload } as any);
       } else {
         // Create new student with sequential ID
         const res = await fetch('/api/admin/students/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(normalizedPayload),
         });
         const data = await res.json();
         if (!data.success) throw new Error(data.error || 'Failed to create student');
-        onSuccess({ id: data.id, studentId: data.studentId, ...formData } as any);
+        onSuccess({ id: data.id, studentId: data.studentId, ...normalizedPayload } as any);
       }
       onClose();
     } catch (err: any) {
@@ -395,19 +400,19 @@ export default function StudentFormModal({
 
               <div>
                 <label className="block font-semibold text-text-secondary dark:text-slate-300 mb-1">
-                  Monthly Tuition Fee (₹)
+                  Dedicated Monthly Fee (₹)
                 </label>
                 <input
                   type="number"
                   min="0"
                   step="100"
                   value={formData.monthlyFee}
-                  onChange={(e) => setFormData({ ...formData, monthlyFee: Number(e.target.value) })}
-                  placeholder="2000"
+                  onChange={(e) => setFormData({ ...formData, monthlyFee: e.target.value === '' ? '' : Number(e.target.value) })}
+                  placeholder="e.g. 4000 (leave blank if unassigned)"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-violet"
                 />
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Default fee auto-billed on the last day of each month.
+                  Static fee per student. If left blank, shows &quot;Fees Unpaid&quot; without random values.
                 </p>
               </div>
             </div>

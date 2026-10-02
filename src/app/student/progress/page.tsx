@@ -135,7 +135,7 @@ export default function StudentProgressPage() {
                       <span className="w-2 h-2 rounded-full bg-[#2874f0]" />
                       <span>Today&apos;s Class</span>
                     </div>
-                    <p className="text-slate-700 leading-relaxed font-medium pl-3.5">
+                    <p className="text-slate-700 leading-relaxed font-medium pl-3.5 whitespace-pre-line break-words">
                       {rep.todaysClass}
                     </p>
                   </div>
@@ -147,7 +147,7 @@ export default function StudentProgressPage() {
                       <span className="w-2 h-2 rounded-full bg-amber-500" />
                       <span>Practice Work / Assignments</span>
                     </div>
-                    <p className="text-amber-950 leading-relaxed font-medium pl-3.5">
+                    <p className="text-amber-950 leading-relaxed font-medium pl-3.5 whitespace-pre-line break-words">
                       {rep.practiceWork}
                     </p>
                   </div>
@@ -159,7 +159,7 @@ export default function StudentProgressPage() {
                       <span className="w-2 h-2 rounded-full bg-emerald-500" />
                       <span>Songs Covered</span>
                     </div>
-                    <p className="text-emerald-950 leading-relaxed font-medium pl-3.5">
+                    <p className="text-emerald-950 leading-relaxed font-medium pl-3.5 whitespace-pre-line break-words">
                       {rep.songsCovered}
                     </p>
                   </div>
@@ -168,7 +168,7 @@ export default function StudentProgressPage() {
 
               {/* Legacy Evaluation / Overview fallback */}
               {!rep.todaysClass && !rep.practiceWork && !rep.songsCovered && rep.evaluation && (
-                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium whitespace-pre-line break-words">
                   {rep.evaluation}
                 </p>
               )}

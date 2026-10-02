@@ -110,16 +110,13 @@ export default function Header() {
             </div>
 
             {/* Mobile Controls */}
-            <div className="flex lg:hidden items-center gap-2">
+            <div className="flex lg:hidden items-center gap-2.5">
               <Link
                 href="/student-login"
-                className="px-2.5 py-1.5 rounded-xl bg-blue-50 text-[#2874f0] text-xs font-bold border border-blue-200 shrink-0 shadow-2xs"
+                className="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-[#2874f0] text-xs font-bold border border-blue-200 shrink-0 shadow-2xs transition-all active:scale-95"
               >
-                Portal
+                Student Portal
               </Link>
-              <Button href="/admin/login" size="sm">
-                Admin Portal
-              </Button>
               <button
                 onClick={() => setIsMobileOpen(true)}
                 className="p-2 text-slate-700 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition-colors border border-slate-200"

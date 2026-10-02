@@ -279,7 +279,7 @@ export default function AttendanceCalendar({
                 </span>
               </p>
               {activeDayRecord.record?.remarks ? (
-                <p className="text-xs text-slate-600 mt-0.5 font-medium">
+                <p className="text-xs text-slate-600 mt-0.5 font-medium whitespace-pre-line break-words">
                   {activeDayRecord.record.remarks}
                 </p>
               ) : (

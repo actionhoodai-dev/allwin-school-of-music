@@ -194,7 +194,7 @@ export default function StudentExamsPage() {
                   <span className="font-bold text-slate-900 block text-[11px] mb-0.5">
                     Exam Instructions:
                   </span>
-                  <p className="text-slate-600 font-medium">
+                  <p className="text-slate-600 font-medium whitespace-pre-line break-words">
                     {exam.instructions}
                   </p>
                 </div>
