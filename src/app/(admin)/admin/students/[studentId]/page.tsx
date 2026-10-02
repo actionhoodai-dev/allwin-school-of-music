@@ -133,6 +133,7 @@ export default function AdminStudentWorkspacePage({
   });
 
   const [showAddFee, setShowAddFee] = useState(false);
+  const [feeFilter, setFeeFilter] = useState<'unpaid' | 'paid'>('unpaid');
   const [staticFeeInput, setStaticFeeInput] = useState<string>('');
   const [isSavingStaticFee, setIsSavingStaticFee] = useState(false);
   const [updatingFeeId, setUpdatingFeeId] = useState<string | null>(null);
@@ -1466,103 +1467,168 @@ export default function AdminStudentWorkspacePage({
               </form>
             )}
 
-            <div className="space-y-2.5">
-              {fees.map((fee) => {
-                const monthDetails = getFeeMonthDetails(fee);
-                const hasAmount = fee.amount && fee.amount > 0;
+            {/* Filter Tabs: Unpaid Dues (default) vs Paid Receipts */}
+            {(() => {
+              const unpaidFees = fees.filter((f) => f.status === 'pending' || f.status === 'overdue');
+              const paidFeesList = fees.filter((f) => f.status === 'paid');
+              const displayedFees = feeFilter === 'unpaid' ? unpaidFees : paidFeesList;
+              const hasDedicatedFee = student?.monthlyFee !== undefined && student?.monthlyFee !== null && Number(student.monthlyFee) > 0;
 
-                return (
-                  <div
-                    key={fee.id}
-                    className="p-4 rounded-2xl bg-white border border-border shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                            fee.status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-                          }`}
-                        >
-                          {fee.status === 'paid' ? 'PAID' : 'UNPAID'}
-                        </span>
-                        <span
-                          className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                            monthDetails.isCurrentMonth
-                              ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                              : monthDetails.isLastMonth
-                              ? 'bg-amber-100 text-amber-900 border border-amber-300 font-extrabold'
-                              : 'bg-slate-100 text-slate-700'
-                          }`}
-                        >
-                          {monthDetails.relativeLabel || monthDetails.formattedMonth}
-                        </span>
-                        <span className="text-xs text-text-muted">Due: {fee.dueDate}</span>
-                      </div>
-                      <h4 className="font-bold text-sm text-navy mt-1">{fee.title}</h4>
-                      <p className="text-xs text-text-secondary mt-0.5">
-                        Amount:{' '}
-                        {hasAmount ? (
-                          <strong className="text-slate-900">₹{fee.amount.toLocaleString()}</strong>
-                        ) : (
-                          <span className="text-amber-800 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                            Fees Unpaid (Fee not assigned yet)
-                          </span>
-                        )}
-                        {fee.receiptNumber ? ` • Receipt: ${fee.receiptNumber}` : ''}
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-2 self-end sm:self-auto">
-                      {fee.id && (
-                        <button
-                          type="button"
-                          onClick={() => handleToggleFeeStatus(fee.id!, fee.status, fee.amount || 0)}
-                          disabled={updatingFeeId === fee.id}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-2xs flex items-center gap-1.5 ${
-                            fee.status === 'paid'
-                              ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                              : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
-                          }`}
-                          title={fee.status === 'paid' ? 'Click to mark unpaid' : 'Click to mark paid'}
-                        >
-                          {fee.status === 'paid' ? (
-                            <span>Mark Unpaid</span>
-                          ) : (
-                            <>
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              <span>Mark Paid</span>
-                            </>
-                          )}
-                        </button>
-                      )}
-
+              return (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => handleOpenEditFee(fee)}
-                        className="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-700 hover:text-blue-700 bg-slate-100 hover:bg-blue-50 border border-slate-200 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
-                        title="Edit Fee Record (Change amount, title, due date, etc.)"
+                        onClick={() => setFeeFilter('unpaid')}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          feeFilter === 'unpaid'
+                            ? 'bg-amber-100 text-amber-900 border border-amber-300 shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-100'
+                        }`}
                       >
-                        <Edit className="w-3.5 h-3.5 text-blue-600" />
-                        <span>Edit</span>
+                        Unpaid Dues ({unpaidFees.length})
                       </button>
-
                       <button
-                        onClick={async () => {
-                          if (!fee.id) return;
-                          if (!confirm(`Are you sure you want to delete "${fee.title}"?`)) return;
-                          await deleteDoc(doc(db, 'fees', fee.id));
-                          setFees(fees.filter((x) => x.id !== fee.id));
-                        }}
-                        className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all cursor-pointer"
-                        title="Delete Fee Record"
+                        type="button"
+                        onClick={() => setFeeFilter('paid')}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                          feeFilter === 'paid'
+                            ? 'bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-2xs'
+                            : 'text-slate-600 hover:bg-slate-100'
+                        }`}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        Paid Receipts ({paidFeesList.length})
                       </button>
                     </div>
+
+                    <span className="text-[11px] text-slate-500 font-medium">
+                      {feeFilter === 'unpaid'
+                        ? 'Showing active unpaid fees only'
+                        : 'Showing cleared paid history'}
+                    </span>
                   </div>
-                );
-              })}
-            </div>
+
+                  {displayedFees.length === 0 ? (
+                    <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+                      <p className="font-bold text-slate-700 text-xs">
+                        {feeFilter === 'unpaid'
+                          ? 'No pending unpaid dues! All fees are cleared.'
+                          : 'No paid receipts recorded yet.'}
+                      </p>
+                      {feeFilter === 'unpaid' && (
+                        <p className="text-[11px] text-slate-500 mt-1">
+                          When a fee is marked paid, it moves to Paid Receipts.
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-2.5">
+                      {displayedFees.map((fee) => {
+                        const monthDetails = getFeeMonthDetails(fee);
+                        // If student dedicated fee is NOT configured, NEVER show 1500 or dummy amounts!
+                        const effectiveAmount = hasDedicatedFee
+                          ? (fee.amount && fee.amount > 0 ? fee.amount : Number(student!.monthlyFee))
+                          : 0;
+                        const showAssignedAmount = hasDedicatedFee && effectiveAmount > 0;
+
+                        return (
+                          <div
+                            key={fee.id}
+                            className="p-4 rounded-2xl bg-white border border-border shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+                          >
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                    fee.status === 'paid'
+                                      ? 'bg-emerald-100 text-emerald-800'
+                                      : 'bg-amber-100 text-amber-800'
+                                  }`}
+                                >
+                                  {fee.status === 'paid' ? 'PAID' : 'UNPAID'}
+                                </span>
+                                <span
+                                  className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                    monthDetails.isCurrentMonth
+                                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                                      : 'bg-slate-100 text-slate-700'
+                                  }`}
+                                >
+                                  {monthDetails.relativeLabel || monthDetails.formattedMonth}
+                                </span>
+                                <span className="text-xs text-text-muted">Due: {fee.dueDate}</span>
+                              </div>
+                              <h4 className="font-bold text-sm text-navy mt-1">{fee.title}</h4>
+                              <p className="text-xs text-text-secondary mt-0.5">
+                                Amount:{' '}
+                                {showAssignedAmount ? (
+                                  <strong className="text-slate-900">₹{effectiveAmount.toLocaleString()}</strong>
+                                ) : (
+                                  <span className="text-amber-800 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                    Fees Unpaid (Fee not assigned yet)
+                                  </span>
+                                )}
+                                {fee.receiptNumber ? ` • Receipt: ${fee.receiptNumber}` : ''}
+                                {fee.paymentDate ? ` • Paid: ${fee.paymentDate}` : ''}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center gap-2 self-end sm:self-auto">
+                              {fee.id && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleFeeStatus(fee.id!, fee.status, effectiveAmount)}
+                                  disabled={updatingFeeId === fee.id}
+                                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-2xs flex items-center gap-1.5 ${
+                                    fee.status === 'paid'
+                                      ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                                      : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
+                                  }`}
+                                  title={fee.status === 'paid' ? 'Click to mark unpaid' : 'Click to mark paid (removes from unpaid dues)'}
+                                >
+                                  {fee.status === 'paid' ? (
+                                    <span>Mark Unpaid</span>
+                                  ) : (
+                                    <>
+                                      <CheckCircle2 className="w-3.5 h-3.5" />
+                                      <span>Mark Paid</span>
+                                    </>
+                                  )}
+                                </button>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() => handleOpenEditFee(fee)}
+                                className="px-2.5 py-1.5 rounded-xl text-xs font-semibold text-slate-700 hover:text-blue-700 bg-slate-100 hover:bg-blue-50 border border-slate-200 flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer shadow-2xs"
+                                title="Edit Fee Record (Change amount, title, due date, etc.)"
+                              >
+                                <Edit className="w-3.5 h-3.5 text-blue-600" />
+                                <span>Edit</span>
+                              </button>
+
+                              <button
+                                onClick={async () => {
+                                  if (!fee.id) return;
+                                  if (!confirm(`Are you sure you want to delete "${fee.title}"?`)) return;
+                                  await deleteDoc(doc(db, 'fees', fee.id));
+                                  setFees(fees.filter((x) => x.id !== fee.id));
+                                }}
+                                className="p-2 text-red-500 hover:bg-red-50 rounded-xl transition-all cursor-pointer"
+                                title="Delete Fee Record"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Edit Fee Record Modal */}
             {editingFee && (

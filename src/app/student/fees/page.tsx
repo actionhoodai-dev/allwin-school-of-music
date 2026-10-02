@@ -64,10 +64,12 @@ export default function StudentFeesPage() {
     loadFees();
   }, [student?.studentId, student?.status, student?.monthlyFee]);
 
+  const hasDedicatedFee = student?.monthlyFee !== undefined && student?.monthlyFee !== null && Number(student.monthlyFee) > 0;
   const pendingDues = fees.filter((f) => f.status === 'pending' || f.status === 'overdue');
   const paidFees = fees.filter((f) => f.status === 'paid');
-  const totalPendingAmount = pendingDues.reduce((sum, f) => sum + (f.balanceAmount || f.amount || 0), 0);
-  const hasUnassignedPending = pendingDues.some((f) => !f.amount || f.amount === 0);
+  const totalPendingAmount = hasDedicatedFee
+    ? pendingDues.reduce((sum, f) => sum + (f.balanceAmount || f.amount || Number(student!.monthlyFee) || 0), 0)
+    : 0;
 
   return (
     <div className="space-y-4 animate-fade-in">
@@ -160,7 +162,10 @@ export default function StudentFeesPage() {
           <div className="space-y-2.5">
             {pendingDues.map((fee) => {
               const monthDetails = getFeeMonthDetails(fee);
-              const hasAmount = fee.amount && fee.amount > 0;
+              const effectiveAmount = hasDedicatedFee
+                ? (fee.amount && fee.amount > 0 ? fee.amount : Number(student!.monthlyFee))
+                : 0;
+              const showAssignedAmount = hasDedicatedFee && effectiveAmount > 0;
 
               return (
                 <div
@@ -172,9 +177,7 @@ export default function StudentFeesPage() {
                       <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-md ${
                         monthDetails.isCurrentMonth
                           ? 'bg-blue-50 text-[#2874f0] border border-blue-200'
-                          : monthDetails.isLastMonth
-                          ? 'bg-amber-100 text-amber-900 border border-amber-300 font-extrabold'
-                          : 'bg-rose-50 text-rose-700 border border-rose-200'
+                          : 'bg-slate-100 text-slate-700'
                       }`}>
                         {monthDetails.relativeLabel || 'Pending Due'}
                       </span>
@@ -194,8 +197,8 @@ export default function StudentFeesPage() {
 
                   <div className="text-left sm:text-right">
                     <div className="text-xl font-bold text-[#fb641b]">
-                      {hasAmount ? (
-                        `₹${fee.amount.toLocaleString()}`
+                      {showAssignedAmount ? (
+                        `₹${effectiveAmount.toLocaleString()}`
                       ) : (
                         <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-1 rounded border border-amber-200">
                           Fees Unpaid
@@ -203,7 +206,7 @@ export default function StudentFeesPage() {
                       )}
                     </div>
                     <span className="text-xs text-slate-500 font-medium block mt-0.5">
-                      {hasAmount ? 'Pending Payment' : 'Fee amount not assigned yet'}
+                      {showAssignedAmount ? 'Pending Payment' : 'Fee amount not assigned yet'}
                     </span>
                   </div>
                 </div>

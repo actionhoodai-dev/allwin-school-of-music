@@ -1,8 +1,8 @@
 // ============================================
-// Fees Utility: Sequential Monthly Dues & Static Fee Management
+// Fees Utility: Monthly Dues & Static Fee Management
 // ============================================
 
-import { collection, addDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import type { StudentFeeItem, FeeStatus } from '@/types/student';
 
@@ -19,7 +19,7 @@ export const MONTH_NAMES = [
 export function getLastDayOfMonth(date = new Date()): string {
   const year = date.getFullYear();
   const month = date.getMonth();
-  const lastDayDate = new Date(year, month + 1, 0); // 0 gets the last day of previous month index
+  const lastDayDate = new Date(year, month + 1, 0); // last day of month
   const y = lastDayDate.getFullYear();
   const m = String(lastDayDate.getMonth() + 1).padStart(2, '0');
   const d = String(lastDayDate.getDate()).padStart(2, '0');
@@ -57,8 +57,7 @@ export interface FeeMonthDetails {
 }
 
 /**
- * Extracts month, year, and sequential relative label (e.g. This Month, Last Month, Overdue)
- * from a fee record's due date or title.
+ * Extracts month, year, and relative label from a fee record's due date or title.
  */
 export function getFeeMonthDetails(fee: StudentFeeItem): FeeMonthDetails {
   const now = new Date();
@@ -125,104 +124,149 @@ export function getFeeMonthDetails(fee: StudentFeeItem): FeeMonthDetails {
 }
 
 /**
- * Ensures sequential tuition fee records exist for both Previous Month and Current Month.
- * - If dedicated monthly fee is set (e.g. ₹4000), it uses that static amount.
- * - If no dedicated fee is assigned yet, amount defaults to 0 (displays as Fees Unpaid with NO random values).
- * - Sorts all fees in reverse-chronological sequential order so the admin and student can clearly track
- *   "last month pending" and "this month pending".
+ * Ensures ONLY the current month's tuition fee record exists for the student.
+ * - Does NOT auto-create previous months (only 1 current active month is triggered).
+ * - If dedicated monthly fee is configured by admin, it uses that exact amount.
+ * - If no dedicated fee is configured by admin, amount is strictly 0 / unassigned (NO random 1500 or 2000).
+ * - Cleans up any stale 1500/2000 amounts on pending tuition fees if the admin has not set a dedicated fee.
+ * - Cleans up any auto-created past empty months (e.g. September).
  */
-export async function ensureSequentialMonthlyFees(
+export async function ensureCurrentMonthlyFee(
   studentId: string,
   existingFees: StudentFeeItem[],
   studentMonthlyFee?: number
 ): Promise<StudentFeeItem[]> {
   if (!studentId) return existingFees;
 
-  // Dedicated static fee or 0 if unassigned — NEVER fallback to random 2000!
-  const effectiveAmount = (studentMonthlyFee && Number(studentMonthlyFee) > 0)
-    ? Number(studentMonthlyFee)
-    : 0;
-
   const now = new Date();
-  // Check previous month and current month
-  const prevMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-  const currentMonthDate = new Date(now.getFullYear(), now.getMonth(), 1);
+  const currentMonthInfo = getMonthFeeInfo(now);
 
-  const targetMonths = [
-    getMonthFeeInfo(prevMonthDate),
-    getMonthFeeInfo(currentMonthDate),
-  ];
+  const hasConfiguredFee =
+    studentMonthlyFee !== undefined &&
+    studentMonthlyFee !== null &&
+    Number(studentMonthlyFee) > 0;
+  const effectiveAmount = hasConfiguredFee ? Number(studentMonthlyFee) : 0;
 
-  let updatedList = [...existingFees];
-
-  for (const info of targetMonths) {
-    // Check if a tuition fee for this specific month & year already exists
-    const exists = updatedList.some((f) => {
-      if (f.dueDate && f.dueDate.startsWith(info.monthYearStr)) return true;
-      if (
-        f.title &&
-        f.title.toLowerCase().includes(info.monthName.toLowerCase()) &&
-        f.title.includes(String(info.year))
-      ) {
-        return true;
+  // Clean up any empty past month tuition records that were auto-created
+  const cleanedList: StudentFeeItem[] = [];
+  for (const f of existingFees) {
+    if (
+      f.feeType === 'tuition' &&
+      f.status === 'pending' &&
+      (!f.amount || f.amount === 0) &&
+      f.dueDate &&
+      f.dueDate < currentMonthInfo.monthYearStr
+    ) {
+      if (f.id) {
+        deleteDoc(doc(db, 'fees', f.id)).catch(() => {});
       }
-      return false;
-    });
-
-    if (!exists) {
-      try {
-        const newFeeData = {
-          studentId,
-          title: info.title,
-          feeType: 'tuition' as const,
-          amount: effectiveAmount,
-          paidAmount: 0,
-          balanceAmount: effectiveAmount,
-          dueDate: info.dueDate,
-          status: 'pending' as FeeStatus,
-          paymentMethod: 'UPI / GPay' as const,
-          receiptNumber: '',
-          createdAt: serverTimestamp(),
-        };
-
-        const docRef = await addDoc(collection(db, 'fees'), newFeeData);
-
-        const createdItem: StudentFeeItem = {
-          id: docRef.id,
-          studentId,
-          title: info.title,
-          feeType: 'tuition',
-          amount: effectiveAmount,
-          paidAmount: 0,
-          balanceAmount: effectiveAmount,
-          dueDate: info.dueDate,
-          status: 'pending',
-          paymentMethod: 'UPI / GPay',
-          receiptNumber: '',
-        };
-
-        updatedList.push(createdItem);
-      } catch (err) {
-        console.error(`Error auto-creating fee for ${info.title}:`, err);
-      }
+      continue;
     }
+    cleanedList.push(f);
   }
 
-  // Sort descending by due date (This Month on top, Last Month directly below)
-  updatedList.sort((a, b) => (b.dueDate || '').localeCompare(a.dueDate || ''));
+  // Check if current month tuition fee already exists
+  const existingCurrentIndex = cleanedList.findIndex((f) => {
+    if (f.dueDate && f.dueDate.startsWith(currentMonthInfo.monthYearStr)) return true;
+    if (
+      f.title &&
+      f.title.toLowerCase().includes(currentMonthInfo.monthName.toLowerCase()) &&
+      f.title.includes(String(currentMonthInfo.year))
+    ) {
+      return true;
+    }
+    return false;
+  });
 
-  return updatedList;
+  if (existingCurrentIndex >= 0) {
+    const currentFee = cleanedList[existingCurrentIndex];
+
+    // If student has NO configured fee, but the doc had an old hardcoded amount (e.g. 1500 or 2000), wipe it out to 0
+    if (!hasConfiguredFee && currentFee.amount > 0 && currentFee.status === 'pending') {
+      currentFee.amount = 0;
+      currentFee.balanceAmount = 0;
+      if (currentFee.id) {
+        updateDoc(doc(db, 'fees', currentFee.id), {
+          amount: 0,
+          balanceAmount: 0,
+          updatedAt: serverTimestamp(),
+        }).catch(() => {});
+      }
+    } else if (hasConfiguredFee && currentFee.status === 'pending' && currentFee.amount !== effectiveAmount) {
+      // Sync to configured dedicated fee
+      currentFee.amount = effectiveAmount;
+      currentFee.balanceAmount = effectiveAmount;
+      if (currentFee.id) {
+        updateDoc(doc(db, 'fees', currentFee.id), {
+          amount: effectiveAmount,
+          balanceAmount: effectiveAmount,
+          updatedAt: serverTimestamp(),
+        }).catch(() => {});
+      }
+    }
+
+    cleanedList.sort((a, b) => (b.dueDate || '').localeCompare(a.dueDate || ''));
+    return cleanedList;
+  }
+
+  // Create current month tuition fee
+  try {
+    const newFeeData = {
+      studentId,
+      title: currentMonthInfo.title,
+      feeType: 'tuition' as const,
+      amount: effectiveAmount,
+      paidAmount: 0,
+      balanceAmount: effectiveAmount,
+      dueDate: currentMonthInfo.dueDate,
+      status: 'pending' as FeeStatus,
+      paymentMethod: 'UPI / GPay' as const,
+      receiptNumber: '',
+      createdAt: serverTimestamp(),
+    };
+
+    const docRef = await addDoc(collection(db, 'fees'), newFeeData);
+
+    const createdItem: StudentFeeItem = {
+      id: docRef.id,
+      studentId,
+      title: currentMonthInfo.title,
+      feeType: 'tuition',
+      amount: effectiveAmount,
+      paidAmount: 0,
+      balanceAmount: effectiveAmount,
+      dueDate: currentMonthInfo.dueDate,
+      status: 'pending',
+      paymentMethod: 'UPI / GPay',
+      receiptNumber: '',
+    };
+
+    cleanedList.unshift(createdItem);
+  } catch (err) {
+    console.error(`Error auto-creating fee for ${currentMonthInfo.title}:`, err);
+  }
+
+  cleanedList.sort((a, b) => (b.dueDate || '').localeCompare(a.dueDate || ''));
+  return cleanedList;
 }
 
 /**
- * Backward-compatible alias for ensureSequentialMonthlyFees.
+ * Backward-compatible aliases
  */
+export async function ensureSequentialMonthlyFees(
+  studentId: string,
+  existingFees: StudentFeeItem[],
+  studentMonthlyFee?: number
+): Promise<StudentFeeItem[]> {
+  return ensureCurrentMonthlyFee(studentId, existingFees, studentMonthlyFee);
+}
+
 export async function ensureCurrentMonthFee(
   studentId: string,
   existingFees: StudentFeeItem[],
   studentMonthlyFee?: number
 ): Promise<StudentFeeItem[]> {
-  return ensureSequentialMonthlyFees(studentId, existingFees, studentMonthlyFee);
+  return ensureCurrentMonthlyFee(studentId, existingFees, studentMonthlyFee);
 }
 
 /**
