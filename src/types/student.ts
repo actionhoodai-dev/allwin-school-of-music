@@ -31,6 +31,7 @@ export interface Student {
   status: StudentStatus;
   mustChangePassword?: boolean;
   notes?: string;
+  monthlyFee?: number;
   createdAt?: Timestamp | any;
   updatedAt?: Timestamp | any;
   lastLoginAt?: Timestamp | any;

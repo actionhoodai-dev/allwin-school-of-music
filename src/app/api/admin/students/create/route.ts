@@ -31,6 +31,7 @@ export async function POST(request: Request) {
       initialPassword,
       mustChangePassword = true,
       notes = '',
+      monthlyFee = 2000,
     } = body;
 
     if (!name || !parentEmail) {
@@ -85,6 +86,7 @@ export async function POST(request: Request) {
       status: 'active',
       mustChangePassword: Boolean(mustChangePassword),
       notes: notes || '',
+      monthlyFee: Number(monthlyFee) || 2000,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     };

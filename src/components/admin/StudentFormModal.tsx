@@ -45,6 +45,7 @@ export default function StudentFormModal({
     joiningDate: new Date().toISOString().split('T')[0],
     initialPassword: '',
     status: 'active',
+    monthlyFee: 2000,
   });
 
   const [nextIdPreview, setNextIdPreview] = useState<string>('Loading...');
@@ -82,12 +83,14 @@ export default function StudentFormModal({
         joiningDate: editingStudent.joiningDate || new Date().toISOString().split('T')[0],
         initialPassword: '',
         status: editingStudent.status || 'active',
+        monthlyFee: editingStudent.monthlyFee ?? 2000,
       });
       setNextIdPreview(editingStudent.studentId);
     } else {
       setFormData((prev) => ({
         ...prev,
         joiningDate: new Date().toISOString().split('T')[0],
+        monthlyFee: 2000,
       }));
       fetch('/api/admin/students/next-id')
         .then((res) => res.json())
@@ -373,20 +376,40 @@ export default function StudentFormModal({
               </div>
             </div>
 
-            {/* Date of Joining */}
-            <div className="pt-2">
-              <label className="block font-semibold text-text-secondary dark:text-slate-300 mb-1">
-                Date of Joining
-              </label>
-              <input
-                type="date"
-                value={formData.joiningDate}
-                onChange={(e) => setFormData({ ...formData, joiningDate: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-violet"
-              />
-              <p className="text-[11px] text-slate-500 mt-1">
-                Official enrollment date when the student joined the academy.
-              </p>
+            {/* Date of Joining & Monthly Tuition Fee */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <div>
+                <label className="block font-semibold text-text-secondary dark:text-slate-300 mb-1">
+                  Date of Joining
+                </label>
+                <input
+                  type="date"
+                  value={formData.joiningDate}
+                  onChange={(e) => setFormData({ ...formData, joiningDate: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-violet"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Official enrollment date.
+                </p>
+              </div>
+
+              <div>
+                <label className="block font-semibold text-text-secondary dark:text-slate-300 mb-1">
+                  Monthly Tuition Fee (₹)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  step="100"
+                  value={formData.monthlyFee}
+                  onChange={(e) => setFormData({ ...formData, monthlyFee: Number(e.target.value) })}
+                  placeholder="2000"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border dark:border-white/10 bg-slate-50 dark:bg-white/5 text-xs text-text-primary dark:text-white focus:outline-none focus:ring-2 focus:ring-violet"
+                />
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Default fee auto-billed on the last day of each month.
+                </p>
+              </div>
             </div>
           </div>
 

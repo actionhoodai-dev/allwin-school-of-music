@@ -45,7 +45,7 @@ export default function StudentFeesPage() {
         const snap = await getDocs(q);
         const rawList = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as StudentFeeItem[];
         const finalizedList = (!studentStatus || studentStatus === 'active')
-          ? await ensureCurrentMonthFee(studentId, rawList)
+          ? await ensureCurrentMonthFee(studentId, rawList, student?.monthlyFee || 2000)
           : rawList;
         finalizedList.sort((a, b) => (b.dueDate || '').localeCompare(a.dueDate || ''));
         setFees(finalizedList);

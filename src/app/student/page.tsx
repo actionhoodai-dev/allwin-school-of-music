@@ -74,7 +74,7 @@ export default function StudentDashboardPage() {
         const feeSnap = await getDocs(feeQuery).catch(() => ({ docs: [] } as any));
         const rawFeeList = feeSnap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
         const finalizedFeeList = (!student?.status || student?.status === 'active')
-          ? await ensureCurrentMonthFee(studentId, rawFeeList)
+          ? await ensureCurrentMonthFee(studentId, rawFeeList, student?.monthlyFee || 2000)
           : rawFeeList;
         setFees(finalizedFeeList);
 
