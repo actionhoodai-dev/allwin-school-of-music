@@ -65,6 +65,34 @@ export default function AdminAttendanceCalendar({
     return map;
   }, [records]);
 
+  // Calculate attendance statistics for the currently selected month
+  const monthStats = useMemo(() => {
+    let presentCount = 0;
+    let absentCount = 0;
+    let noClassCount = 0;
+
+    const monthStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+
+    records.forEach((r) => {
+      if (r.date && r.date.startsWith(monthStr)) {
+        if (r.status === 'present') presentCount++;
+        else if (r.status === 'absent') absentCount++;
+        else if (r.status === 'no_class') noClassCount++;
+      }
+    });
+
+    const totalActiveDays = presentCount + absentCount;
+    const percentage = totalActiveDays > 0 ? Math.round((presentCount / totalActiveDays) * 100) : 0;
+
+    return {
+      presentCount,
+      absentCount,
+      noClassCount,
+      totalActiveDays,
+      percentage,
+    };
+  }, [records, currentYear, currentMonth]);
+
   // Navigate months
   const handlePrevMonth = () => {
     if (currentMonth === 0) {
@@ -251,6 +279,51 @@ export default function AdminAttendanceCalendar({
           >
             <ChevronRight className="w-5 h-5 stroke-[2.5]" />
           </button>
+        </div>
+      </div>
+
+      {/* Monthly Attendance Summary Badges (Responsive Mobile & Desktop) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-2 sm:p-2.5 rounded-xl bg-slate-50 border border-[#D5D4DF]/80">
+        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200/80 shadow-2xs">
+          <div className="w-6 h-6 rounded-md bg-emerald-600 flex items-center justify-center text-white shrink-0 shadow-2xs">
+            <Check className="w-3.5 h-3.5 stroke-[3]" />
+          </div>
+          <div className="min-w-0">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 block leading-tight">
+              Present
+            </span>
+            <span className="text-sm sm:text-base font-black text-emerald-950 leading-tight">
+              {monthStats.presentCount} {monthStats.presentCount === 1 ? 'Day' : 'Days'}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-rose-50 border border-rose-200/80 shadow-2xs">
+          <div className="w-6 h-6 rounded-md bg-rose-600 flex items-center justify-center text-white shrink-0 shadow-2xs">
+            <X className="w-3.5 h-3.5 stroke-[3]" />
+          </div>
+          <div className="min-w-0">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-rose-700 block leading-tight">
+              Absent
+            </span>
+            <span className="text-sm sm:text-base font-black text-rose-950 leading-tight">
+              {monthStats.absentCount} {monthStats.absentCount === 1 ? 'Day' : 'Days'}
+            </span>
+          </div>
+        </div>
+
+        <div className="col-span-2 sm:col-span-1 flex items-center justify-between sm:justify-start gap-2 px-2.5 py-1.5 rounded-lg bg-white border border-slate-200">
+          <div className="min-w-0">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block leading-tight">
+              Monthly Rate
+            </span>
+            <span className="text-xs sm:text-sm font-extrabold text-slate-800 leading-tight">
+              {monthStats.totalActiveDays > 0 ? `${monthStats.percentage}% Attended` : 'No Classes'}
+            </span>
+          </div>
+          <span className="text-[10px] text-slate-400 font-medium sm:hidden">
+            {MONTH_NAMES[currentMonth].slice(0, 3)}
+          </span>
         </div>
       </div>
 

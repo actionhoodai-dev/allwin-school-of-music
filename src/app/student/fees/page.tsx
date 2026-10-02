@@ -18,6 +18,7 @@ import {
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import type { StudentFeeItem } from '@/types/student';
+import { ensureCurrentMonthFee } from '@/lib/utils/fees';
 
 export default function StudentFeesPage() {
   const { student, markSectionViewed } = useStudentAuth();
@@ -33,15 +34,21 @@ export default function StudentFeesPage() {
     if (!student?.studentId) return;
 
     async function loadFees() {
+      if (!student?.studentId) return;
       try {
+        const studentId = student.studentId;
+        const studentStatus = student.status;
         const q = query(
           collection(db, 'fees'),
-          where('studentId', '==', student!.studentId)
+          where('studentId', '==', studentId)
         );
         const snap = await getDocs(q);
-        const list = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as StudentFeeItem[];
-        list.sort((a, b) => (b.dueDate || '').localeCompare(a.dueDate || ''));
-        setFees(list);
+        const rawList = snap.docs.map((d) => ({ id: d.id, ...d.data() })) as StudentFeeItem[];
+        const finalizedList = (!studentStatus || studentStatus === 'active')
+          ? await ensureCurrentMonthFee(studentId, rawList)
+          : rawList;
+        finalizedList.sort((a, b) => (b.dueDate || '').localeCompare(a.dueDate || ''));
+        setFees(finalizedList);
       } catch (err) {
         console.error('Error fetching fees:', err);
       } finally {
@@ -50,7 +57,7 @@ export default function StudentFeesPage() {
     }
 
     loadFees();
-  }, [student?.studentId]);
+  }, [student?.studentId, student?.status]);
 
   const pendingDues = fees.filter((f) => f.status === 'pending' || f.status === 'overdue');
   const paidFees = fees.filter((f) => f.status === 'paid');

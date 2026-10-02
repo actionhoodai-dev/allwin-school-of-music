@@ -38,6 +38,7 @@ import type {
   SchoolAnnouncement,
   ProgressReport,
 } from '@/types/student';
+import { ensureCurrentMonthFee } from '@/lib/utils/fees';
 
 export default function StudentDashboardPage() {
   const { student, sectionBadges, markSectionViewed } = useStudentAuth();
@@ -71,8 +72,11 @@ export default function StudentDashboardPage() {
           where('studentId', '==', studentId)
         );
         const feeSnap = await getDocs(feeQuery).catch(() => ({ docs: [] } as any));
-        const feeList = feeSnap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
-        setFees(feeList);
+        const rawFeeList = feeSnap.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+        const finalizedFeeList = (!student?.status || student?.status === 'active')
+          ? await ensureCurrentMonthFee(studentId, rawFeeList)
+          : rawFeeList;
+        setFees(finalizedFeeList);
 
         // 3. Schedules
         const schedQuery = query(

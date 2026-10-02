@@ -54,6 +54,7 @@ import type {
   ExamRecord,
 } from '@/types/student';
 import { ALL_GRADES, ALL_LEVELS, getLevelForGrade } from '@/lib/constants';
+import { getLastDayOfMonth, ensureCurrentMonthFee, toggleFeeStatusInDb } from '@/lib/utils/fees';
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: User },
@@ -131,11 +132,12 @@ export default function AdminStudentWorkspacePage({
   });
 
   const [showAddFee, setShowAddFee] = useState(false);
+  const [updatingFeeId, setUpdatingFeeId] = useState<string | null>(null);
   const [newFee, setNewFee] = useState({
     title: 'Monthly Tuition Fee',
     feeType: 'tuition' as any,
     amount: 2000,
-    dueDate: new Date().toISOString().split('T')[0],
+    dueDate: getLastDayOfMonth(),
     status: 'pending' as any,
     paidAmount: 0,
     paymentMethod: 'UPI / GPay' as any,
@@ -207,7 +209,14 @@ export default function AdminStudentWorkspacePage({
       setSchedules(schedSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
       setProgressReports(progSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
       setAchievements(achSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
-      setFees(feeSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
+
+      const rawFees = feeSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as StudentFeeItem[];
+      // Auto-ensure current month fee with due date on the last day of the month for active students
+      const finalizedFees = targetStudent.status === 'active'
+        ? await ensureCurrentMonthFee(studentId, rawFees)
+        : rawFees;
+      setFees(finalizedFees);
+
       setExams(examSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
     } catch (err) {
       console.error('Error fetching student data:', err);
@@ -444,6 +453,30 @@ export default function AdminStudentWorkspacePage({
       setShowAddFee(false);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  // Toggle Fee Status (Implicitly change Unpaid <-> Paid)
+  const handleToggleFeeStatus = async (feeId: string, currentStatus: any, amount: number) => {
+    try {
+      setUpdatingFeeId(feeId);
+      const nextStatus = await toggleFeeStatusInDb(feeId, currentStatus, amount);
+      setFees((prev) =>
+        prev.map((f) =>
+          f.id === feeId
+            ? {
+                ...f,
+                status: nextStatus,
+                paidAmount: nextStatus === 'paid' ? amount : 0,
+                balanceAmount: nextStatus === 'paid' ? 0 : amount,
+              }
+            : f
+        )
+      );
+    } catch (err) {
+      console.error('Error updating fee status:', err);
+    } finally {
+      setUpdatingFeeId(null);
     }
   };
 
@@ -1224,25 +1257,54 @@ export default function AdminStudentWorkspacePage({
 
             <div className="space-y-2.5">
               {fees.map((fee) => (
-                <div key={fee.id} className="p-4 rounded-2xl bg-white border border-border shadow-xs flex items-center justify-between">
+                <div key={fee.id} className="p-4 rounded-2xl bg-white border border-border shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${fee.status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>{fee.status.toUpperCase()}</span>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${fee.status === 'paid' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                        {fee.status === 'paid' ? 'PAID' : 'UNPAID'}
+                      </span>
                       <span className="text-xs text-text-muted">Due: {fee.dueDate}</span>
                     </div>
                     <h4 className="font-bold text-sm text-navy mt-1">{fee.title}</h4>
                     <p className="text-xs text-text-secondary">Amount: ₹{fee.amount} {fee.receiptNumber ? `(Receipt: ${fee.receiptNumber})` : ''}</p>
                   </div>
-                  <button
-                    onClick={async () => {
-                      if (!fee.id) return;
-                      await deleteDoc(doc(db, 'fees', fee.id));
-                      setFees(fees.filter((x) => x.id !== fee.id));
-                    }}
-                    className="p-2 text-red-500 hover:bg-red-50 rounded-xl"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    {fee.id && (
+                      <button
+                        type="button"
+                        onClick={() => handleToggleFeeStatus(fee.id!, fee.status, fee.amount)}
+                        disabled={updatingFeeId === fee.id}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all active:scale-95 cursor-pointer shadow-2xs flex items-center gap-1.5 ${
+                          fee.status === 'paid'
+                            ? 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20'
+                        }`}
+                        title={fee.status === 'paid' ? 'Click to mark unpaid' : 'Click to mark paid'}
+                      >
+                        {fee.status === 'paid' ? (
+                          <span>Mark Unpaid</span>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Mark Paid</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    <button
+                      onClick={async () => {
+                        if (!fee.id) return;
+                        await deleteDoc(doc(db, 'fees', fee.id));
+                        setFees(fees.filter((x) => x.id !== fee.id));
+                      }}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-xl"
+                      title="Delete Fee Record"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
