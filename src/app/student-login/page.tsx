@@ -68,13 +68,13 @@ export default function StudentLoginPage() {
     setLoading(true);
     try {
       await signIn(identifier.trim(), password);
-      router.push('/student');
+      // Hard navigation ensures clean session hydration on iOS Safari
+      window.location.href = '/student';
     } catch (err: any) {
       console.error('Student login error:', err);
       setError(
         err.message || 'Login failed. Please check your Student ID and password.'
       );
-    } finally {
       setLoading(false);
     }
   };
@@ -171,7 +171,7 @@ export default function StudentLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f1f3f6] flex flex-col justify-between text-slate-900 select-none relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-[#f1f3f6] flex flex-col justify-between text-slate-900 relative overflow-y-auto">
       {/* Top Header */}
       <header className="p-4 sm:p-6 flex items-center justify-between max-w-md w-full mx-auto z-10">
         <Link
@@ -233,7 +233,12 @@ export default function StudentLoginPage() {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder="e.g. ASM101 or parent@email.com"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:bg-white transition-all font-medium"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  autoComplete="username"
+                  enterKeyHint="next"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:bg-white transition-all font-medium"
                 />
                 <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               </div>
@@ -262,7 +267,12 @@ export default function StudentLoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:bg-white transition-all"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  autoComplete="current-password"
+                  enterKeyHint="go"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:bg-white transition-all"
                 />
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               </div>
@@ -349,7 +359,10 @@ export default function StudentLoginPage() {
                     value={otpIdentifier}
                     onChange={(e) => setOtpIdentifier(e.target.value)}
                     placeholder="e.g. ASM101"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:bg-white text-slate-900 font-medium"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#1d4ed8] focus:bg-white text-slate-900 font-medium"
                   />
                 </div>
 
@@ -374,6 +387,9 @@ export default function StudentLoginPage() {
                   </label>
                   <input
                     type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    pattern="[0-9]*"
                     required
                     maxLength={6}
                     value={otpCode}
@@ -393,7 +409,11 @@ export default function StudentLoginPage() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="At least 6 characters"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2874f0] focus:bg-white text-slate-900 font-medium"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    autoComplete="new-password"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#2874f0] focus:bg-white text-slate-900 font-medium"
                   />
                 </div>
 
@@ -407,7 +427,11 @@ export default function StudentLoginPage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Re-enter new password"
-                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2874f0] focus:bg-white text-slate-900 font-medium"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    autoComplete="new-password"
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#2874f0] focus:bg-white text-slate-900 font-medium"
                   />
                 </div>
 

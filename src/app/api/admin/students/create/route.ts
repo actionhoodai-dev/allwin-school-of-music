@@ -85,6 +85,7 @@ export async function POST(request: Request) {
       joiningDate: joiningDate || new Date().toISOString().split('T')[0],
       status: 'active',
       mustChangePassword: Boolean(mustChangePassword),
+      initialPassword: cleanPassword, // Stored to guarantee first login matches admin-assigned password
       notes: notes || '',
       monthlyFee: Number(monthlyFee) || 2000,
       createdAt: serverTimestamp(),

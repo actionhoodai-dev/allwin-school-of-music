@@ -29,7 +29,7 @@ import { normalizeStudentId, getStudentAuthEmail } from '@/lib/utils/student-id'
 export async function enablePersistentSession(): Promise<void> {
   try {
     if (typeof window !== 'undefined') {
-      await setPersistence(auth, browserLocalPersistence);
+      await setPersistence(auth, browserLocalPersistence).catch(() => {});
     }
   } catch (err) {
     console.warn('[Auth] Persistence setup notice:', err);
@@ -114,9 +114,16 @@ export async function signInStudent(identifier: string, password: string): Promi
   const authEmail = foundStudent.email || getStudentAuthEmail(foundStudent.studentId);
   let user: User;
 
-  // 2. Check for pending password reset (from OTP reset flow)
+  // 2. Check for pending password reset (from OTP reset flow) or admin initial password
   const hasPendingReset = !!(foundStudent as any).pendingPasswordReset;
   const pendingPassword = (foundStudent as any).pendingPasswordReset;
+  const initialPassword = (foundStudent as any).initialPassword;
+  const phonePassword = foundStudent.parentPhone ? foundStudent.parentPhone.trim() : '';
+
+  // Check if entered password matches admin-assigned initial credentials
+  const matchesInitialPassword =
+    (initialPassword && cleanPassword === initialPassword.trim()) ||
+    (phonePassword && cleanPassword === phonePassword);
 
   // 3. Authenticate or seamlessly initialize credentials on first login
   try {
@@ -130,48 +137,67 @@ export async function signInStudent(identifier: string, password: string): Promi
       }).catch(() => {});
     }
   } catch (authErr: any) {
-    // If not registered in Firebase Auth yet, automatically activate account with initial password
+    // If not registered in Firebase Auth yet, or password was assigned by admin / OTP reset
     if (
       authErr.code === 'auth/user-not-found' ||
       authErr.code === 'auth/invalid-credential' ||
       authErr.code === 'auth/invalid-login-credentials'
     ) {
-      // If there's a pending password reset and the user entered the new password, honour it
+      // Helper function to create fresh auth credential seamlessly
+      const createFreshAuthUser = async (targetEmail: string) => {
+        try {
+          const newCred = await createUserWithEmailAndPassword(auth, targetEmail, cleanPassword);
+          return newCred.user;
+        } catch (createErr: any) {
+          if (createErr.code === 'auth/email-already-in-use') {
+            const cleanId = foundStudent.studentId.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const freshEmail = `student.${cleanId}_v${Date.now()}@allwinschoolofmusic.internal`;
+            const freshCred = await createUserWithEmailAndPassword(auth, freshEmail, cleanPassword);
+            if (foundStudent.id) {
+              await updateDoc(doc(db, 'students', foundStudent.id), {
+                email: freshEmail,
+                uid: freshCred.user.uid,
+              }).catch(() => {});
+            }
+            return freshCred.user;
+          }
+          throw createErr;
+        }
+      };
+
       if (hasPendingReset && cleanPassword === pendingPassword) {
         try {
-          const cleanId = foundStudent.studentId.toLowerCase().replace(/[^a-z0-9]/g, '');
-          const freshEmail = `student.${cleanId}_v${Date.now()}@allwinschoolofmusic.internal`;
-          const newCred = await createUserWithEmailAndPassword(auth, freshEmail, cleanPassword);
-          user = newCred.user;
+          user = await createFreshAuthUser(authEmail);
           if (foundStudent.id) {
             await updateDoc(doc(db, 'students', foundStudent.id), {
-              email: freshEmail,
               uid: user.uid,
               pendingPasswordReset: null,
             }).catch(() => {});
           }
         } catch (createErr: any) {
-          console.error('[Auth] Failed to update user with reset password:', createErr);
+          console.error('[Auth] Failed to complete password reset login:', createErr);
           throw new Error('Failed to complete password reset login. Please try again.');
         }
-      } else if (!foundStudent.uid) {
+      } else if (matchesInitialPassword || !foundStudent.uid) {
+        // Enrolled student logging in with admin-assigned password for the first time
         try {
-          const newCred = await createUserWithEmailAndPassword(auth, authEmail, cleanPassword);
-          user = newCred.user;
-        } catch (createErr: any) {
-          if (createErr.code === 'auth/email-already-in-use') {
-            if (hasPendingReset) {
-              throw new Error(`Incorrect password. Your password was recently reset via OTP. Please use the new password you set during password recovery.`);
-            }
-            throw new Error('Incorrect password. If you forgot your password, please click "Forgot Password?" below to reset it.');
+          user = await createFreshAuthUser(authEmail);
+          if (foundStudent.id) {
+            await updateDoc(doc(db, 'students', foundStudent.id), {
+              uid: user.uid,
+            }).catch(() => {});
           }
-          throw createErr;
+        } catch (createErr: any) {
+          console.error('[Auth] Account activation error:', createErr);
+          throw new Error(
+            createErr.message ||
+            'Could not activate student account. Please verify password length (at least 6 characters) or contact administration.'
+          );
         }
       } else {
-        if (hasPendingReset) {
-          throw new Error('Incorrect password. Your password was recently reset via OTP. Please use the new password you set during password recovery.');
-        }
-        throw new Error('Incorrect password. Please verify your password or use "Forgot Password?" below to receive a reset code.');
+        throw new Error(
+          'Incorrect password. Please verify the password provided during enrollment, or use "Forgot Password?" below to receive an OTP reset code.'
+        );
       }
     } else {
       throw authErr;

@@ -21,10 +21,10 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
   const [showPasswordChange, setShowPasswordChange] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user && !hasCachedSession) {
-      router.push('/student-login');
+    if (!loading && !user && !student && !hasCachedSession) {
+      window.location.href = '/student-login';
     }
-  }, [user, loading, hasCachedSession, router]);
+  }, [user, student, loading, hasCachedSession]);
 
   useEffect(() => {
     if (student?.mustChangePassword) {
@@ -34,9 +34,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     }
   }, [student?.mustChangePassword]);
 
-  if (loading) {
+  if (loading && !student) {
     return (
-      <div className="min-h-screen bg-[#f1f3f6] flex flex-col items-center justify-center p-6 text-slate-900 text-center select-none">
+      <div className="min-h-[100dvh] bg-[#f1f3f6] flex flex-col items-center justify-center p-6 text-slate-900 text-center select-none">
         <div className="relative w-20 h-20 mb-4 animate-pulse">
           <Image
             src="/logo.png"
@@ -55,17 +55,17 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
     );
   }
 
-  if (!user) {
+  if (!user && !student) {
     return null;
   }
 
   return (
-    <div className="min-h-screen bg-[#f1f3f6] text-slate-900 flex flex-col">
+    <div className="min-h-[100dvh] bg-[#f1f3f6] text-slate-900 flex flex-col">
       {/* Top Application Bar */}
       <StudentTopBar />
 
       {/* Main Content Area — optimized for 390px mobile-first width while gracefully scaling to desktop */}
-      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 pb-28 sm:pb-24">
+      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 pb-32 sm:pb-24">
         {children}
       </main>
 

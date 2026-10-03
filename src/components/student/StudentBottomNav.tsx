@@ -72,6 +72,7 @@ export default function StudentBottomNav() {
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 select-none pb-safe shadow-[0_-2px_10px_rgba(0,0,0,0.06)]"
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 6px)' }}
       aria-label="Mobile Bottom Navigation"
     >
       <div className="max-w-md mx-auto px-3 py-2 flex items-center justify-around">
