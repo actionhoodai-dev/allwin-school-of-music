@@ -24,13 +24,13 @@ import Button from '@/components/ui/Button';
 
 export default function StudentLoginPage() {
   const router = useRouter();
-  const { signIn, user } = useStudentAuth();
+  const { signIn, user, student } = useStudentAuth();
 
   useEffect(() => {
-    if (user) {
+    if (user || student) {
       router.replace('/student');
     }
-  }, [user, router]);
+  }, [user, student, router]);
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -55,7 +55,8 @@ export default function StudentLoginPage() {
     e.preventDefault();
     setError('');
 
-    if (!identifier.trim()) {
+    const cleanIdentifier = identifier.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+    if (!cleanIdentifier) {
       setError('Please enter your Student ID (e.g. ASM101) or email.');
       return;
     }
@@ -67,9 +68,9 @@ export default function StudentLoginPage() {
 
     setLoading(true);
     try {
-      await signIn(identifier.trim(), password);
-      // Hard navigation ensures clean session hydration on iOS Safari
-      window.location.href = '/student';
+      await signIn(cleanIdentifier, password);
+      // Seamless client-side navigation preserves in-memory auth state on iOS Safari
+      router.replace('/student');
     } catch (err: any) {
       console.error('Student login error:', err);
       setError(

@@ -8,7 +8,20 @@ import { collection, addDoc, serverTimestamp, query, where, getDocs } from 'fire
 import { reserveNextStudentId, getStudentAuthEmail } from '@/lib/utils/student-id';
 import { getLevelForGrade } from '@/lib/constants';
 
+// In-memory debouncing map to prevent simultaneous duplicate creations on rapid double-clicks
+const pendingSubmissions = new Map<string, number>();
+
+function cleanupPendingSubmissions() {
+  const now = Date.now();
+  for (const [key, timestamp] of pendingSubmissions.entries()) {
+    if (now - timestamp > 20000) {
+      pendingSubmissions.delete(key);
+    }
+  }
+}
+
 export async function POST(request: Request) {
+  let dedupeKey = '';
   try {
     const body = await request.json();
     const {
@@ -40,6 +53,17 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    dedupeKey = `${String(name).trim().toLowerCase()}:::${String(parentEmail).trim().toLowerCase()}`;
+    cleanupPendingSubmissions();
+    const lastAttempt = pendingSubmissions.get(dedupeKey);
+    if (lastAttempt && Date.now() - lastAttempt < 6000) {
+      return NextResponse.json(
+        { success: false, error: 'A student enrollment for this name and email is currently being processed. Please wait a moment.' },
+        { status: 429 }
+      );
+    }
+    pendingSubmissions.set(dedupeKey, Date.now());
 
     // Check if student with identical name & parent email already exists
     const duplicateQuery = query(
@@ -114,6 +138,9 @@ export async function POST(request: Request) {
       message: `Student account created successfully with ID ${studentId}.`,
     });
   } catch (error: any) {
+    if (dedupeKey) {
+      pendingSubmissions.delete(dedupeKey);
+    }
     console.error('[Create Student API Error]', error);
     return NextResponse.json(
       { success: false, error: error.message || 'Failed to create student account' },

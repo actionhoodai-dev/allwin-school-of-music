@@ -24,12 +24,14 @@ import {
   Save,
   CheckCircle2,
   AlertCircle,
+  AlertTriangle,
   ExternalLink,
   X,
 } from 'lucide-react';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminAttendanceCalendar from '@/components/admin/AdminAttendanceCalendar';
 import StudentFormModal from '@/components/admin/StudentFormModal';
+import DeleteStudentModal from '@/components/admin/DeleteStudentModal';
 import ImageUploader from '@/components/admin/ImageUploader';
 import Button from '@/components/ui/Button';
 import {
@@ -81,6 +83,12 @@ export default function AdminStudentWorkspacePage({
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // Helper to ensure evaluations are strictly sorted by date descending (latest first)
+  const sortProgressReportsDesc = (list: ProgressReport[]): ProgressReport[] => {
+    return [...list].sort((a, b) => (b.assessmentDate || '').localeCompare(a.assessmentDate || ''));
+  };
 
   // Collections state
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
@@ -229,7 +237,8 @@ export default function AdminStudentWorkspacePage({
       );
       setAttendance(deduplicatedAtt);
       setSchedules(schedSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
-      setProgressReports(progSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
+      const rawProgress = progSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as ProgressReport[];
+      setProgressReports(sortProgressReportsDesc(rawProgress));
       setAchievements(achSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })));
 
       const rawFees = feeSnap.docs.map((d: any) => ({ id: d.id, ...d.data() })) as StudentFeeItem[];
@@ -344,20 +353,22 @@ export default function AdminStudentWorkspacePage({
         createdAt: serverTimestamp(),
       }).catch(() => {});
 
-      setProgressReports((prev) => [
-        {
-          id: docRef.id,
-          studentId: student.studentId,
-          course: student.course,
-          instrument: student.instrument,
-          title: `Evaluation - ${newProgress.assessmentDate}`,
-          assessmentDate: newProgress.assessmentDate,
-          todaysClass: newProgress.todaysClass,
-          practiceWork: newProgress.practiceWork,
-          songsCovered: newProgress.songsCovered,
-        },
-        ...prev,
-      ]);
+      setProgressReports((prev) =>
+        sortProgressReportsDesc([
+          {
+            id: docRef.id,
+            studentId: student.studentId,
+            course: student.course,
+            instrument: student.instrument,
+            title: `Evaluation - ${newProgress.assessmentDate}`,
+            assessmentDate: newProgress.assessmentDate,
+            todaysClass: newProgress.todaysClass,
+            practiceWork: newProgress.practiceWork,
+            songsCovered: newProgress.songsCovered,
+          },
+          ...prev,
+        ])
+      );
       setNewProgress({
         assessmentDate: new Date().toISOString().split('T')[0],
         todaysClass: '',
@@ -385,16 +396,18 @@ export default function AdminStudentWorkspacePage({
       });
 
       setProgressReports((prev) =>
-        prev.map((r) =>
-          r.id === editingProgress.id
-            ? {
-                ...r,
-                assessmentDate: editProgressForm.assessmentDate,
-                todaysClass: editProgressForm.todaysClass,
-                practiceWork: editProgressForm.practiceWork,
-                songsCovered: editProgressForm.songsCovered,
-              }
-            : r
+        sortProgressReportsDesc(
+          prev.map((r) =>
+            r.id === editingProgress.id
+              ? {
+                  ...r,
+                  assessmentDate: editProgressForm.assessmentDate,
+                  todaysClass: editProgressForm.todaysClass,
+                  practiceWork: editProgressForm.practiceWork,
+                  songsCovered: editProgressForm.songsCovered,
+                }
+              : r
+          )
         )
       );
       setEditingProgress(null);
@@ -756,6 +769,16 @@ export default function AdminStudentWorkspacePage({
               <span>Test Student Login</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>
+
+            <button
+              type="button"
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 active:bg-red-200 text-red-600 border border-red-200 text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all active:translate-y-0.5 active:scale-95 cursor-pointer"
+              title={`Permanently delete student ${student.studentId}`}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Delete Student</span>
+            </button>
           </div>
         </div>
 
@@ -1139,7 +1162,7 @@ export default function AdminStudentWorkspacePage({
                   No evaluations posted yet for this student. Click &ldquo;Add Grade Evaluation&rdquo; above.
                 </div>
               ) : (
-                progressReports.map((r) => (
+                sortProgressReportsDesc(progressReports).map((r) => (
                   <div key={r.id} className="p-5 rounded-2xl bg-white border border-border shadow-xs flex flex-col sm:flex-row items-start justify-between gap-4">
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-2">
@@ -1899,6 +1922,41 @@ export default function AdminStudentWorkspacePage({
                   Flag for Reset
                 </button>
               </div>
+
+              {/* Danger Zone: Permanently Delete Student */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-red-50/70 border-2 border-red-200 space-y-3 mt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-300 text-red-600 flex items-center justify-center shrink-0 mt-0.5 shadow-inner">
+                      <AlertTriangle className="w-5 h-5 text-red-600 animate-pulse" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-300">
+                          Permanent Deletion
+                        </span>
+                      </div>
+                      <span className="font-bold text-red-900 block text-sm mt-0.5">
+                        Permanently Delete Student ID ({student.studentId})
+                      </span>
+                      <p className="text-red-700/90 text-xs mt-0.5 leading-relaxed">
+                        Permanently delete this specific student record and all associated records (fees, attendance, schedules, evaluations).
+                      </p>
+                      <p className="text-[11px] text-slate-600 mt-1">
+                        ⚠️ <strong>Duplicate Safety:</strong> Only this specific account (<strong className="font-mono text-red-800">{student.studentId}</strong>) will be purged. Any duplicate registration with the same name under a different ID will remain safe and untouched.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsDeleteModalOpen(true)}
+                    className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs shadow-md shadow-red-600/20 flex items-center gap-2 shrink-0 transition-all active:scale-95 cursor-pointer self-start sm:self-center"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete Student Permanently</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
@@ -1910,6 +1968,16 @@ export default function AdminStudentWorkspacePage({
         onClose={() => setIsEditModalOpen(false)}
         onSuccess={(updated) => setStudent({ ...student, ...updated })}
         editingStudent={student}
+      />
+
+      {/* Delete Student Modal */}
+      <DeleteStudentModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onSuccess={() => {
+          router.push('/admin/students');
+        }}
+        student={student}
       />
     </div>
   );

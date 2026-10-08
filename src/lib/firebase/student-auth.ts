@@ -24,23 +24,18 @@ import type { Student } from '@/types/student';
 import { normalizeStudentId, getStudentAuthEmail } from '@/lib/utils/student-id';
 
 /**
- * Ensures Firebase session stays persistently active like a mobile application
+ * Persistence is configured declaratively in initializeAuth (config.ts).
+ * Repeated dynamic calls to setPersistence are avoided to prevent session dropping on iOS Safari.
  */
 export async function enablePersistentSession(): Promise<void> {
-  try {
-    if (typeof window !== 'undefined') {
-      await setPersistence(auth, browserLocalPersistence).catch(() => {});
-    }
-  } catch (err) {
-    console.warn('[Auth] Persistence setup notice:', err);
-  }
+  // Configured in config.ts via initializeAuth
 }
 
 /**
  * Finds a student Firestore record by their Student ID (e.g. ASM101) or Email
  */
 export async function findStudentByLoginIdentifier(identifier: string): Promise<Student | null> {
-  const clean = identifier.trim();
+  const clean = identifier.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
   if (!clean) return null;
 
   try {
@@ -92,9 +87,7 @@ export async function findStudentByLoginIdentifier(identifier: string): Promise<
  * Signs in a student or parent using Student ID (ASM101) or Email + Password
  */
 export async function signInStudent(identifier: string, password: string): Promise<{ user: User; student: Student }> {
-  await enablePersistentSession();
-
-  const cleanIdentifier = identifier.trim();
+  const cleanIdentifier = identifier.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
   const cleanPassword = password.trim();
 
   if (!cleanIdentifier || !cleanPassword) {

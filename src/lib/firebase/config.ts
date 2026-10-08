@@ -23,12 +23,12 @@ const firebaseConfig = {
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Multi-tier persistence: IndexedDB with LocalStorage fallback for mobile browsers
+// Multi-tier persistence: LocalStorage primary with IndexedDB fallback for iOS/WebKit stability
 export const auth = (() => {
   if (typeof window !== 'undefined') {
     try {
       return initializeAuth(app, {
-        persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+        persistence: [browserLocalPersistence, indexedDBLocalPersistence],
       });
     } catch {
       return getAuth(app);

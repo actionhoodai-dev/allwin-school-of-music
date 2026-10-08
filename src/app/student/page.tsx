@@ -107,12 +107,14 @@ export default function StudentDashboardPage() {
         // 4. Progress / Latest Grade Evaluation
         const progQuery = query(
           collection(db, 'progressReports'),
-          where('studentId', '==', studentId),
-          limit(1)
+          where('studentId', '==', studentId)
         );
         const progSnap = await getDocs(progQuery).catch(() => ({ docs: [] } as any));
         if (!progSnap.empty) {
-          setLatestReport({ id: progSnap.docs[0].id, ...progSnap.docs[0].data() } as ProgressReport);
+          const sortedProgs = progSnap.docs
+            .map((d: any) => ({ id: d.id, ...d.data() }) as ProgressReport)
+            .sort((a: any, b: any) => (b.assessmentDate || '').localeCompare(a.assessmentDate || ''));
+          setLatestReport(sortedProgs[0]);
         }
 
         // 5. Announcements

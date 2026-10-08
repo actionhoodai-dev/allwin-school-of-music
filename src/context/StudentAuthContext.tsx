@@ -47,6 +47,35 @@ interface StudentAuthContextType {
 
 const StudentAuthContext = createContext<StudentAuthContextType | undefined>(undefined);
 
+const STUDENT_PROFILE_KEY = 'allwin_student_profile';
+const BADGES_KEY = 'allwin_section_badges';
+
+function getStoredStudent(): Student | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(STUDENT_PROFILE_KEY);
+    return raw ? (JSON.parse(raw) as Student) : null;
+  } catch {
+    return null;
+  }
+}
+
+function setStoredStudent(data: Student | null): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (data) {
+      localStorage.setItem(STUDENT_PROFILE_KEY, JSON.stringify(data));
+      // Backup session cookie for Safari resilience across Private Browsing / WebKit storage partitioning
+      document.cookie = `allwin_student_session=${encodeURIComponent(data.studentId)}; path=/; max-age=2592000; SameSite=Lax`;
+    } else {
+      localStorage.removeItem(STUDENT_PROFILE_KEY);
+      document.cookie = 'allwin_student_session=; path=/; max-age=0; SameSite=Lax';
+    }
+  } catch (err) {
+    console.warn('[StudentAuth] Storage write notice:', err);
+  }
+}
+
 export function StudentAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [student, setStudent] = useState<Student | null>(null);
@@ -55,15 +84,16 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<StudentNotification[]>([]);
   const [sectionBadges, setSectionBadges] = useState<SectionBadgeState>({});
 
-  // Load cached student profile and badge state
+  // Load cached student profile and badge state immediately on mount
   useEffect(() => {
+    const cached = getStoredStudent();
+    if (cached) {
+      setStudent(cached);
+      setHasCachedSession(true);
+      setLoading(false);
+    }
     try {
-      const cached = localStorage.getItem('allwin_student_profile');
-      if (cached) {
-        setStudent(JSON.parse(cached));
-        setHasCachedSession(true);
-      }
-      const cachedBadges = localStorage.getItem('allwin_section_badges');
+      const cachedBadges = localStorage.getItem(BADGES_KEY);
       if (cachedBadges) {
         setSectionBadges(JSON.parse(cachedBadges));
       }
@@ -84,7 +114,7 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
         const d = uidSnap.docs[0];
         const studentData = { id: d.id, ...d.data() } as Student;
         setStudent(studentData);
-        localStorage.setItem('allwin_student_profile', JSON.stringify(studentData));
+        setStoredStudent(studentData);
         return studentData;
       }
 
@@ -99,7 +129,7 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
           const d = emailSnap.docs[0];
           const studentData = { id: d.id, ...d.data() } as Student;
           setStudent(studentData);
-          localStorage.setItem('allwin_student_profile', JSON.stringify(studentData));
+          setStoredStudent(studentData);
           return studentData;
         }
       }
@@ -112,37 +142,29 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    let graceTimeout: NodeJS.Timeout | null = null;
-    enablePersistentSession();
-
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        if (graceTimeout) clearTimeout(graceTimeout);
         setUser(firebaseUser);
         setHasCachedSession(true);
-        await fetchStudentForUser(firebaseUser);
+        const fresh = await fetchStudentForUser(firebaseUser);
+        if (fresh) {
+          setStudent(fresh);
+          setStoredStudent(fresh);
+        }
         setLoading(false);
       } else {
-        // If student profile is cached, give mobile Chrome a grace period to reconnect
-        // rather than immediately destroying the local session on first tick
-        const cached = localStorage.getItem('allwin_student_profile');
-        if (cached && !auth.currentUser) {
-          if (graceTimeout) clearTimeout(graceTimeout);
-          graceTimeout = setTimeout(() => {
-            if (auth.currentUser) {
-              setUser(auth.currentUser);
-              setLoading(false);
-            } else {
-              setStudent(null);
-              setHasCachedSession(false);
-              localStorage.removeItem('allwin_student_profile');
-              setLoading(false);
-            }
-          }, 2500);
+        // Firebase Auth reports no active user. Check if we have an active student profile.
+        // On iOS Safari / WebKit, avoid deleting the session due to slow token initialization.
+        const cached = getStoredStudent();
+        if (cached) {
+          setUser(null);
+          setStudent(cached);
+          setHasCachedSession(true);
+          setLoading(false);
         } else {
+          setUser(null);
           setStudent(null);
           setHasCachedSession(false);
-          localStorage.removeItem('allwin_student_profile');
           setLoading(false);
         }
       }
@@ -151,14 +173,12 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible' && auth.currentUser) {
         setUser(auth.currentUser);
-        setLoading(false);
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
-      if (graceTimeout) clearTimeout(graceTimeout);
       unsubscribe();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
@@ -170,8 +190,12 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
     const unsub = onSnapshot(doc(db, 'students', student.id), (snap) => {
       if (snap.exists()) {
         const updated = { id: snap.id, ...snap.data() } as Student;
+        if (updated.status === 'inactive' || updated.status === 'paused' || updated.status === 'relieved') {
+          signOut();
+          return;
+        }
         setStudent(updated);
-        localStorage.setItem('allwin_student_profile', JSON.stringify(updated));
+        setStoredStudent(updated);
       }
     });
     return () => unsub();
@@ -350,7 +374,7 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
       setUser(authedUser);
       setStudent(studentData);
       setHasCachedSession(true);
-      localStorage.setItem('allwin_student_profile', JSON.stringify(studentData));
+      setStoredStudent(studentData);
     } finally {
       setLoading(false);
     }
@@ -358,13 +382,15 @@ export function StudentAuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     setHasCachedSession(false);
-    await signOutStudent();
+    setStoredStudent(null);
+    try {
+      localStorage.removeItem(BADGES_KEY);
+    } catch {}
     setUser(null);
     setStudent(null);
     setNotifications([]);
     setSectionBadges({});
-    localStorage.removeItem('allwin_student_profile');
-    localStorage.removeItem('allwin_section_badges');
+    await signOutStudent().catch(() => {});
   };
 
   const refreshStudent = async () => {

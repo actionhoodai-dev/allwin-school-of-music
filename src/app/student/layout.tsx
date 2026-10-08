@@ -22,9 +22,9 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     if (!loading && !user && !student && !hasCachedSession) {
-      window.location.href = '/student-login';
+      router.replace('/student-login');
     }
-  }, [user, student, loading, hasCachedSession]);
+  }, [user, student, loading, hasCachedSession, router]);
 
   useEffect(() => {
     if (student?.mustChangePassword) {

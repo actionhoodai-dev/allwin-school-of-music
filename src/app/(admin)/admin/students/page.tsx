@@ -21,9 +21,13 @@ import {
   Sparkles,
   ExternalLink,
   Edit,
+  Trash2,
+  AlertTriangle,
+  CheckCircle2,
 } from 'lucide-react';
 import AdminHeader from '@/components/admin/AdminHeader';
 import StudentFormModal from '@/components/admin/StudentFormModal';
+import DeleteStudentModal from '@/components/admin/DeleteStudentModal';
 import Button from '@/components/ui/Button';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
@@ -38,6 +42,8 @@ export default function AdminStudentsPage() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [statusAlert, setStatusAlert] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     loadStudents();
@@ -59,6 +65,18 @@ export default function AdminStudentsPage() {
 
   const handleStudentCreatedOrUpdated = (savedStudent: Student) => {
     loadStudents();
+  };
+
+  const handleDeleteSuccess = (deletedStudentId: string, studentName: string) => {
+    setStudents((prev) =>
+      prev.filter((s) => s.studentId !== deletedStudentId && s.id !== studentToDelete?.id)
+    );
+    setStatusAlert({
+      message: `Student account for ${studentName} (${deletedStudentId}) has been permanently deleted.`,
+      type: 'success',
+    });
+    setTimeout(() => setStatusAlert(null), 5000);
+    setStudentToDelete(null);
   };
 
   // Filter students
@@ -90,6 +108,22 @@ export default function AdminStudentsPage() {
       <AdminHeader title="Student Directory & Accounts" />
 
       <main className="p-6 sm:p-8 space-y-5 max-w-7xl w-full mx-auto">
+        {/* Status Alert Banner */}
+        {statusAlert && (
+          <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center justify-between shadow-xs animate-fade-in">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span>{statusAlert.message}</span>
+            </div>
+            <button
+              onClick={() => setStatusAlert(null)}
+              className="text-emerald-600 hover:text-emerald-800 text-xs font-bold cursor-pointer"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {/* Top Action Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
@@ -262,20 +296,31 @@ export default function AdminStudentsPage() {
 
                 {/* Actions Bottom Bar */}
                 <div className="pt-3 border-t border-slate-100 dark:border-white/10 flex items-center justify-between gap-2">
-                  <button
-                    onClick={() => {
-                      setSelectedStudent(student);
-                      setIsModalOpen(true);
-                    }}
-                    className="px-3.5 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white text-xs font-bold shadow-md shadow-violet-600/25 flex items-center gap-1.5 transition-all active:translate-y-0.5 active:scale-95 cursor-pointer"
-                  >
-                    <Edit className="w-3.5 h-3.5" />
-                    <span>Edit Info</span>
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => {
+                        setSelectedStudent(student);
+                        setIsModalOpen(true);
+                      }}
+                      className="px-3 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 active:bg-violet-700 text-white text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all active:translate-y-0.5 active:scale-95 cursor-pointer"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setStudentToDelete(student)}
+                      className="p-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 dark:bg-red-950/40 dark:hover:bg-red-900/50 dark:text-red-400 border border-red-200 dark:border-red-900/40 transition-colors active:scale-95 cursor-pointer"
+                      title={`Permanently delete student ${student.studentId}`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
 
                   <Link
                     href={`/admin/students/${student.studentId || student.id}`}
-                    className="px-4 py-2 rounded-xl bg-[#2874f0] hover:bg-blue-600 active:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition-all active:translate-y-0.5 active:scale-95"
+                    className="px-3.5 py-2 rounded-xl bg-[#2874f0] hover:bg-blue-600 active:bg-blue-700 text-white text-xs font-bold shadow-md shadow-blue-600/25 flex items-center gap-1.5 transition-all active:translate-y-0.5 active:scale-95"
                   >
                     <span>Open Workspace</span>
                     <ChevronRight className="w-3.5 h-3.5" />
@@ -293,6 +338,14 @@ export default function AdminStudentsPage() {
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleStudentCreatedOrUpdated}
         editingStudent={selectedStudent}
+      />
+
+      {/* Permanent Delete Confirmation Modal */}
+      <DeleteStudentModal
+        isOpen={!!studentToDelete}
+        onClose={() => setStudentToDelete(null)}
+        onSuccess={handleDeleteSuccess}
+        student={studentToDelete}
       />
     </div>
   );

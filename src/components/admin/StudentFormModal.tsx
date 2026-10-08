@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   X,
   User,
@@ -12,6 +12,7 @@ import {
   Phone,
   Sparkles,
   AlertCircle,
+  Loader2,
 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import ImageUploader from '@/components/admin/ImageUploader';
@@ -101,10 +102,17 @@ export default function StudentFormModal({
     }
   }, [editingStudent, isOpen]);
 
+  const isSubmittingRef = useRef(false);
+
+  useEffect(() => {
+    isSubmittingRef.current = false;
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmittingRef.current || loading) return;
     setError('');
 
     if (!formData.name.trim()) {
@@ -116,6 +124,7 @@ export default function StudentFormModal({
       return;
     }
 
+    isSubmittingRef.current = true;
     setLoading(true);
     try {
       const normalizedPayload = {
@@ -151,6 +160,7 @@ export default function StudentFormModal({
     } catch (err: any) {
       setError(err.message || 'An error occurred while saving student.');
     } finally {
+      isSubmittingRef.current = false;
       setLoading(false);
     }
   };
@@ -486,7 +496,14 @@ export default function StudentFormModal({
               Cancel
             </button>
             <Button type="submit" disabled={loading} size="sm">
-              {loading ? 'Saving Student...' : editingStudent ? 'Update Details' : 'Enroll Student'}
+              {loading ? (
+                <span className="flex items-center gap-1.5">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span>{editingStudent ? 'Saving Details...' : 'Enrolling Student...'}</span>
+                </span>
+              ) : (
+                editingStudent ? 'Update Details' : 'Enroll Student'
+              )}
             </Button>
           </div>
         </form>

@@ -185,7 +185,7 @@ export default function StudentTopBar({ title, showBack, backHref }: StudentTopB
                       onClick={async () => {
                         setProfileMenuOpen(false);
                         await signOut();
-                        window.location.href = '/student-login';
+                        router.push('/student-login');
                       }}
                       className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-xs active:scale-95 transition-all mt-1.5 cursor-pointer"
                     >
